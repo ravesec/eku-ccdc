@@ -1,0 +1,10 @@
+/root/bu/
+/dev/
+/proc/
+/sys/
+/tmp/
+/run/
+/mnt/
+/media/
+/var/log/
+/lost+found

@@ -1,0 +1,1 @@
+* * * * * sha1sum -c /tmp/checksums | grep -v "OK" >> /var/log/checksums.log

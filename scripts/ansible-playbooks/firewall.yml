@@ -1,0 +1,16 @@
+---
+- hosts: firewall
+  vars:
+    provider:
+      api_key: "LUFRPT15bnBiVGpjcisvb2djYUEwSTlxanlDR1orR2s9MEJGb1J6NDNPc1pZeElneWRicTA3cHRtWHEzeGNPdkJvUjRNeE9takRMR3dtWXVLMWh3OXJnQkdQS0xKeW9SMg=="
+      ip_address: "192.168.1.41"
+      password: "Changeme!"
+      port: 443
+      username: "admin"
+  remote_user: admin
+  gather_facts: no
+  tasks:
+    - name: Show all logged in admins
+      paloaltonetworks.panos.panos_op:
+        provider: '{{ provider }}'
+        cmd: 'show admins'

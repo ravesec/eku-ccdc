@@ -5,6 +5,7 @@
   gather_facts: no
 
   vars:
+    external_ip_address: "172.31.41.2/29"
     provider:
       ip_address: "192.168.1.41"
       password: "Changeme!"
@@ -36,16 +37,51 @@
 
     - name: Commit Changes
       paloaltonetworks.panos.panos_commit_firewall:
+        provider: '{{ provider }}' 
+
+    - name: Set Ethernet1/1 (PUBLIC) Management Profile
+      paloaltonetworks.panos.panos_interface:
         provider: '{{ provider }}'
+        if_name: "ethernet1/1"
+        zone_name: "Public"
+        management_profile: "Allow-Ping"
+        ip: "172.20.241.254/24"
+        enable_dhcp: false
+        comment: "Public"
+        state: replaced
 
-    - name: Kill all admin sessions
-      paloaltonetworks.panos.panos_op:
+    - name: Set Ethernet1/2 (INTERNAL) Management Profile
+      paloaltonetworks.panos.panos_interface:
         provider: '{{ provider }}'
-        cmd: 'delete admin-sessions'
-        ignore_disconnect: true
-          
+        if_name: "ethernet1/2"
+        zone_name: "Internal"
+        management_profile: "Allow-Ping"
+        ip: "172.20.240.254/24"
+        enable_dhcp: false
+        comment: "Internal"
+        state: replaced
 
+    - name: Set Ethernet1/3 (EXTERNAL) Management Profile
+      paloaltonetworks.panos.panos_interface:
+        provider: '{{ provider }}'
+        if_name: "ethernet1/3"
+        zone_name: "External"
+        management_profile: "Nothing"
+        ip: '{{ external_ip_address }}'
+        enable_dhcp: false
+        comment: "External"
+        state: replaced
 
+    - name: Set Ethernet1/4 (USER) Management Profile
+      paloaltonetworks.panos.panos_interface:
+        provider: '{{ provider }}'
+        if_name: "ethernet1/4"
+        zone_name: "User"
+        management_profile: "Allow-HTTPS-SSH-Ping"
+        ip: "172.20.242.254/24"
+        enable_dhcp: false
+        comment: "User"
+        state: replaced
 
 
 

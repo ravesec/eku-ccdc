@@ -1,0 +1,51 @@
+---
+- hosts: firewall
+  connection: local
+  remote_user: admin
+  gather_facts: no
+
+  vars:
+    provider:
+      ip_address: "192.168.1.41"
+      password: "Changeme!"
+      port: 443
+      username: "admin"
+
+  
+  tasks:
+    - name: Create Allow-Ping Management Profile
+      paloaltonetworks.panos.panos_management_profile:
+        provider: '{{ provider }}'
+        name: 'Allow-Ping'
+        ping: true
+        permitted_ip: ['172.20.240.0/24', '172.20.241.0/24', '172.20.242.0/24']
+
+    - name: Create Allow-HTTPS-SSH-Ping Management Profile
+      paloaltonetworks.panos.panos_management_profile:
+        provider: '{{ provider }}'
+        name: 'Allow-HTTPS-SSH-Ping'
+        https: true
+        ssh: true
+        ping: true
+        permitted_ip: ['172.20.242.0/24']
+
+    - name: Create Nothing Management Profile
+      paloaltonetworks.panos.panos_management_profile:
+        provider: '{{ provider }}'
+        name: 'Nothing'
+
+    - name: Commit Changes
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: '{{ provider }}'
+
+    - name: Kill all admin sessions
+      paloaltonetworks.panos.panos_op:
+        provider: '{{ provider }}'
+        cmd: 'delete admin-sessions'
+        ignore_disconnect: true
+          
+
+
+
+
+

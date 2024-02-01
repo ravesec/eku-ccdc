@@ -35,7 +35,7 @@
         provider: '{{ provider }}'
         name: 'Nothing'
 
-    - name: Commit Changes
+    - name: Commit Management Profile Changes
       paloaltonetworks.panos.panos_commit_firewall:
         provider: '{{ provider }}' 
 
@@ -82,6 +82,234 @@
         enable_dhcp: false
         comment: "User"
         state: replaced
+
+    - name: Commit Interface Changes
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: '{{ provider }}'
+
+    - name: Create Web Traffic Application Group
+      paloaltonetworks.panos.panos_application_group:
+        provider: '{{ provider }}'
+        name: 'web-traffic'
+        value:
+          - web-browsing
+          - ssl
+          - git
+          - github
+
+    - name: Create Windows Updates Application Group
+      paloaltonetworks.panos.panos_application_group:
+        provider: '{{ provider }}'
+        name: 'windows-updates'
+        value:
+          - ms-update
+
+    - name: Create Linux Updates Application Group
+      paloaltonetworks.panos.panos_application_group:
+        provider: '{{ provider }}'
+        name: 'linux-updates'
+        value:
+          - apt-get
+          - yum
+
+    - name: Create Webmail Application Group
+      paloaltonetworks.panos.panos_application_group:
+        provider: '{{ provider }}'
+        name: 'webmail'
+        value:
+          - smtp
+          - pop3
+          - imap
+
+    - name: Create ICMP-Ping Application Group
+      paloaltonetworks.panos.panos_application_group:
+        provider: '{{ provider }}'
+        name: 'icmp-ping'
+        value:
+          - icmp
+          - ipv6-icmp
+          - ping
+
+    - name: Create Active Directory Application Group
+      paloaltonetworks.panos.panos_application_group:
+        provider: '{{ provider }}'
+        name: 'windows-active-directory'
+        value:
+          - active-directory
+          - ldap
+          - ms-ds-smb
+          - kerberos
+
+    - name: Create Placeholder Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'placeholder'
+        value: '169.254.74.75/32'
+        description: 'Placeholder IP address for the blacklist group'
+
+    - name: Create Public Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'public-net'
+        value: '172.20.241.0/24'
+        description: 'The public subnet'
+
+    - name: Create User Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'user-net'
+        value: '172.20.242.0/24'
+        description: 'The user subnet'
+
+    - name: Create Internal Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'internal-net'
+        value: '172.20.240.0/24'
+        description: 'The internal subnet'
+
+    - name: Create 2016 Docker/Remote Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'docker-remote'
+        value: '172.20.240.10/24'
+        description: '2016 Docker/Remote Machine'
+
+    - name: Create Debian 10 DNS/NTP Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'debian-dns-ntp'
+        value: '172.20.240.20/24'
+        description: 'Debian 10 DNS/NTP Machine'
+
+    - name: Create Ubuntu 18 Web Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'ubuntu-web'
+        value: '172.20.242.10/24'
+        description: 'Ubuntu 18 Web Machine'
+
+    - name: Create 2019 AD/DNS/DHCP Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'windows-server-2019'
+        value: '172.20.242.200/24'
+        description: '2019 AD/DNS/DHCP Machine'
+
+    - name: Create Splunk 9.1.1 Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'splunk'
+        value: '172.20.241.20/24'
+        description: 'Splunk 9.1.1 Machine'
+
+    - name: Create CentOS 7 E-comm Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'centos-ecomm'
+        value: '172.20.241.30/24'
+        description: 'CentOS 7 E-Comm Machine'
+
+    - name: Create Fedora 21 Webmail/WebApps Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'fedora-webmail'
+        value: '172.20.241.40/24'
+        description: 'Fedora 21 Webmail/WebApps Machine'
+
+    - name: Create IP-Address Blacklist Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'blacklist'
+        static_value: ['placeholder']
+
+    - name: Create All Machines Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'all-company-machines'
+        static_value: ['docker-remote', 'debian-dns-ntp', 'ubuntu-web', 'windows-server-2019', 'splunk', 'centos-ecomm', 'fedora-webmail']
+
+    - name: Create Internal Network Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'internal-subnet'
+        static_value: ['docker-remote', 'debian-dns-ntp']
+
+    - name: Create User Network Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'user-subnet'
+        static_value: ['ubuntu-web', 'windows-server-2019']
+
+    - name: Create Public Network Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'public-subnet'
+        static_value: ['splunk', 'centos-ecomm', 'fedora-webmail']
+
+    - name: Create Internal DNS Servers Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'internal-dns-servers'
+        static_value: ['debian-dns-ntp', 'windows-server-2019']
+
+    - name: Create Internal NTP Servers Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'internal-ntp-servers'
+        static_value: ['debian-dns-ntp']
+
+    - name: Create Splunk Web Service Object
+      paloaltonetworks.panos.panos_service_object:
+        provider: '{{ provider }}'
+        name: 'splunk-web-service'
+        destination_port: '8000'
+        description: 'Splunk web ui service'
+
+    - name: Create Splunk Management Service Object
+      paloaltonetworks.panos.panos_service_object:
+        provider: '{{ provider }}'
+        name: 'splunk-management-service'
+        destination_port: '8089'
+        description: 'Splunk management and rest api service'
+
+    - name: Create Splunk Indexing Service Object
+      paloaltonetworks.panos.panos_service_object:
+        provider: '{{ provider }}'
+        name: 'splunk-indexing-service'
+        destination_port: '9997'
+        description: 'Splunk indexing service'
+
+    - name: Create Splunk Index Replication Service Object
+      paloaltonetworks.panos.panos_service_object:
+        provider: '{{ provider }}'
+        name: 'splunk-index-replication-service'
+        destination_port: '8080'
+        description: 'Splunk index replication service'
+
+    - name: Create Splunk Syslog Service Object
+      paloaltonetworks.panos.panos_service_object:
+        provider: '{{ provider }}'
+        name: 'splunk-syslog-service'
+        destination_port: '514'
+        description: 'Splunk syslog network input service'
+
+    - name: Create Splunk Services Group
+      paloaltonetworks.panos.panos_service_group:
+        provider: '{{ provider }}'
+        name: 'splunk-services'
+        value: ['splunk-web-service', 'splunk-management-service', 'splunk-indexing-service', 'splunk-index-replication-service', 'splunk-syslog-service']
+
+    - name: Commit Object Group Changes
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: '{{ provider }}'
+
+
+
+
+
+
+
 
 
 

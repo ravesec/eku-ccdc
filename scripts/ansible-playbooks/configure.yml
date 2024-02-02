@@ -35,9 +35,9 @@
         provider: '{{ provider }}'
         name: 'Nothing'
 
-    - name: Commit Management Profile Changes
-      paloaltonetworks.panos.panos_commit_firewall:
-        provider: '{{ provider }}' 
+          #- name: Commit Management Profile Changes
+          #paloaltonetworks.panos.panos_commit_firewall:
+          #provider: '{{ provider }}' 
 
     - name: Set Ethernet1/1 (PUBLIC) Management Profile
       paloaltonetworks.panos.panos_interface:
@@ -300,9 +300,129 @@
         name: 'splunk-services'
         value: ['splunk-web-service', 'splunk-management-service', 'splunk-indexing-service', 'splunk-index-replication-service', 'splunk-syslog-service']
 
-    - name: Commit Object Group Changes
-      paloaltonetworks.panos.panos_commit_firewall:
+          #- name: Commit Object Group Changes
+          #paloaltonetworks.panos.panos_commit_firewall:
+          #provider: '{{ provider }}'
+
+    - name: Create Splunk Syslog Profile
+      paloaltonetworks.panos.panos_type_cmd:
         provider: '{{ provider }}'
+        xpath: |
+          /config/shared/log-settings/syslog/entry[@name='Splunk Syslog Profile']
+          /server/entry[@name='splunk-server']
+        element: |
+          <server>172.20.241.20</server>
+          <format>BSD</format>
+          <port>1738</port>
+          <transport>TCP</transport>
+          <facility>LOG_USER</facility>
+
+    - name: Create Splunk Log Forwarding Profile
+      paloaltonetworks.panos.panos_log_forwarding_profile:
+        provider: '{{ provider }}'
+        name: 'Splunk Log Forwarding'
+        enhanced_logging: false
+
+    - name: Create Splunk Traffic Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-traffic'
+        description: 'Splunk syslog traffic log forwarding'
+        log_type: 'traffic'
+        syslog_profiles: ['Splunk Syslog Profile']
+        filter: "(addr.src in '10.0.0.0/8')"
+
+    - name: Create Splunk Auth Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-auth'
+        description: 'Splunk syslog auth log forwarding'
+        log_type: 'auth'
+        syslog_profiles: ['Splunk Syslog Profile']
+        filter: "(ip in '10.0.0.0/8')"
+
+    - name: Create Splunk Data Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-data'
+        description: 'Splunk syslog data log forwarding'
+        log_type: 'data'
+        syslog_profiles: ['Splunk Syslog Profile']
+        filter: "(addr in '10.0.0.0/8')"
+
+          #- name: Create Splunk Decryption Match List
+          #paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+          #provider: '{{ provider }}'
+          #log_forwarding_profile: 'Splunk Log Forwarding'
+          #name: 'sp-decryption'
+          #description: 'Splunk syslog decryption log forwarding'
+          #log_type: 'decryption'
+          #syslog_profiles: ['Splunk Syslog Profile']
+
+    - name: Create Splunk Threat Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-threat'
+        description: 'Splunk syslog threat log forwarding'
+        log_type: 'threat'
+        syslog_profiles: ['Splunk Syslog Profile']
+
+    - name: Create Splunk Tunnel Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-tunnel'
+        description: 'Splunk syslog tunnel log forwarding'
+        log_type: 'tunnel'
+        syslog_profiles: ['Splunk Syslog Profile']
+
+    - name: Create Splunk URL Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-url'
+        description: 'Splunk syslog URL log forwarding'
+        log_type: 'url'
+        syslog_profiles: ['Splunk Syslog Profile']
+
+    - name: Create Splunk Wildfire Match List
+      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+        provider: '{{ provider }}'
+        log_forwarding_profile: 'Splunk Log Forwarding'
+        name: 'sp-wildfire'
+        description: 'Splunk syslog wildfire log forwarding'
+        log_type: 'wildfire'
+        syslog_profiles: ['Splunk Syslog Profile']
+
+          #    - name: Commit Log Forwarding Settings
+          #paloaltonetworks.panos.panos_commit_firewall:
+          #provider: '{{ provider }}'
+
+    - name: Create 'servers to splunk' Security Rule
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Servers to Splunk'
+        description: 'Allow all company servers to forward logs to splunk.'
+        source_zone: ['Internal', 'Public', 'User']
+        source_ip: ['all-company-machines']
+        destination_zone: ['Public']
+        destination_ip: ['splunk']
+        application: ['any']
+        service: ['splunk-indexing-service', 'splunk-syslog-service']
+        action: 'allow'
+        location: 'bottom'
+
+
+
+
+
+
+
+
 
 
 

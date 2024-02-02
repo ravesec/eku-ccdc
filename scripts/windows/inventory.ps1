@@ -1,6 +1,6 @@
 $ErrorActionPreference = "SilentlyContinue"
 
-$ipv6 = Read-Host "LETS GET READY TO RUMBLEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE`nAre you all using IPv6? (y/N)" 
+$ipv6 = Read-Host "Are you all using IPv6? (y/N)" 
 if($ipv6 -inotlike "y*")
 {
     $ipv6 = $false
@@ -49,18 +49,22 @@ Invoke-Command -ScriptBlock {
     $netframeworks = Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name Version -EA 0 | Where-Object { $_.PSChildName -Match '^(?!S)\p{L}'} | Select-Object PSChildName, Version
     Write-Output "`t.NET Framework Verisons:"
 
-    foreach($netframework in $netframeworks){
+    foreach($netframework in $netframeworks)
+    {
         Write-Output "`t`t$($netframework.PSChildName): $($netframework.Version)"
     }
 
     Write-Output "`n--Interface Information--"
     $interfaces = Get-NetAdapter
 
-    foreach($interface in $interfaces){
+    foreach($interface in $interfaces)
+    {
         Write-Output "`n`tInterface $($interface.Name)"
-        if($interface.Status -ne 'Disabled'){
+        if($interface.Status -ne 'Disabled')
+        {
             Write-Output "`t`tIP Address(es): $((Get-NetIPAddress -InterfaceAlias $interface.Name).IPAddress)"
-        } else {
+        } else
+        {
             Write-Output "`t`tThis interface is in a disabled state."
         }
         Write-Output "`t`tEthernet Address: $($interface.MacAddress)"
@@ -81,7 +85,8 @@ Invoke-Command -ScriptBlock {
         $udpephermeral = Get-NetUDPEndpoint | Where-Object { $_.LocalAddress -notlike '*:*' -and $_.LocalPort -ge '49152' } | Sort-Object LocalPort, LocalAddress
     }
 
-    foreach($tcpconnection in $tcpconnections) {
+    foreach($tcpconnection in $tcpconnections)
+    {
         $process = Get-Process -Id $tcpconnection.OwningProcess -ErrorAction SilentlyContinue
         [PSCustomObject]@{
             LocalAddress = $tcpconnection.LocalAddress
@@ -92,7 +97,8 @@ Invoke-Command -ScriptBlock {
     
     Write-Output "^^^^^^^^^ TCP ^^^^^^^^^"
 
-    foreach($udpconnection in $udpconnections) {
+    foreach($udpconnection in $udpconnections)
+    {
         $process = Get-Process -Id $udpconnection.OwningProcess -ErrorAction SilentlyContinue
         [PSCustomObject]@{
             LocalAddress = $udpconnection.LocalAddress

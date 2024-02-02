@@ -663,10 +663,7 @@ function BruteForceUpdating_Click
 
         function AfterDate_Enter
         {
-          # CHANGE THIS IN THE FUTURE PLEASEEEEEEEEEEEEEEEEE
-
-          #$csvDate = $windowUpdate.FindName("AfterDate").Text
-          $script:csvUpdates = Import-Csv $selectedFile | Where-Object {$_.Hyperlinks -like "*2023*"}
+          # Needs improvement
         }
 
         $windowUpdate.FindName("SecurityUpdates").Add_Click({ SecurityUpdates_Click; $windowUpdate.close() })

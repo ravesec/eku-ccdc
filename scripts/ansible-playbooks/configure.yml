@@ -35,10 +35,6 @@
         provider: '{{ provider }}'
         name: 'Nothing'
 
-          #- name: Commit Management Profile Changes
-          #paloaltonetworks.panos.panos_commit_firewall:
-          #provider: '{{ provider }}' 
-
     - name: Set Ethernet1/1 (PUBLIC) Management Profile
       paloaltonetworks.panos.panos_interface:
         provider: '{{ provider }}'
@@ -147,21 +143,21 @@
         value: '169.254.74.75/32'
         description: 'Placeholder IP address for the blacklist group'
 
-    - name: Create Public Address Object
+    - name: Create Public Network Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
         name: 'public-net'
         value: '172.20.241.0/24'
         description: 'The public subnet'
 
-    - name: Create User Address Object
+    - name: Create User Network Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
         name: 'user-net'
         value: '172.20.242.0/24'
         description: 'The user subnet'
 
-    - name: Create Internal Address Object
+    - name: Create Internal Network Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
         name: 'internal-net'
@@ -223,11 +219,23 @@
         name: 'blacklist'
         static_value: ['placeholder']
 
+    - name: Create GUIs Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'guis'
+        static_value: ['windows-server-2019', 'debian-dns-ntp', 'docker-remote']
+
+    - name: Create SNMP Server Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'snmp-server'
+        static_value: ['placeholder']
+
     - name: Create All Machines Address Group
       paloaltonetworks.panos.panos_address_group:
         provider: '{{ provider }}'
         name: 'all-company-machines'
-        static_value: ['docker-remote', 'debian-dns-ntp', 'ubuntu-web', 'windows-server-2019', 'splunk', 'centos-ecomm', 'fedora-webmail']
+        static_value: ['docker-remote', 'debian-dns-ntp', 'ubuntu-web', 'windows-server-2019', 'splunk', 'centos-ecomm', 'fedora-webmail', 'user-net']
 
     - name: Create Internal Network Address Group
       paloaltonetworks.panos.panos_address_group:
@@ -300,10 +308,6 @@
         name: 'splunk-services'
         value: ['splunk-web-service', 'splunk-management-service', 'splunk-indexing-service', 'splunk-index-replication-service', 'splunk-syslog-service']
 
-          #- name: Commit Object Group Changes
-          #paloaltonetworks.panos.panos_commit_firewall:
-          #provider: '{{ provider }}'
-
     - name: Create Splunk Syslog Profile
       paloaltonetworks.panos.panos_type_cmd:
         provider: '{{ provider }}'
@@ -370,15 +374,16 @@
         description: 'Splunk syslog threat log forwarding'
         log_type: 'threat'
         syslog_profiles: ['Splunk Syslog Profile']
+        filter: "(addr in '10.0.0.0/8')"
 
-    - name: Create Splunk Tunnel Match List
-      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
-        provider: '{{ provider }}'
-        log_forwarding_profile: 'Splunk Log Forwarding'
-        name: 'sp-tunnel'
-        description: 'Splunk syslog tunnel log forwarding'
-        log_type: 'tunnel'
-        syslog_profiles: ['Splunk Syslog Profile']
+          #- name: Create Splunk Tunnel Match List
+          #paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
+          #provider: '{{ provider }}'
+          #log_forwarding_profile: 'Splunk Log Forwarding'
+          #name: 'sp-tunnel'
+          #description: 'Splunk syslog tunnel log forwarding'
+          #log_type: 'tunnel'
+          #syslog_profiles: ['Splunk Syslog Profile']
 
     - name: Create Splunk URL Match List
       paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
@@ -388,24 +393,173 @@
         description: 'Splunk syslog URL log forwarding'
         log_type: 'url'
         syslog_profiles: ['Splunk Syslog Profile']
+        filter: "(addr in '10.0.0.0/8')"
 
-    - name: Create Splunk Wildfire Match List
-      paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
-        provider: '{{ provider }}'
-        log_forwarding_profile: 'Splunk Log Forwarding'
-        name: 'sp-wildfire'
-        description: 'Splunk syslog wildfire log forwarding'
-        log_type: 'wildfire'
-        syslog_profiles: ['Splunk Syslog Profile']
-
-          #    - name: Commit Log Forwarding Settings
-          #paloaltonetworks.panos.panos_commit_firewall:
+          #- name: Create Splunk Wildfire Match List
+          #paloaltonetworks.panos.panos_log_forwarding_profile_match_list:
           #provider: '{{ provider }}'
+          #log_forwarding_profile: 'Splunk Log Forwarding'
+          #name: 'sp-wildfire'
+          #description: 'Splunk syslog wildfire log forwarding'
+          #log_type: 'wildfire'
+          #syslog_profiles: ['Splunk Syslog Profile']
 
-    - name: Create 'servers to splunk' Security Rule
+    - name: Delete Default 'any2any' Security Policy
+      paloaltonetworks.panos.panos_type_cmd:
+        provider: '{{ provider }}'
+        cmd: 'delete'
+        xpath: |
+          /config/devices/entry[@name='localhost.localdomain']
+          /vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry[@name='any2any']
+
+    - name: Delete Default 'PUBLIC2EXTERNAL' Security Policy
+      paloaltonetworks.panos.panos_type_cmd:
+        provider: '{{ provider }}'
+        cmd: 'delete'
+        xpath: |
+          /config/devices/entry[@name='localhost.localdomain']
+          /vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry[@name='PUBLIC2EXTERNAL']
+
+    - name: Delete Default 'PUBLIC2INTERNAL' Security Policy
+
+      paloaltonetworks.panos.panos_type_cmd:
+        provider: '{{ provider }}'
+        cmd: 'delete'
+        xpath: |
+          /config/devices/entry[@name='localhost.localdomain']
+          /vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry[@name='PUBLIC2INTERNAL']
+
+    - name: Delete Default 'INTERNAL2PUBLIC' Security Policy
+      paloaltonetworks.panos.panos_type_cmd:
+        provider: '{{ provider }}'
+        cmd: 'delete'
+        xpath: |
+          /config/devices/entry[@name='localhost.localdomain']
+          /vsys/entry[@name='vsys1']
+          /rulebase/security/rules/entry[@name='INTERNAL2PUBLIC']
+
+    - name: Reconfigure Default Interzone Security Policy
+      paloaltonetworks.panos.panos_type_cmd:
+        provider: '{{ provider }}'
+        xpath: |
+          /config/devices/entry[@name='localhost.localdomain']
+          /vsys/entry[@name='vsys1']
+          /rulebase/default-security-rules/rules/entry[@name='interzone-default']
+        element: |
+          <action>drop</action>
+          <icmp-unreachable>yes</icmp-unreachable>
+          <log-end>yes</log-end>
+          <log-start>yes</log-start>
+          <log-setting>Splunk Log Forwarding</log-setting>
+
+    - name: Commit Security Policy Changes
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: '{{ provider }}'
+
+    - name: Reset All Sessions
+      paloaltonetworks.panos.panos_op:
+        provider: '{{ provider }}'
+        cmd: 'clear session all'
+
+    - name: Create 'Block Outbound Blacklisted IPs' Security Policy
       paloaltonetworks.panos.panos_security_rule:
         provider: '{{ provider }}'
-        rule_name: 'Servers to Splunk'
+        rule_name: 'Deny blacklisted egress'
+        description: 'Drop traffic with a blacklisted destination address from escaping the network.'
+        source_zone: ['Internal', 'Public', 'User']
+        source_ip: ['any']
+        destination_zone: ['External']
+        destination_ip: ['blacklist']
+        application: ['any']
+        service: ['any']
+        action: 'drop'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+    - name: Create 'Block Inbound Blacklisted IPs' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Deny blacklisted ingress'
+        description: 'Drop traffic with a blacklisted source address from entering the network.'
+        source_zone: ['External']
+        source_ip: ['blacklist']
+        destination_zone: ['Internal', 'Public', 'User']
+        destination_ip: ['any']
+        application: ['any']
+        service: ['any']
+        action: 'drop'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+    - name: Create 'Outbound Company Traffic' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Company Traffic Egress'
+        description: 'Controls which traffic is permitted to exit the company perimeter.'
+        source_zone: ['Internal', 'Public', 'User']
+        source_ip: ['any']
+        destination_zone: ['External']
+        destination_ip: ['any']
+        application: ['dns', 'ntp', 'windows-updates', 'linux-updates', 'web-traffic', 'webmail', 'icmp-ping']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+    - name: Create 'External to Public' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'External to Public'
+        description: 'Controls which traffic is permitted to access the public network from the external network.'
+        source_zone: ['External']
+        source_ip: ['any']
+        destination_zone: ['Public']
+        destination_ip: ['public-subnet']
+        application: ['icmp-ping', 'linux-updates', 'web-traffic', 'webmail']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+    - name: Create 'External to User' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'External to User'
+        description: 'Controls which traffic is permitted to access the user network from the external network.'
+        source_zone: ['External']
+        source_ip: ['any']
+        destination_zone: ['User']
+        destination_ip: ['user-net']
+        application: ['dns', 'icmp-ping', 'linux-updates', 'web-traffic', 'windows-updates']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+    - name: Create 'External to Internal' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'External to Internal'
+        description: 'Controls which traffic is permitted to access the internal network from the external network.'
+        source_zone: ['External']
+        source_ip: ['any']
+        destination_zone: ['Internal']
+        destination_ip: ['internal-subnet']
+        application: ['dns', 'icmp-ping', 'linux-updates', 'ntp', 'web-traffic', 'windows-updates']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+    - name: Create 'Internal Servers to Splunk' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow servers to splunk'
         description: 'Allow all company servers to forward logs to splunk.'
         source_zone: ['Internal', 'Public', 'User']
         source_ip: ['all-company-machines']
@@ -414,22 +568,106 @@
         application: ['any']
         service: ['splunk-indexing-service', 'splunk-syslog-service']
         action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
+          # - name: Create 'Splunk to Internal Servers' Security Policy
 
+    - name: Create 'Servers to DNS/NTP' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow servers to DNS and NTP'
+        description: 'Allow all company servers to communicate with internal DNS and NTP servers.'
+        source_zone: ['Internal', 'Public', 'User']
+        source_ip: ['all-company-machines']
+        destination_zone: ['Internal', 'User']
+        destination_ip: ['internal-dns-servers', 'internal-ntp-servers']
+        application: ['dns', 'ntp']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
 
+    - name: Create 'DNS/NTP to Servers' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow DNS and NTP to servers'
+        description: 'Allow internal DNS and NTP servers to communicate with all company machines.'
+        source_zone: ['User', 'Internal']
+        source_ip: ['internal-dns-servers', 'internal-ntp-servers']
+        destination_zone: ['Internal', 'User', 'Public']
+        destination_ip: ['all-company-machines']
+        application: ['dns', 'ntp']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
 
+    - name: Create 'Webmail to Active Directory' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow Webmail to Active Directory'
+        description: 'Allow the webmail/webapps server to communicate with the active directory server.'
+        source_zone: ['Public']
+        source_ip: ['fedora-webmail']
+        destination_zone: ['User']
+        destination_ip: ['windows-server-2019']
+        application: ['windows-active-directory']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
 
+    - name: Create 'Active Directory to Webmail' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow Active Directory to Webmail'
+        description: 'Allow the active directory server to communicate with the webmail/webapps server.'
+        source_zone: ['User']
+        source_ip: ['windows-server-2019']
+        destination_zone: ['Public']
+        destination_ip: ['fedora-webmail']
+        application: ['windows-active-directory']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
 
+    - name: Create 'GUIs to Splunk' Security Policy # Combine bi-directionality into one rule
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow GUIs to Splunk'
+        description: 'Allow all company machines with a GUI to access the internal Splunk server.'
+        source_zone: ['Internal', 'User', 'Public']
+        source_ip: ['all-company-machines']
+        destination_zone: ['Public']
+        destination_ip: ['splunk']
+        application: ['any']
+        service: ['splunk-services']
+        action: 'allow'
+        location: 'bottom'
 
+      # - name: Create 'Splunk to GUIs' Security Policy
 
+    - name: Create 'Internal Servers to SNMP Server' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'Allow Servers to SNMP'
+        description: 'Allow all internal machines to communicate with the internal SNMP server.'
+        source_zone: ['Internal', 'User', 'Public']
+        source_ip: ['all-company-machines']
+        destination_zone: ['Internal', 'User']
+        destination_ip: ['snmp-server']
+        application: ['snmp']
+        action: 'allow'
+        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
 
+    # - name: Create 'SNMP Server to Internal Servers' Security Policy
 
-
-
-
-
-
-
-
+    - name: Commit Security Policy Changes
+      paloaltonetworks.panos.panos_commit_firewall:
+        provider: '{{ provider }}'
 

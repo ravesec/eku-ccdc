@@ -9,7 +9,7 @@
 # Usage: 
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
-then echo "This script must be ran as root!" >&2
+then echo -e "\e[31mERROR: This script must be ran as root!\e[0m" >&2
     exit 1
 fi
 

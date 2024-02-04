@@ -1,0 +1,5 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =3
+let g:netrw_dirhist_3='/home/raven/ccdc/eku-ccdc/config_files'
+let g:netrw_dirhist_2='/home/raven/ccdc/crabshack/scripts/linux/staging/debian'
+let g:netrw_dirhist_1='/home/raven/test'

@@ -34,7 +34,7 @@ fi
 mkdir -p $backup_dir
 
 # Check if the argument is a valid file or directory.
-if [ -d "$1" ] || [ -f "$1" ] then;
+if [ -d "$1" ] || [ -f "$1" ]; then
     # Create a backup and save a hash of the generated archive
     
     echo "\e[32m Creating a backup of '$1'..."

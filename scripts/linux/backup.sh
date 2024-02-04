@@ -37,10 +37,10 @@ mkdir -p $backup_dir
 if [ -d "$1" ] || [ -f "$1" ]; then
     # Create a backup and save a hash of the generated archive
     
-    echo "\e[32m Creating a backup of '$1'..."
+    echo "\e[32m Creating a backup of '$1'...\e[0m"
     backup_path="$backup_dir/$(basename $1).tar.gz"
     tar -czvf $backup_path $1
-    sha256sum $backup_path
+    sha256sum $backup_path > $backup_dir/$(basename $1)-checksum
 
     # Make the backups and relevant files immutable to protect backup integrity
     chattr +i $backup_path $(basename $1)-checksum

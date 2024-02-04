@@ -9,26 +9,27 @@
 # Created: 02/04/2024
 # Usage: <./backup.sh <directory>>
 
-usage="\e[31mUsage: ./backup.sh <directory>\e[0m"
+script_name="backup.sh"
+usage="\e[31mUsage: ./$script_name <directory>\e[0m"
+
+# Import environment variables
+. ../../config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
-then echo -e "\e[31mERROR: This script must be ran as root!\e[0m" >&2
+then echo "\e[31mError: This script must be ran as root!\e[0m" >&2
     exit 1
 fi
 
-# Import environment variables
-. ../../config_files/env
-
 # Check for the correct number of arguments
 if [ "$#" -ne 1 ]
-then echo -e $usage
+then echo $usage
     exit 1
 fi
 
 # Check if the directory is valid
 if [[ ! -d $1 ]]
 then
-    echo -e "\e[31m'$1' is not a valid directory. Exiting!\e[0m"
+    echo "\e[31m'$1' is not a valid directory. Exiting!\e[0m" >&2
     exit 1
 fi
 
@@ -42,6 +43,9 @@ sha256sum $backup_dir/$backup_name.tar.gz > $backup_dir/$backup_name-checksum
 
 # Recursively change file attributes to protect backup integrity
 chattr -R +i $backup_dir/
+
+# Backup complete!
+echo "\e[32mThe backup of '$1' was completed successfully!\e[0m"
 
 exit 0 # Script ended successfully
 

@@ -3,10 +3,13 @@
 # Author: <author(s)>
 # script_name.sh
 #
-# Descriptions:
+# Description:
+# 
 #
 # Created: MM/DD/YYYY
-# Usage: 
+# Usage: <./script_name.sh <args>>
+
+usage="./script_name.sh <args>"
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then echo -e "\e[31mERROR: This script must be ran as root!\e[0m" >&2

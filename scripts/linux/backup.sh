@@ -42,7 +42,8 @@ tar -czvf $backup_dir/$backup_name.tar.gz $1
 sha256sum $backup_dir/$backup_name.tar.gz > $backup_dir/$backup_name-checksum
 
 # Recursively change file attributes to protect backup integrity
-chattr -R +i $backup_dir/
+chattr -R +i $backup_dir/$backup_name.tar.gz
+chattr +i $backup_dir/$backup_name-checksum
 
 # Backup complete!
 echo "\e[32mThe backup of '$1' was completed successfully!\e[0m"

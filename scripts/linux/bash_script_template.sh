@@ -9,7 +9,7 @@
 # Created: MM/DD/YYYY
 # Usage: <./script_name.sh <args>>
 
-usage="./script_name.sh <args>"
+usage="\e[31m./script_name.sh <args>\e[0m"
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then echo -e "\e[31mERROR: This script must be ran as root!\e[0m" >&2

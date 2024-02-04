@@ -1,4 +1,6 @@
 backup_dir="/root/backups"
 identifier="[\e[33m$script_name\e[0m]"
 
-alias echo='echo -e $identifier '
+echo() {
+    command echo -e "$identifier $*"
+}

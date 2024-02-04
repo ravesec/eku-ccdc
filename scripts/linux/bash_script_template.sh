@@ -17,6 +17,8 @@ then echo -e "\e[31mERROR: This script must be ran as root!\e[0m" >&2
     exit 1
 fi
 
+# Import environment variables
+. ../../config_files/env
 
 # Main script here...
 

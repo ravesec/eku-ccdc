@@ -3,7 +3,7 @@
 # Author: Raven Dean
 # backup.sh
 #
-# Description: This script creates a backup of the file or directory passed in the arguments.
+# Description: This script creates a backup of the directory passed in the arguments.
 #  This script works in tandem with ./restore.sh 
 #
 # Created: 02/04/2024

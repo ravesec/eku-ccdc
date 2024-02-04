@@ -16,6 +16,9 @@ then echo -e "\e[31mERROR: This script must be ran as root!\e[0m" >&2
     exit 1
 fi
 
+# Import environment variables
+. ../../config_files/env
+
 # Check for the correct number of arguments
 if [ "$#" -ne 1 ]
 then echo -e $usage
@@ -30,7 +33,6 @@ then
 fi
 
 # Create the backup directory if it doesn't exit already
-backup_dir="/root/backups"
 mkdir -p $backup_dir
 
 # Backup the directory and save a hash of the generated archive

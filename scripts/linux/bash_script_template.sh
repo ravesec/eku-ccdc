@@ -3,8 +3,9 @@
 # Author: <author(s)>
 # script_name.sh
 #
-# Description: A template for bash scripts created by Raven Dean. NOTE that the echo command is overriden to identify the script
-#  that is putting output on the terminal.
+# Description: A template for bash scripts created by Raven Dean. NOTE that the echo 
+#  command is overriden in ../../config_files/ekurc to identify the script that is
+#  putting output on the terminal.
 #
 # Dependencies: N/A
 # Created: MM/DD/YYYY

@@ -44,7 +44,7 @@ if [ -d "$1" ] || [ -f "$1" ]; then
     backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
     checksum_path="$backup_dir/$(basename $1)-$(date +%s)-checksum"
 
-    if [ ! $(dirname $1) -eq "/" ]
+    if [ $(dirname $1) != "/" ]
     then
         original_dir="$(dirname $(realpath $1))/"
         echo "\e[36m DEBUG: First condition\e[0m"

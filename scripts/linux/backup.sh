@@ -1,16 +1,18 @@
 #!/bin/bash
 
 # Author: Raven Dean
-# backup.sh
+# Script: backup.sh
 #
 # Description: This script creates a backup of the files and directories passed in the arguments.
 #  This script works in tandem with ./restore.sh 
 #
+# Dependencies: ../../config_files/ekurc
+#
 # Created: 02/04/2024
 # Usage: <./backup.sh <directory>>
 
-#TODO: Add support for overwriting previous backups
-#TODO: Ask for user confirmation to overwrite a previous backup unlesss --confirm is set
+#TODO: [x] Add support for overwriting previous backups
+#TODO: [x] Ask for user confirmation to overwrite a previous backup
 #TODO: [x] Add support for files
 #TODO: [x] Add support for infinite arguments
 script_name="backup.sh"
@@ -34,7 +36,9 @@ fi
 umask 027 # rw-r-----
 mkdir -p $backup_dir # Backup directory
 touch $backup_dir/map # Map to original location
+touch $backup_dir/checksums # sha256sums
 chattr +a $backup_dir/map # Make the map file immutable and appendable only
+chattr +a $backup_dir/checksums
 
 # For each argument, check if the argument is a valid file or directory.
 for item in "$@"
@@ -43,16 +47,42 @@ do
         info "Creating backups..."
 
         # Variable definitions. 
-        # Notes:
         # The usage of 'date' is not to timestamp archives, but to make sure that no naming collisions occur when backing up multiple files with the same name. Also note that there is still a chance of collision if multiple files with the same name are backed up in the same second.
         backup_path="$backup_dir/$(basename $item)-$(date +%s).tar.gz"
-        checksum_path="$backup_dir/$(basename $item)-$(date +%s)-checksum"
+        checksum_path="$backup_dir/checksums"
         original_dir="$(dirname $(realpath $item))"
 
         # If the original directory is not the root directory, append a /
         if [ $(dirname $item) != "/" ]
         then
             original_dir="$original_dir/"
+        fi
+
+        # If the item already exists in the map, show a warning and confirm the overwrite
+        grep --quiet "$(realpath item)" $backup_dir/map
+        if [ "$?" -eq 0 ]
+        then
+            warning "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."
+            read -n 1 -s key
+
+            if [ $key != "" ]
+            then
+                information "Skipping '$item'!"
+                continue
+            else # Dereference the old backup and continue.
+                read $map_backup_path $unused_vars < $(grep "$(realpath item)" $backup_dir/map)
+                
+                # Remove the immutability.
+                chattr -ia $map_backup_path $backup_dir/checksums $backup_dir/map
+
+                # Rename the original backup and remove it's relevant information
+                mv $map_backup_path $map_backup_path~
+                sed -i '/$map_backup_path/d' $backup_dir/checksums $backup_dir/map
+
+                # Restore immutability
+                chattr +i $map_backup_path
+                chattr +a $backup_dir/checksums $backup_dir/map
+            fi
         fi
 
         # Create the archive, generate it's hash, and store the original file location for later restoration
@@ -68,11 +98,11 @@ do
             continue
         fi
 
-        sha256sum $backup_path > $checksum_path
-        printf "$backup_path $original_dir $item\n" >> $backup_dir/map
+        sha256sum $backup_path > $backup_path/checksums
+        printf "$backup_path $original_dir $(realpath item)\n" >> $backup_dir/map
 
-        # Make the backups and relevant files immutable to protect backup integrity
-        chattr +i $backup_path $checksum_path
+        # Make the backup immutable to protect backup integrity
+        chattr +i $backup_path
 
         # Backup complete!
         success "The backup of '$(realpath $item)' was completed successfully!"

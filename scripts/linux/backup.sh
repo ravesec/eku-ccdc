@@ -36,14 +36,15 @@ mkdir -p $backup_dir # Backup directory
 touch $backup_dir/map # Map to original location
 chattr +a $backup_dir/map # Make the map file immutable and appendable only
 
-# Check if the argument is a valid file or directory.
+# For each argument, check if the argument is a valid file or directory.
 for item in "$@"
 do
     if [ -d "$item" ] || [ -f "$item" ]; then
-        #echo "\e[33m Creating a backup of '$item'...\e[0m"
         info "Creating a backup of '$item'..."
 
-        # Variable definitions. The usage of 'date' is not to timestamp archives, but to make sure that no naming collisions occur when backing up multiple files with the same name. NOTE: There is still a chance of collision if multiple files with the same name are backed up in the same second.
+        # Variable definitions. 
+        # Notes:
+        # The usage of 'date' is not to timestamp archives, but to make sure that no naming collisions occur when backing up multiple files with the same name. Also note that there is still a chance of collision if multiple files with the same name are backed up in the same second.
         backup_path="$backup_dir/$(basename $item)-$(date +%s).tar.gz"
         checksum_path="$backup_dir/$(basename $item)-$(date +%s)-checksum"
         original_dir="$(dirname $(realpath $item))"
@@ -55,7 +56,18 @@ do
         fi
 
         # Create the archive, generate it's hash, and store the original file location for later restoration
-        tar -czvf $backup_path $item
+        tar -czf $backup_path $item
+        if [ ! "$?" -eq 0 ]
+        then
+            # Something went wrong while making the backup. Abort the process and continue to the next item.
+            error "Archiving failed for '$item'. Aborting backup." >&2
+            rm -f $backup_path
+            chattr -a $backup_dir/map
+            sed -i '/$backup_path/d' $backup_dir/map
+            chattr +a $backup_dir/map
+            continue
+        fi
+
         sha256sum $backup_path > $checksum_path
         printf "$backup_path $original_dir\n" >> $backup_dir/map
 

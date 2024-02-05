@@ -47,10 +47,8 @@ if [ -d "$1" ] || [ -f "$1" ]; then
     if [ $(dirname $1) != "/" ]
     then
         original_dir="$(dirname $(realpath $1))/"
-        echo "\e[36m DEBUG: First condition\e[0m"
     else
         original_dir="$(dirname $(realpath $1))"
-        echo "\e[36m DEBUG: Else condition\e[0m"
     fi
 
     tar -czvf $backup_path $1

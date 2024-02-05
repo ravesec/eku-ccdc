@@ -1,6 +1,35 @@
 backup_dir="/root/backups"
 identifier="[\e[33m$script_name\e[0m]"
 
-echo() {
-    command echo -e "$identifier $*"
+#echo() {
+#    command echo -e "$identifier $*"
+#}
+
+info() {
+    # Cyan
+    echo -e "$identifier\e[36m $*\e[0m"
 }
+
+debug() {
+    # Blue
+    echo -e "$identifier\e[34m $*\e[0m"
+}
+
+warning() {
+    # Yellow
+    echo -e "$identifier\e[33m $*\e[0m"
+}
+
+error() {
+    # Red
+    echo -e "$identifier\e[31m $*\e[0m"
+}
+
+success() {
+    # Green
+    echo -e "$identifier\e[32m $*\e[0m"
+}
+
+#TODO Create a function to restart services
+#TODO more documentation
+#TODO determine what service manager is on the os and store it

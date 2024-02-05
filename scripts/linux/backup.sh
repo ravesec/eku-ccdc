@@ -25,7 +25,7 @@ then error "This script must be ran as root!" >&2
 fi
 
 # Check for the correct number of arguments
-if [ "$#" -ne 1 ]
+if [ "$#" -lt 1 ]
 then error $usage >&2
     exit 1
 fi

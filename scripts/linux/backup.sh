@@ -31,38 +31,44 @@ then echo $usage
 fi
 
 # Create necessary files and set the umask
-umask 027
+umask 027 # rw-r-----
 mkdir -p $backup_dir # Backup directory
 touch $backup_dir/map # Map to original location
 chattr +a $backup_dir/map # Make the map file immutable and appendable only
 
 # Check if the argument is a valid file or directory.
-if [ -d "$1" ] || [ -f "$1" ]; then
-    # Create a backup and save a hash of the generated archive
-    echo "\e[33m Creating a backup of '$1'...\e[0m"
+for item in "$@"
+do
+    if [ -d "$item" ] || [ -f "$item" ]; then
+        #echo "\e[33m Creating a backup of '$item'...\e[0m"
+        info "Creating a backup of '$item'..."
 
-    backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
-    checksum_path="$backup_dir/$(basename $1)-$(date +%s)-checksum"
+        backup_path="$backup_dir/$(basename $item)-$(date +%s).tar.gz"
+        checksum_path="$backup_dir/$(basename $item)-$(date +%s)-checksum"
+        original_dir="$(dirname $(realpath $item))"
 
-    if [ $(dirname $1) != "/" ]
-    then
-        original_dir="$(dirname $(realpath $1))/"
+        # If the original directory is not the root directory, append a /
+        if [ $(dirname $item) != "/" ]
+        then
+            original_dir="$original_path/"
+        fi
+
+        # Create the archive, generate it's hash, and store the original file location for later restoration
+        tar -czvf $backup_path $item
+        sha256sum $backup_path > $checksum_path
+        printf "$backup_path $original_dir\n" >> $backup_dir/map
+
+        # Make the backups and relevant files immutable to protect backup integrity
+        chattr +i $backup_path $checksum_path
+
+        # Backup complete!
+        #echo "\e[32mThe backup of '$item' was completed successfully!\e[0m"
+        success "The backup of '$item' was completed successfully!"
     else
-        original_dir="$(dirname $(realpath $1))"
+        #echo "\e[31mError: '$item': No such file or directory.\e[0m" >&2
+        error "'$item': No such file or directory." >&2
     fi
-
-    tar -czvf $backup_path $1
-    sha256sum $backup_path > $checksum_path
-    printf "$backup_path $original_dir\n" >> $backup_dir/map
-
-    # Make the backups and relevant files immutable to protect backup integrity
-    chattr +i $backup_path $checksum_path
-
-    # Backup complete!
-    echo "\e[32mThe backup of '$1' was completed successfully!\e[0m"
-else
-    echo "\e[31mError: '$1': No such file or directory.\e[0m" >&2
-fi
+done
 
 exit 0 # Script ended successfully
 

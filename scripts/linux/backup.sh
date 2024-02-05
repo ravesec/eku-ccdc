@@ -40,12 +40,12 @@ touch $backup_dir/checksums # sha256sums
 chattr +a $backup_dir/map # Make the map file immutable and appendable only
 chattr +a $backup_dir/checksums
 
+info "Creating backups..."
+
 # For each argument, check if the argument is a valid file or directory.
 for item in "$@"
 do
     if [ -d "$item" ] || [ -f "$item" ]; then
-        info "Creating backups..."
-
         # Variable definitions. 
         # The usage of 'date' is not to timestamp archives, but to make sure that no naming collisions occur when backing up multiple files with the same name. Also note that there is still a chance of collision if multiple files with the same name are backed up in the same second.
         backup_path="$backup_dir/$(basename $item)-$(date +%s).tar.gz"
@@ -59,7 +59,7 @@ do
         fi
 
         # If the item already exists in the map, show a warning and confirm the overwrite
-        grep --quiet "$(realpath $item)" $backup_dir/map
+        grep --quiet " $(realpath $item)$" $backup_dir/map
         if [ "$?" -eq 0 ]
         then
             warning "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."

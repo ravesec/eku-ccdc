@@ -40,7 +40,7 @@ chattr +a $backup_dir/map # Make the map file immutable and appendable only
 for item in "$@"
 do
     if [ -d "$item" ] || [ -f "$item" ]; then
-        info "Creating a backup of '$item'..."
+        info "Creating backups..."
 
         # Variable definitions. 
         # Notes:

@@ -33,7 +33,7 @@ fi
 # Create necessary files
 mkdir -p $backup_dir # Backup directory
 touch $backup_dir/map # Map to original location
-chattr +ia $backup_dir/map # Make the map file immutable and appendable only
+chattr +a $backup_dir/map # Make the map file immutable and appendable only
 
 # Check if the argument is a valid file or directory.
 if [ -d "$1" ] || [ -f "$1" ]; then

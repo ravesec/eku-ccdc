@@ -42,7 +42,7 @@ if [ -d "$1" ] || [ -f "$1" ]; then
     echo "\e[33m Creating a backup of '$1'...\e[0m"
 
     backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
-    checksum_path="$backup_dir/$(basename $1)-checksum"
+    checksum_path="$backup_dir/$(basename $1)-$(date +%s)-checksum"
 
     if [ ! $(dirname $1) -eq "/" ]
     then

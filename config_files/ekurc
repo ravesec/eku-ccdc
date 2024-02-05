@@ -1,4 +1,4 @@
-backup_dir="/root/backups"
+backup_dir="/root/.backups"
 identifier="[\e[35m$script_name\e[0m]"
 
 info() {

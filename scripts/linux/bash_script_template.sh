@@ -19,11 +19,18 @@ usage="\e[31m./$script_name <args>\e[0m"
 . ../../config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
-then echo "\e[31mError: This script must be ran as root!\e[0m" >&2
+then error "This script must be ran as root!" >&2
     exit 1
 fi
 
 # Main script here...
+
+# Example logging message functions
+info "Send a general information message to the terminal."
+debug "Send a debug message to the terminal."
+warning "Send a warning message to the terminal."
+error "Send an error message to the terminal."
+success "Send a success message to the terminal."
 
 exit 0 # Script ended successfully
 

@@ -59,7 +59,7 @@ do
         fi
 
         # If the item already exists in the map, show a warning and confirm the overwrite
-        grep --quiet "$(realpath item)" $backup_dir/map
+        grep --quiet "$(realpath $item)" $backup_dir/map
         if [ "$?" -eq 0 ]
         then
             warning "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."
@@ -70,7 +70,8 @@ do
                 information "Skipping '$item'!"
                 continue
             else # Dereference the old backup and continue.
-                read $map_backup_path $unused_vars < $(grep "$(realpath item)" $backup_dir/map)
+                #read $map_backup_path $unused_vars < $(grep "$(realpath item)" $backup_dir/map)
+                grep "$(realpath $item)" $backup_dir/map | read $map_backup_path $unused_vars
                 
                 # Remove the immutability.
                 chattr -ia $map_backup_path $backup_dir/checksums $backup_dir/map

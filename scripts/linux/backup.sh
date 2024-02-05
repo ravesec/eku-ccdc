@@ -30,7 +30,8 @@ then echo $usage
     exit 1
 fi
 
-# Create necessary files
+# Create necessary files and set the umask
+umask 027
 mkdir -p $backup_dir # Backup directory
 touch $backup_dir/map # Map to original location
 chattr +a $backup_dir/map # Make the map file immutable and appendable only
@@ -42,10 +43,10 @@ if [ -d "$1" ] || [ -f "$1" ]; then
 
     backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
     checksum_path="$backup_dir/$(basename $1)-checksum"
-    original_dir="$(dirname $(realpath $1))"
+    original_dir="$(dirname $(realpath $1))/"
     tar -czvf $backup_path $1
     sha256sum $backup_path > $checksum_path
-    printf "$backup_path $original_dir" >> $backup_dir/map
+    printf "$backup_path $original_dir\n" >> $backup_dir/map
 
     # Make the backups and relevant files immutable to protect backup integrity
     chattr +i $backup_path $checksum_path

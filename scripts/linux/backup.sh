@@ -64,10 +64,10 @@ do
 
         # Backup complete!
         #echo "\e[32mThe backup of '$item' was completed successfully!\e[0m"
-        success "The backup of '$item' was completed successfully!"
+        success "The backup of '$(realpath $item)' was completed successfully!"
     else
         #echo "\e[31mError: '$item': No such file or directory.\e[0m" >&2
-        error "'$item': No such file or directory." >&2
+        error "'$(realpath $item)': No such file or directory." >&2
     fi
 done
 

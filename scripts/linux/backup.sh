@@ -56,11 +56,11 @@ do
         fi
 
         # Create the archive, generate it's hash, and store the original file location for later restoration
-        tar -czf $backup_path $item
+        tar -czf $backup_path $item 2>/dev/null
         if [ ! "$?" -eq 0 ]
         then
             # Something went wrong while making the backup. Abort the process and continue to the next item.
-            error "Archiving failed for '$item'. Aborting backup." >&2
+            error "Archiving failed for '$item'." >&2
             rm -f $backup_path
             chattr -a $backup_dir/map
             sed -i '/$backup_path/d' $backup_dir/map
@@ -69,7 +69,7 @@ do
         fi
 
         sha256sum $backup_path > $checksum_path
-        printf "$backup_path $original_dir\n" >> $backup_dir/map
+        printf "$backup_path $original_dir $item\n" >> $backup_dir/map
 
         # Make the backups and relevant files immutable to protect backup integrity
         chattr +i $backup_path $checksum_path

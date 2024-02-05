@@ -10,7 +10,7 @@
 # Usage: <./backup.sh <directory>>
 
 #TODO: Ask for user confirmation unlesss --confirm is set
-#TODO: Add support for files
+#TODO: [x] Add support for files
 #TODO: Add support for infinite arguments
 #TODO: Add terminal output for tar, chattr, and sha256sum
 script_name="backup.sh"
@@ -30,35 +30,28 @@ then echo $usage
     exit 1
 fi
 
-# Create the backup directory if it doesn't already exist.
-mkdir -p $backup_dir
+# Create necessary files
+mkdir -p $backup_dir # Backup directory
+touch $backup_dir/map # Map to original location
+chattr +ia $backup_dir/map # Make the map file immutable and appendable only
 
 # Check if the argument is a valid file or directory.
 if [ -d "$1" ] || [ -f "$1" ]; then
     # Create a backup and save a hash of the generated archive
-    echo "\e[32m Creating a backup of '$1'...\e[0m"
+    echo "\e[33m Creating a backup of '$1'...\e[0m"
 
-    backup_path="$backup_dir/$(basename $1).tar.gz"
+    backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
     checksum_path="$backup_dir/$(basename $1)-checksum"
-    
+    original_dir="$(dirname $(realpath $1))"
     tar -czvf $backup_path $1
     sha256sum $backup_path > $checksum_path
+    printf "$backup_path $original_dir" >> $backup_dir/map
 
     # Make the backups and relevant files immutable to protect backup integrity
     chattr +i $backup_path $checksum_path
 else
     echo "\e[31mError: '$1': No such file or directory.\e[0m" >&2
 fi
-
-# Backup the directory and save a hash of the generated archive
-#backup_name=$(basename $1)
- # full-path should be $1
-#tar -czvf $backup_dir/$backup_name.tar.gz $1
-#sha256sum $backup_dir/$backup_name.tar.gz > $backup_dir/$backup_name-checksum
-
-# Recursively change file attributes to protect backup integrity
-#chattr -R +i $backup_dir/$backup_name.tar.gz
-#chattr +i $backup_dir/$backup_name-checksum
 
 # Backup complete!
 echo "\e[32mThe backup of '$1' was completed successfully!\e[0m"

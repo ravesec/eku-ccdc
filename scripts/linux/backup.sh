@@ -43,19 +43,19 @@ if [ -d "$1" ] || [ -f "$1" ]; then
 
     backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
     checksum_path="$backup_dir/$(basename $1)-checksum"
-    original_dir="$(dirname $(realpath $1))/"
+    original_dir="$(realpath $1)"
     tar -czvf $backup_path $1
     sha256sum $backup_path > $checksum_path
     printf "$backup_path $original_dir\n" >> $backup_dir/map
 
     # Make the backups and relevant files immutable to protect backup integrity
     chattr +i $backup_path $checksum_path
+
+    # Backup complete!
+    echo "\e[32mThe backup of '$1' was completed successfully!\e[0m"
 else
     echo "\e[31mError: '$1': No such file or directory.\e[0m" >&2
 fi
-
-# Backup complete!
-echo "\e[32mThe backup of '$1' was completed successfully!\e[0m"
 
 exit 0 # Script ended successfully
 

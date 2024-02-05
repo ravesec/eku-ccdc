@@ -43,7 +43,14 @@ if [ -d "$1" ] || [ -f "$1" ]; then
 
     backup_path="$backup_dir/$(basename $1)-$(date +%s).tar.gz"
     checksum_path="$backup_dir/$(basename $1)-checksum"
-    original_dir="$(dirname $(realpath $1))/"
+
+    if [ ! $(dirname $1) -eq "/" ]
+    then
+        original_dir="$(dirname $(realpath $1)/)"
+    else
+        original_dir="$(dirname $(realpath $1))"
+    fi
+
     tar -czvf $backup_path $1
     sha256sum $backup_path > $checksum_path
     printf "$backup_path $original_dir\n" >> $backup_dir/map

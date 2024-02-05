@@ -9,10 +9,10 @@
 # Created: 02/04/2024
 # Usage: <./backup.sh <directory>>
 
-#TODO: Ask for user confirmation unlesss --confirm is set
+#TODO: Add support for overwriting previous backups
+#TODO: Ask for user confirmation to overwrite a previous backup unlesss --confirm is set
 #TODO: [x] Add support for files
-#TODO: Add support for infinite arguments
-#TODO: Add terminal output for tar, chattr, and sha256sum
+#TODO: [x] Add support for infinite arguments
 script_name="backup.sh"
 usage="Usage: ./$script_name <directory>"
 
@@ -43,6 +43,7 @@ do
         #echo "\e[33m Creating a backup of '$item'...\e[0m"
         info "Creating a backup of '$item'..."
 
+        # Variable definitions. The usage of 'date' is not to timestamp archives, but to make sure that no naming collisions occur when backing up multiple files with the same name. NOTE: There is still a chance of collision if multiple files with the same name are backed up in the same second.
         backup_path="$backup_dir/$(basename $item)-$(date +%s).tar.gz"
         checksum_path="$backup_dir/$(basename $item)-$(date +%s)-checksum"
         original_dir="$(dirname $(realpath $item))"

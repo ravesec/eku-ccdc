@@ -46,7 +46,7 @@ if [ -d "$1" ] || [ -f "$1" ]; then
 
     if [ ! $(dirname $1) -eq "/" ]
     then
-        original_dir="$(dirname $(realpath $1)/)"
+        original_dir="$(dirname $(realpath $1))/"
     else
         original_dir="$(dirname $(realpath $1))"
     fi

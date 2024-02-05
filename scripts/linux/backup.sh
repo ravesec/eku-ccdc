@@ -14,19 +14,19 @@
 #TODO: Add support for infinite arguments
 #TODO: Add terminal output for tar, chattr, and sha256sum
 script_name="backup.sh"
-usage="\e[31mUsage: ./$script_name <directory>\e[0m"
+usage="Usage: ./$script_name <directory>"
 
 # Import environment variables
 . ../../config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
-then echo "\e[31mError: This script must be ran as root!\e[0m" >&2
+then error "This script must be ran as root!" >&2
     exit 1
 fi
 
 # Check for the correct number of arguments
 if [ "$#" -ne 1 ]
-then echo $usage
+then error $usage >&2
     exit 1
 fi
 

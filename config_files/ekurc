@@ -11,7 +11,7 @@ debug() {
     echo -e "$identifier[\e[34mDEBUG\e[0m] $*"
 }
 
-warning() {
+warn() {
     # Yellow
     echo -e "$identifier[\e[33mWARNING\e[0m] $*"
 }

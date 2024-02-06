@@ -28,7 +28,7 @@ fi
 # Example logging message functions
 info "Send a general information message to the terminal."
 debug "Send a debug message to the terminal."
-warning "Send a warning message to the terminal."
+warn "Send a warning message to the terminal."
 error "Send an error message to the terminal."
 success "Send a success message to the terminal."
 

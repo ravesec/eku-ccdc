@@ -62,12 +62,12 @@ do
         grep --quiet " $(realpath $item)$" $backup_dir/map
         if [ "$?" -eq 0 ]
         then
-            warning "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."
+            warn "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."
             read -n 1 -s key
 
             if [ "$key" != "" ]
             then
-                information "Skipping '$item'!"
+                info "Skipping '$item'!"
                 continue
             else # Dereference the old backup and continue.
                 # Grab the path information from the map file

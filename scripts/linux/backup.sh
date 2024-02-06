@@ -62,10 +62,10 @@ do
         grep --quiet " $(realpath $item)$" $backup_dir/map
         if [ "$?" -eq 0 ]
         then
-            warn "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."
-            read -n 1 -s key
+            warn "'$item' already exists in the backups folder. Overwrite? (y/n)."
+            read yn
 
-            if [ "$key" != "" ]
+            if [ "$yn" == "y" ] || [ "$yn" == "n"];
             then
                 info "Skipping '$item'!"
                 continue

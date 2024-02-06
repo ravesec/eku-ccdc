@@ -28,7 +28,7 @@ then error $usage
 fi
 
 # Set the mysql root password
-local new_pass=$(ask_password "the mysql root user")
+new_pass=$(ask_password "the mysql root user")
 
 mysql -u root -p<<EOF
 ALTER USER 'root'@'localhost' IDENTIFIED BY '$new_pass';
@@ -45,6 +45,7 @@ key="$(cat $key_path | grep "_COOKIE_KEY_" | cut -d ',' -f2 | tr -d " ,');")"
 query="UPDATE ps_employee SET passwd = MD5('$key$(ask_password "the prestashop admin user")') WHERE firstname = 'Greg';"
 
 mysql -u"root" -p"$new_pass" -D"prestashop" -e"$query" --verbose
+unset new_pass
 
 exit 0 # Script ended successfully
 

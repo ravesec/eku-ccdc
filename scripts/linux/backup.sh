@@ -65,19 +65,19 @@ do
             warning "'$item' already exists in the backups folder. Press 'Enter' to overwrite. Press any other key to continue."
             read -n 1 -s key
 
-            if [ $key != "" ]
+            if [ "$key" != "" ]
             then
                 information "Skipping '$item'!"
                 continue
             else # Dereference the old backup and continue.
-                #read $map_backup_path $unused_vars < $(grep "$(realpath item)" $backup_dir/map)
-                grep "$(realpath $item)" $backup_dir/map | read $map_backup_path $unused_vars
-                
+                # Grab the path information from the map file
+                read $map_backup_path $unused_vars <<< $(grep "$(realpath $item) $backup_dir/map")
+
                 # Remove the immutability.
                 chattr -ia $map_backup_path $backup_dir/checksums $backup_dir/map
 
                 # Rename the original backup and remove it's relevant information
-                mv $map_backup_path $map_backup_path~
+                mv $map_backup_path "$map_backup_path~"
                 sed -i '/$map_backup_path/d' $backup_dir/checksums $backup_dir/map
 
                 # Restore immutability

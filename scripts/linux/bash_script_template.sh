@@ -3,34 +3,42 @@
 # Author: <author(s)>
 # script_name.sh
 #
-# Description: A template for bash scripts created by Raven Dean. NOTE that the echo 
-#  command is overriden in ../../config_files/ekurc to identify the script that is
-#  putting output on the terminal.
+# Description: A template for bash scripts created by Raven Dean. NOTE that there are special
+#  commands in ../../config_files/ekurc to output log messages to the terminal. These include
+#  info, debug, warn, error, and success.
 #
 # Dependencies: N/A
 # Created: MM/DD/YYYY
 # Usage: <./script_name.sh <args>>
 
-# Edit these as required. ANSI color coding is used.
+# Edit these as required.
 script_name="script_name.sh"
-usage="\e[31m./$script_name <args>\e[0m"
+usage="./$script_name <args>"
 
 # Import environment variables
 . ../../config_files/ekurc
 
-if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
-then error "This script must be ran as root!" >&2
+if [ "$EUID" -ne 0 ] # Superuser requirement.
+then error "This script must be ran as root!"
+    exit 1
+fi
+
+# Check for the correct number of arguments
+if [ "$#" -lt 1 ]
+then error $usage
     exit 1
 fi
 
 # Main script here...
 
+
+
 # Example logging message functions
-info "Send a general information message to the terminal."
-debug "Send a debug message to the terminal."
-warn "Send a warning message to the terminal."
-error "Send an error message to the terminal."
-success "Send a success message to the terminal."
+info "Send a general information message to stdout."
+debug "Send a debug message to stdout."
+warn "Send a warning message to stdout."
+error "Send an error message to stderr."
+success "Send a success message to stdout."
 
 exit 0 # Script ended successfully
 

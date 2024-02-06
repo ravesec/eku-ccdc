@@ -65,13 +65,13 @@ do
             warn "'$item' already exists in the backups folder. Overwrite? (y/n)."
             read yn
 
-            if [ "$yn" == "y" ] || [ "$yn" == "n"];
+            if [ "$yn" == "n" ];
             then
                 info "Skipping '$item'!"
                 continue
             else # Dereference the old backup and continue.
                 # Grab the path information from the map file
-                read $map_backup_path $unused_vars <<< $(grep "$(realpath $item) $backup_dir/map")
+                read map_backup_path unused_vars <<< $(grep "$(realpath $item) $backup_dir/map")
 
                 # Remove the immutability.
                 chattr -ia $map_backup_path $backup_dir/checksums $backup_dir/map

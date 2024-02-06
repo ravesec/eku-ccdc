@@ -8,6 +8,13 @@
 #
 # Dependencies: ../../config_files/ekurc
 #
+# Notes:
+#  Stores backup files in the path specified in ../../config_files/ekurc
+#  'Overwritten' backups are just renamed with a leading . and trailing ~, however they must be manually restored because the map
+#   and checksum data is deleted.
+#
+#  Backups can be restored using ./restore.sh
+#
 # Created: 02/04/2024
 # Usage: <./backup.sh <directory>>
 
@@ -73,11 +80,11 @@ do
                 chattr -ia $map_backup_path $backup_dir/checksums $backup_dir/map
 
                 # Rename the original backup and remove it's relevant information
-                mv $map_backup_path "$map_backup_path~"
+                mv $map_backup_path ".$map_backup_path~"
                 sed -i "\|$map_backup_path|d" $backup_dir/checksums $backup_dir/map
 
                 # Restore immutability to the old archive
-                chattr +i $map_backup_path~
+                chattr +i .$map_backup_path~
                 chattr +a $backup_dir/checksums $backup_dir/map
             fi
         fi

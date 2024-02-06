@@ -67,7 +67,7 @@ do
 
             if [ "$yn" == "n" ];
             then
-                info "Skipping '$item'!"
+                info "Skipping '$item'..."
                 continue
             else # Dereference the old backup and continue.
                 # Grab the path information from the map file
@@ -80,8 +80,8 @@ do
                 mv $map_backup_path "$map_backup_path~"
                 sed -i '/$map_backup_path/d' $backup_dir/checksums $backup_dir/map
 
-                # Restore immutability
-                chattr +i $map_backup_path
+                # Restore immutability to the old archive
+                chattr +i $map_backup_path~
                 chattr +a $backup_dir/checksums $backup_dir/map
             fi
         fi

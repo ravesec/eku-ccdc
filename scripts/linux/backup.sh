@@ -63,7 +63,7 @@ do
         if [ "$?" -eq 0 ]
         then
             warn "'$item' already exists in the backups folder. Overwrite? (y/n)."
-            read yn
+            read -n 1 -s yn
 
             if [ "$yn" == "n" ];
             then

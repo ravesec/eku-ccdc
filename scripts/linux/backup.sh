@@ -11,10 +11,6 @@
 # Created: 02/04/2024
 # Usage: <./backup.sh <directory>>
 
-#TODO: [x] Add support for overwriting previous backups
-#TODO: [x] Ask for user confirmation to overwrite a previous backup
-#TODO: [x] Add support for files
-#TODO: [x] Add support for infinite arguments
 script_name="backup.sh"
 usage="Usage: ./$script_name <directory>"
 
@@ -78,7 +74,7 @@ do
 
                 # Rename the original backup and remove it's relevant information
                 mv $map_backup_path "$map_backup_path~"
-                sed -i '/$map_backup_path/d' $backup_dir/checksums $backup_dir/map
+                sed -i "\|$map_backup_path|d" $backup_dir/checksums $backup_dir/map
 
                 # Restore immutability to the old archive
                 chattr +i $map_backup_path~
@@ -94,7 +90,7 @@ do
             error "Archiving failed for '$item'." >&2
             rm -f $backup_path
             chattr -a $backup_dir/map
-            sed -i '/$backup_path/d' $backup_dir/map
+            sed -i "\|$backup_path|d" $backup_dir/map
             chattr +a $backup_dir/map
             continue
         fi

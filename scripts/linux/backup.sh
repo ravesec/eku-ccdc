@@ -100,7 +100,7 @@ do
         fi
 
         sha256sum $backup_path >> $backup_dir/checksums
-        printf "$backup_path $original_dir $(realpath item)\n" >> $backup_dir/map
+        printf "$backup_path $original_dir $(realpath $item)\n" >> $backup_dir/map
 
         # Make the backup immutable to protect backup integrity
         chattr +i $backup_path

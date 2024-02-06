@@ -18,7 +18,7 @@ warn() {
 
 error() {
     # Red
-    echo -e "$identifier[\e[31mERROR\e[0m] $*"
+    echo -e "$identifier[\e[31mERROR\e[0m] $*" >&2
 }
 
 success() {

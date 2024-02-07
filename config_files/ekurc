@@ -5,27 +5,6 @@ ccdc_team_number=""
 prestashop_password=""
 palo_alto_password=""
 
-
-ask_password() {
-    while true; do
-        info "Enter password for $1:"
-        read -s candidate
-        info "Confirm password for $1:"
-        read -s replica
-
-        if [ "$candidate" == "$replica" ]; then
-            local temp_var="$candidate"
-            unset candidate replica # Wipe vars
-            echo "$temp_var"
-            break
-        elif [ "$candidate" == "" ] || [ "$replica" == "" ]; then
-            error "Password cannot be empty, try again."
-        else
-            error "Passwords don't match, try again."
-        fi
-     done
-}
-
 # Functions to make output pretty.
 info() {
     # Cyan

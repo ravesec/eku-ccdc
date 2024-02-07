@@ -28,12 +28,6 @@ then error $usage
     exit 1
 fi
 
-# Set the mysql root password
-mysql -u root<<EOF
-ALTER USER 'root'@'localhost' IDENTIFIED BY '$sql_pass';
-FLUSH PRIVILEGES;
-EOF
-
 # Secure the mysql installation
 info "Starting the MySQL secure installation script..."
 mysql_secure_installation
@@ -41,8 +35,9 @@ mysql_secure_installation
 # The password of prestashop users is salted with the cookie key. Save the cookie key to a variable and change the password.
 key_path="/var/www/html/prestashop/config/settings.inc.php"
 key="$(cat $key_path | grep "_COOKIE_KEY_" | cut -d ',' -f2 | tr -d " ,');")"
-query="UPDATE ps_employee SET passwd = MD5('$key$(ask_password)') WHERE firstname = 'Greg';"
+query="UPDATE ps_employee SET passwd = MD5('$key$prestashop_password') WHERE firstname = 'Greg';"
 
+info "Changing prestashop admin password"
 mysql -u"root" -p"$sql_pass" -D"prestashop" -e"$query" --verbose
 
 exit 0 # Script ended successfully

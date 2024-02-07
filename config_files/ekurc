@@ -33,6 +33,8 @@ success() {
     echo -e "$identifier[\e[32mSUCCESS\e[0m] $*"
 }
 
+alias ekuccdc='sudo docker run --rm -it ekuccdc:latest /bin/bash -c "nano configure.yml && ansible-playbook -i inventory configure.yml"'
+
 #TODO Create a function to restart services
 #TODO more documentation
 #TODO determine what service manager is on the os and store it

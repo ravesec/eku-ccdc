@@ -6,7 +6,9 @@ import xml.etree.ElementTree as ET
 # TODO: Press enter to quit & specify password in sys.argv[0]
 
 def connect_to_device():
-    xapi = PanXapi(api_username='admin', api_password='Changeme!', hostname='192.168.1.41')
+    host='172.20.242.150'
+    password='Changeme123' #TODO CHANGE ME!!!
+    xapi = PanXapi(api_username='admin', api_password=password, hostname=host)
     key = xapi.keygen()
     pwn.log.info(f"API Key: {key}")
     return xapi

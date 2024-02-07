@@ -2,9 +2,11 @@
 backup_dir="/root/.backups"
 identifier="[\e[35m$script_name\e[0m]"
 ccdc_team_number="12"
-prestashop_password="changeme"
+prestashop_admin_password="changeme"
+prestashop_new_db_user_password="changeme"
 centos_sql_password="changeme"
 palo_alto_password="changeme123!"
+
 
 # Functions to make output pretty.
 info() {

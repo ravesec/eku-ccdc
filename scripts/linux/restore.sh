@@ -31,7 +31,8 @@ fi
 
 # Check if the supplied directory exists in the backups folder
 backup_name=$(realpath $1)
-if [[ ! -f "$backup_dir/$backup_name.tar.gz" ]]
+grep "$backup_name" $backup_dir/map
+if [ ! "$?" -eq 0 ]
 then
     error "'$1' does not exist in the backups folder!"
     exit 1

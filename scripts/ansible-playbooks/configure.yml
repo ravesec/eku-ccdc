@@ -528,46 +528,46 @@
           /vsys/entry[@name='vsys1']
           /rulebase/security/rules/entry[@name='any2any']
 
-    - name: Delete Default 'PUBLIC2EXTERNAL' Security Policy
-      paloaltonetworks.panos.panos_type_cmd:
-        provider: '{{ provider }}'
-        cmd: 'delete'
-        xpath: |
-          /config/devices/entry[@name='localhost.localdomain']
-          /vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry[@name='PUBLIC2EXTERNAL']
+          #    - name: Delete Default 'PUBLIC2EXTERNAL' Security Policy
+          #paloaltonetworks.panos.panos_type_cmd:
+          #provider: '{{ provider }}'
+          #cmd: 'delete'
+          #xpath: |
+          #/config/devices/entry[@name='localhost.localdomain']
+          #/vsys/entry[@name='vsys1']
+          #/rulebase/security/rules/entry[@name='PUBLIC2EXTERNAL']
 
-    - name: Delete Default 'PUBLIC2INTERNAL' Security Policy
-      paloaltonetworks.panos.panos_type_cmd:
-        provider: '{{ provider }}'
-        cmd: 'delete'
-        xpath: |
-          /config/devices/entry[@name='localhost.localdomain']
-          /vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry[@name='PUBLIC2INTERNAL']
+          #- name: Delete Default 'PUBLIC2INTERNAL' Security Policy
+      #paloaltonetworks.panos.panos_type_cmd:
+        #provider: '{{ provider }}'
+          #cmd: 'delete'
+          #xpath: |
+          #/config/devices/entry[@name='localhost.localdomain']
+          #/vsys/entry[@name='vsys1']
+          #/rulebase/security/rules/entry[@name='PUBLIC2INTERNAL']
 
-    - name: Delete Default 'INTERNAL2PUBLIC' Security Policy
-      paloaltonetworks.panos.panos_type_cmd:
-        provider: '{{ provider }}'
-        cmd: 'delete'
-        xpath: |
-          /config/devices/entry[@name='localhost.localdomain']
-          /vsys/entry[@name='vsys1']
-          /rulebase/security/rules/entry[@name='INTERNAL2PUBLIC']
+          #- name: Delete Default 'INTERNAL2PUBLIC' Security Policy
+          #paloaltonetworks.panos.panos_type_cmd:
+          #provider: '{{ provider }}'
+          #cmd: 'delete'
+          #xpath: |
+          #/config/devices/entry[@name='localhost.localdomain']
+          #/vsys/entry[@name='vsys1']
+          #/rulebase/security/rules/entry[@name='INTERNAL2PUBLIC']
 
-    - name: Reconfigure Default Interzone Security Policy
-      paloaltonetworks.panos.panos_type_cmd:
-        provider: '{{ provider }}'
-        xpath: |
-          /config/devices/entry[@name='localhost.localdomain']
-          /vsys/entry[@name='vsys1']
-          /rulebase/default-security-rules/rules/entry[@name='interzone-default']
-        element: |
-          <action>drop</action>
-          <icmp-unreachable>yes</icmp-unreachable>
-          <log-end>yes</log-end>
-          <log-start>yes</log-start>
-          <log-setting>Splunk Log Forwarding</log-setting>
+          #- name: Reconfigure Default Interzone Security Policy
+      #paloaltonetworks.panos.panos_type_cmd:
+        #provider: '{{ provider }}'
+          #xpath: |
+          #/config/devices/entry[@name='localhost.localdomain']
+          #/vsys/entry[@name='vsys1']
+          #/rulebase/default-security-rules/rules/entry[@name='interzone-default']
+          #element: |
+          #<action>drop</action>
+          #<icmp-unreachable>yes</icmp-unreachable>
+          #<log-end>yes</log-end>
+          #<log-start>yes</log-start>
+          #<log-setting>Splunk Log Forwarding</log-setting>
 
           #TODO: Delete unnecessary configs (global, etc)
 

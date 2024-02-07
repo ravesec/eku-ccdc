@@ -6,6 +6,5 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 apt-cache policy docker-ce
 sudo apt install --yes docker-ce
 sudo systemctl enable docker
-sudo systemctl status docker
 sudo docker build --no-cache -t ekuccdc:latest docker/
 sudo docker run --rm --it --name ekuccdc --volume /home/sysadmin:/root/shared --hostname ekuccdc-docker ekuccdc:latest

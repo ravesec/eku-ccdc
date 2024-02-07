@@ -45,6 +45,7 @@
         if_name: "ethernet1/1"
         zone_name: "Public"
         management_profile: "Allow-Ping"
+        vr_name: "RT1"
         ip: "172.20.241.254/24"
         enable_dhcp: false
         comment: "Public"
@@ -56,6 +57,7 @@
         if_name: "ethernet1/2"
         zone_name: "Internal"
         management_profile: "Allow-Ping"
+        vr_name: "RT1"
         ip: "172.20.240.254/24"
         enable_dhcp: false
         comment: "Internal"
@@ -67,6 +69,7 @@
         if_name: "ethernet1/3"
         zone_name: "External"
         management_profile: "Nothing"
+        vr_name: "RT1"
         ip: '{{ external_ip_address }}'
         enable_dhcp: false
         comment: "External"
@@ -78,8 +81,9 @@
         if_name: "ethernet1/4"
         zone_name: "User"
         management_profile: "Allow-HTTPS-SSH-Ping"
+        vr_name: "RT1"
         ip: "172.20.242.254/24"
-        enable_dhcp: false
+          #enable_dhcp: false
         comment: "User"
         state: replaced
 

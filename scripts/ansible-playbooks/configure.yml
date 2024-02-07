@@ -506,17 +506,17 @@
           #log_type: 'wildfire'
           #syslog_profiles: ['Splunk Syslog Profile']
       
-    - name: Change Syslog Service Route Configuration
-      paloaltonetworks.panos.panos_type_cmd:
-        provider: '{{ provider }}'
-        cmd: 'set'
-        xpath: |
-          /config/devices/entry[@name='localhost.localdomain']
-          /deviceconfig/system/route/service/entry[@name='syslog']
-          /source
-        element: |
-          <interface>ethernet1/1</interface>
-          <address>172.20.241.254/24</address>
+          #- name: Change Syslog Service Route Configuration
+          #paloaltonetworks.panos.panos_type_cmd:
+          #provider: '{{ provider }}'
+          #cmd: 'set'
+          #xpath: |
+          #/config/devices/entry[@name='localhost.localdomain']
+          #/deviceconfig/system/route/service/entry[@name='syslog']
+          #/source
+          #element: |
+          #<interface>ethernet1/1</interface>
+          #<address>172.20.241.254/24</address>
 
 
           #- name: Delete Default 'any2any' Security Policy

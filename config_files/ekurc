@@ -6,7 +6,6 @@ prestashop_admin_password="changeme"
 prestashop_new_db_user_password="changeme"
 centos_sql_password="changeme"
 palo_alto_password="changeme123!"
-alias start-ansible="docker build --nocache -t ekuccdc:latest docker/ && docker run --rm -it --name ekuccdc --volume /home/sysadmin:/root/shared --hostname ekuccdc-docker ekuccdc:latest"
 
 # Functions to make output pretty.
 info() {

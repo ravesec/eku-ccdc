@@ -83,7 +83,7 @@
         management_profile: "Allow-HTTPS-SSH-Ping"
         vr_name: "RT1"
         ip: "172.20.242.254/24"
-          #enable_dhcp: false
+        enable_dhcp: false
         comment: "User"
         state: replaced
 
@@ -273,7 +273,7 @@
     - name: Create CentOS 7 E-comm Internal Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
-        name: 'centos-ecomm-internal'
+        name: 'centos-ecomm'
         value: '172.20.241.30/24'
         description: 'CentOS 7 E-Comm Machine'
 
@@ -313,7 +313,7 @@
       paloaltonetworks.panos.panos_address_group:
         provider: '{{ provider }}'
         name: 'all-company-machines'
-        static_value: ['docker-remote', 'debian-dns-ntp', 'ubuntu-web', 'windows-server-2019', 'splunk', 'centos-ecomm', 'fedora-webmail', 'user-net']
+        static_value: ['docker-remote', 'debian-dns-ntp', 'ubuntu-web', 'windows-server-2019', 'splunk', 'centos-ecomm', 'fedora-webmail', 'user-net-private']
 
     - name: Create Internal Network Address Group
       paloaltonetworks.panos.panos_address_group:

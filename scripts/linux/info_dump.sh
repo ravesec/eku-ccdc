@@ -63,3 +63,21 @@ done
 
 # Display the system crontab
 printf "System Crontab: \n%s\n" "$(cat /etc/crontab)"
+
+printf "/**********************************/
+/* Dangerous Binaries (SUID/SGID) */
+/**********************************/\n\n"
+#TODO Find SUID/SGID executables on the system
+find / -type f -executable \( -perm -4000 -o -perm -2000 \) -exec ls -lah {} \; 2>/dev/null | grep -v "/usr | grep -v "/root/bu" | grep -v "/bin" | grep -v "/sbin"
+
+#TODO Check for services in /etc/init.d
+
+#TODO Check user's .bashrc files
+
+#TODO List recent commands executed by sudo
+
+#TODO Check Bash history
+
+#TODO Show third party log files in /var/log
+
+#TODO Tail the syslog

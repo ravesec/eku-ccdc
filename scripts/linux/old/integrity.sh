@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#TODO: Force restore files if they are modified
 # Ensure script is being ran as root
 if [ "$EUID" -ne 0 ]
 then echo "Script must be ran as root!"

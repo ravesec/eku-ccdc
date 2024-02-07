@@ -44,11 +44,20 @@ key="$(cat $key_path | grep "_COOKIE_KEY_" | cut -d ',' -f2 | tr -d " ,');")"
 query="UPDATE ps_employee SET passwd = MD5('$key$prestashop_admin_password') WHERE firstname = 'Greg';"
 
 info "Resetting prestashop DB_USER and DB_PASSWD"
-sed -i "/_DB_USER_/c\define('_DB_USER_', '$prestashop_new_db_user_password');" $key_path
+sed -i "/_DB_USER_/c\define('_DB_USER_', 'sysadmin');" $key_path
 sed -i "/_DB_PASSWD_/c\define('_DB_PASSWD_', '$prestashop_new_db_user_password');" $key_path
 
 info "Changing prestashop admin password"
 mysql -u"sysadmin" -p"$prestashop_new_db_user_password" -D"prestashop" -e"$query" --verbose
+
+prestashop_dir="/var/www/html/prestashop"
+info "Fixing file permissions"
+find $prestashop_dir -type f -exec chmod 644 -- {} +
+find $prestashop_dir -type d -exec chmod 755 -- {} +
+
+info "Remove dangerous files and folders"
+mv $prestashop_dir/admin3258 $prestashop_dir/.131011
+rm -rf $prestashop_dir/install.tar $prestashop_dir/install_bkp $prestashop_dir/docs $prestashop_dir/README.md
 
 exit 0 # Script ended successfully
 

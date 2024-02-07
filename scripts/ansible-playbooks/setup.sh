@@ -9,5 +9,5 @@ apt-cache policy docker-ce
 sudo apt install --yes docker-ce
 sudo systemctl enable docker
 sudo docker build -t ekuccdc:latest docker/
-ekuccdc
+sudo docker run --rm -it ekuccdc:latest /bin/bash -c "nano configure.yml && ansible-playbook -i inventory configure.yml"
 success "Script complete!"

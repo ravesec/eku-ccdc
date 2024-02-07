@@ -14,7 +14,6 @@ WORKDIR /root
 RUN mkdir /root/shared
 RUN add-apt-repository --yes --update ppa:ansible/ansible && \
     apt install --yes ansible && \
-    ssh-keygen -t rsa -f /root/.ssh/id_rsa -q -N "" && \
     ansible-galaxy collection install paloaltonetworks.panos && \
     pip install pan-python pan-os-python
 

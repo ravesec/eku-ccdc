@@ -8,6 +8,6 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 apt-cache policy docker-ce
 sudo apt install --yes docker-ce
 sudo systemctl enable docker
-sudo docker build --no-cache -t ekuccdc:latest docker/
+sudo docker build -t ekuccdc:latest docker/
 sudo docker run --rm -it --name ekuccdc --hostname ekuccdc-docker ekuccdc:latest /bin/bash -c "nano configure.yml && ansible-playbook -i inventory configure.yml"
 success "Script complete!"

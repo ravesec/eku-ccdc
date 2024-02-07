@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Update apt and install packages
 RUN apt update && \
     apt upgrade -y && \
-    apt install git ssh python3 pip software-properties-common file vim sudo curl net-tools iputils-* iproute2 -y && \
+    apt install git ansible python3 nano pip software-properties-common file sudo curl net-tools iputils-* iproute2 -y && \
     apt clean && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root

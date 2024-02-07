@@ -47,6 +47,7 @@ fi
 # Grab the path information from the map file
 read map_backup_path original_path unused <<< $(cat $backup_dir/map | grep "$(realpath $1)")
 
+rm -rf $backup_name
 tar -xzf $map_backup_path -C $original_path
 
 exit 0 # Script ended successfully

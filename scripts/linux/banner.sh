@@ -1,8 +1,10 @@
 #!/bin/bash
 
+# Author: Raven Dean
+
 # Ensure root
 if [ "$EUID" -ne 0 ]
-then echo "This script must be ran as root!"
+then echo "This script must be ran as root!" >&2
     exit
 fi
 
@@ -31,12 +33,12 @@ search="PermitRootLogin yes"
 replace="PermitRootLogin no"
 sed -i "s/$search/$replace/" /etc/ssh/sshd_config
 
-# Restart ssh service
-file=/etc/init.d/ssh
-if [[ -f "$file" ]] ; then
-    /etc/init.d/ssh restart
-else
-    /etc/init.d/sshd restart
-fi
 
-systemctl restart sshd
+# Restart the ssh service in a brute force hacky way.
+which systemctl >/dev/null # Return code 0 if systemctl exists
+if [[ $? -eq 0 ]]
+then
+    systemctl restart sshd
+else # If systemctl doesn't exist, use service.
+    service sshd restart
+fi

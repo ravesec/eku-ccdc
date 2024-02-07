@@ -7,4 +7,4 @@ apt-cache policy docker-ce
 sudo apt install --yes docker-ce
 sudo systemctl enable docker
 sudo docker build --no-cache -t ekuccdc:latest docker/
-sudo docker run --rm --it --name ekuccdc --volume /home/sysadmin:/root/shared --hostname ekuccdc-docker ekuccdc:latest
+sudo docker run --rm -it --name ekuccdc --volume /home/sysadmin:/root/shared --hostname ekuccdc-docker ekuccdc:latest

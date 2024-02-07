@@ -44,7 +44,7 @@ else
 }
 
 
-if($PSVersionTable.PSVersion.Major - "7" -and $PSVersionTable.PSVersion.Minor -ge "4")
+if($PSVersionTable.PSVersion.Major -ge "7" -and $PSVersionTable.PSVersion.Minor -ge "4")
 {
     Write-Host "`nWMF is up-to-date"
 }
@@ -55,9 +55,9 @@ elseif(Test-Path "$env:ProgramFiles\Powershell\7")
 else
 {
     $update = $true
-    Write-Host "Backing up PSModulePath to $env:temp\updater\..."
-    $env:PSModulePath | Out-File -FilePath "$env:temp\updater\PSModulePath.txt"
     Write-Host "`nUpdating Powershell to 7.4...`n"
+    Write-Host "`tBacking up PSModulePath to $env:temp\updater\..."
+    $env:PSModulePath | Out-File -FilePath "$env:temp\updater\PSModulePath.txt"
     Write-Host "`tDownloading  updater..."
     $webClient.DownloadFile("https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/PowerShell-7.4.1-win-x64.msi","$env:temp\updater\pwsh-updater.msi")
     Write-Host "`tRunning Powershell updater..."

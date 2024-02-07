@@ -31,14 +31,12 @@ fi
 
 # Check if the supplied directory exists in the backups folder
 backup_name=$(realpath $1)
-grep "$backup_name" $backup_dir/map
+grep --quiet "$backup_name" $backup_dir/map
 if [ ! "$?" -eq 0 ]
 then
     error "'$1' does not exist in the backups folder!"
     exit 1
 fi
-
-
 
 # Check if the backup and it's checksum are still immutable
 
@@ -46,6 +44,10 @@ fi
 
 # Everything seems okay... restore the directory from the backup.
 
+# Grab the path information from the map file
+read map_backup_path original_path unused <<< $(cat $backup_dir/map | grep "$(realpath $1)")
+
+tar -xzf $map_backup_path -C $original_path
 
 exit 0 # Script ended successfully
 

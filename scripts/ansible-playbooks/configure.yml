@@ -5,14 +5,18 @@
   gather_facts: no
 
   vars:
-    external_ip_address: "172.31.41.2/29"
+    third_octet: "32" # TODO: UPDATE ME!!! 20 + Team Number
+    external_ip_address: "172.31.{{ third_octet }}.2/29"
     provider:
-      ip_address: "192.168.1.41"
-      password: "Changeme!"
+      ip_address: "172.20.242.150"
+      password: "Changeme123" # TODO: UPDATE ME!!!
       port: 443
       username: "admin"
 
-  
+        # TODO: Set login banner to the warning banner
+        # TODO: Change Policies and Address Groups to Account for NAT
+        # TODO: Change what interface syslog exits out of (device -> services -> syslog)
+        # TODO: Break File into Stages and make bash script
   tasks:
     - name: Create Allow-Ping Management Profile
       paloaltonetworks.panos.panos_management_profile:
@@ -143,27 +147,48 @@
         value: '169.254.74.75/32'
         description: 'Placeholder IP address for the blacklist group'
 
-    - name: Create Public Network Address Object
+    - name: Create Private Public Network Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
-        name: 'public-net'
+        name: 'public-net-private'
         value: '172.20.241.0/24'
         description: 'The public subnet'
 
-    - name: Create User Network Address Object
+    - name: Create Private User Network Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
-        name: 'user-net'
+        name: 'user-net-private'
         value: '172.20.242.0/24'
         description: 'The user subnet'
 
-    - name: Create Internal Network Address Object
+    - name: Create Private Network Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
-        name: 'internal-net'
+        name: 'internal-net-private'
         value: '172.20.240.0/24'
         description: 'The internal subnet'
 
+    - name: Create NAT Public Network Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'public-net-nat'
+        value: '172.25.{{ third_octet }}.151/24'
+        description: 'The nat translation to the public subnet'
+
+    - name: Create NAT User Network Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'user-net-nat'
+        value: '172.25.{{ third_octet }}.152/24'
+        description: 'The nat translation to the user subnet'
+
+    - name: Create NAT Internal Network Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'internal-net-nat'
+        value: '172.25.{{ third_octet }}.150/24'
+        description: 'The nat translation to the internal subnet'
+ 
     - name: Create 2016 Docker/Remote Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
@@ -177,6 +202,48 @@
         name: 'debian-dns-ntp'
         value: '172.20.240.20/24'
         description: 'Debian 10 DNS/NTP Machine'
+
+    - name: Create NAT Debian 10 DNS/NTP Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'debian-dns-ntp-nat'
+        value: '172.25.{{ third_octet }}.20/24'
+        description: 'Debian 10 DNS/NTP Machine NAT'
+
+    - name: Create NAT 2016 Docker/Remote Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'docker-remote-nat'
+        value: '172.25.{{ third_octet }}.97/24'
+        description: '2016 Docker/Remote Machine NAT'
+
+    - name: Create NAT 2019 AD/DNS Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'windows-server-2019-nat'
+        value: '172.25.{{ third_octet }}.27/24'
+        description: '2019 AD/DNS/DHCP Machine NAT'
+
+    - name: Create NAT Fedora Webmail Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'fedora-webmail-nat'
+        value: '172.25.{{ third_octet }}.39/24'
+        description: 'Fedora webmail NAT'
+
+    - name: Create NAT Splunk Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'splunk-nat'
+        value: '172.25.{{ third_octet }}.9/24'
+        description: 'Splunk NAT'
+
+    - name: Create NAT Ubuntu 18 Web Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'ubuntu-web-nat'
+        value: '172.25.{{ third_octet }}.23/24'
+        description: 'Ubuntu web NAT'
 
     - name: Create Ubuntu 18 Web Address Object
       paloaltonetworks.panos.panos_address_object:
@@ -199,12 +266,19 @@
         value: '172.20.241.20/24'
         description: 'Splunk 9.1.1 Machine'
 
-    - name: Create CentOS 7 E-comm Address Object
+    - name: Create CentOS 7 E-comm Internal Address Object
       paloaltonetworks.panos.panos_address_object:
         provider: '{{ provider }}'
-        name: 'centos-ecomm'
+        name: 'centos-ecomm-internal'
         value: '172.20.241.30/24'
         description: 'CentOS 7 E-Comm Machine'
+
+    - name: Create CentOS 7 E-comm Translated Address Object
+      paloaltonetworks.panos.panos_address_object:
+        provider: '{{ provider }}'
+        name: 'centos-ecomm-nat'
+        value: '172.25.{{ third_octet }}.11/24'
+        description: 'CentOS 7 E-Comm Machine NAT'
 
     - name: Create Fedora 21 Webmail/WebApps Address Object
       paloaltonetworks.panos.panos_address_object:
@@ -243,11 +317,23 @@
         name: 'internal-subnet'
         static_value: ['docker-remote', 'debian-dns-ntp']
 
+    - name: Create Internal Network NAT Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'internal-subnet-nat'
+        static_value: ['docker-remote-nat', 'debian-dns-ntp-nat']
+
     - name: Create User Network Address Group
       paloaltonetworks.panos.panos_address_group:
         provider: '{{ provider }}'
         name: 'user-subnet'
         static_value: ['ubuntu-web', 'windows-server-2019']
+
+    - name: Create User Network NAT Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'user-subnet-nat'
+        static_value: ['ubuntu-web-nat', 'windows-server-2019-nat']
 
     - name: Create Public Network Address Group
       paloaltonetworks.panos.panos_address_group:
@@ -255,11 +341,23 @@
         name: 'public-subnet'
         static_value: ['splunk', 'centos-ecomm', 'fedora-webmail']
 
+    - name: Create Public Network NAT Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'public-subnet-nat'
+        static_value: ['splunk-nat', 'centos-ecomm-nat', 'fedora-webmail-nat']
+
     - name: Create Internal DNS Servers Address Group
       paloaltonetworks.panos.panos_address_group:
         provider: '{{ provider }}'
         name: 'internal-dns-servers'
         static_value: ['debian-dns-ntp', 'windows-server-2019']
+
+    - name: Create Internal DNS Servers NAT Address Group
+      paloaltonetworks.panos.panos_address_group:
+        provider: '{{ provider }}'
+        name: 'internal-dns-servers-nat'
+        static_value: ['debian-dns-ntp-nat', 'windows-server-2019-nat']
 
     - name: Create Internal NTP Servers Address Group
       paloaltonetworks.panos.panos_address_group:
@@ -403,6 +501,19 @@
           #description: 'Splunk syslog wildfire log forwarding'
           #log_type: 'wildfire'
           #syslog_profiles: ['Splunk Syslog Profile']
+      
+    - name: Change Syslog Service Route Configuration
+      paloaltonetworks.panos.panos_type_cmd:
+        provider: '{{ provider }}'
+        cmd: 'set'
+        xpath: |
+          /config/devices/entry[@name='localhost.localdomain']
+          /deviceconfig/system/route/service/entry[@name='syslog']
+          /source
+        element: |
+          <interface>ethernet1/1</interface>
+          <address>172.20.241.254/24</address>
+
 
     - name: Delete Default 'any2any' Security Policy
       paloaltonetworks.panos.panos_type_cmd:
@@ -423,7 +534,6 @@
           /rulebase/security/rules/entry[@name='PUBLIC2EXTERNAL']
 
     - name: Delete Default 'PUBLIC2INTERNAL' Security Policy
-
       paloaltonetworks.panos.panos_type_cmd:
         provider: '{{ provider }}'
         cmd: 'delete'
@@ -455,6 +565,8 @@
           <log-start>yes</log-start>
           <log-setting>Splunk Log Forwarding</log-setting>
 
+          #TODO: Delete unnecessary configs (global, etc)
+
     - name: Commit Security Policy Changes
       paloaltonetworks.panos.panos_commit_firewall:
         provider: '{{ provider }}'
@@ -476,7 +588,6 @@
         application: ['any']
         service: ['any']
         action: 'drop'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -492,7 +603,6 @@
         application: ['any']
         service: ['any']
         action: 'drop'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -507,7 +617,6 @@
         destination_ip: ['any']
         application: ['dns', 'ntp', 'windows-updates', 'linux-updates', 'web-traffic', 'webmail', 'icmp-ping']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -519,10 +628,25 @@
         source_zone: ['External']
         source_ip: ['any']
         destination_zone: ['Public']
-        destination_ip: ['public-subnet']
+        destination_ip: ['public-subnet-nat']
         application: ['icmp-ping', 'linux-updates', 'web-traffic', 'webmail']
         action: 'allow'
-        log_start: true
+        log_setting: 'Splunk Log Forwarding'
+        location: 'bottom'
+
+
+    - name: Create 'External to Splunk' Security Policy
+      paloaltonetworks.panos.panos_security_rule:
+        provider: '{{ provider }}'
+        rule_name: 'External to Splunk'
+        description: 'Allows external web-browsing to splunk'
+        source_zone: ['External']
+        source_ip: ['any']
+        destination_zone: ['Public']
+        destination_ip: ['splunk-nat']
+        application: ['web-browsing']
+        service: ['splunk-web-service']
+        action: 'allow'
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -534,10 +658,9 @@
         source_zone: ['External']
         source_ip: ['any']
         destination_zone: ['User']
-        destination_ip: ['user-net']
+        destination_ip: ['user-net-nat', 'user-subnet-nat']
         application: ['dns', 'icmp-ping', 'linux-updates', 'web-traffic', 'windows-updates']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -549,10 +672,9 @@
         source_zone: ['External']
         source_ip: ['any']
         destination_zone: ['Internal']
-        destination_ip: ['internal-subnet']
+        destination_ip: ['internal-subnet-nat']
         application: ['dns', 'icmp-ping', 'linux-updates', 'ntp', 'web-traffic', 'windows-updates']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -568,7 +690,6 @@
         application: ['any']
         service: ['splunk-indexing-service', 'splunk-syslog-service']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -585,7 +706,6 @@
         destination_ip: ['internal-dns-servers', 'internal-ntp-servers']
         application: ['dns', 'ntp']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -600,7 +720,6 @@
         destination_ip: ['all-company-machines']
         application: ['dns', 'ntp']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -615,7 +734,6 @@
         destination_ip: ['windows-server-2019']
         application: ['windows-active-directory']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -630,7 +748,6 @@
         destination_ip: ['fedora-webmail']
         application: ['windows-active-directory']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 
@@ -661,7 +778,6 @@
         destination_ip: ['snmp-server']
         application: ['snmp']
         action: 'allow'
-        log_start: true
         log_setting: 'Splunk Log Forwarding'
         location: 'bottom'
 

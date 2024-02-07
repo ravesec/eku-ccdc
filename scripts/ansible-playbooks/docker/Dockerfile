@@ -1,40 +1,27 @@
-FROM ubuntu:22.04
+# Use the Ubuntu base image
+FROM ubuntu:latest
 
-ARG ANSIBLE_CORE_VERSION
-ARG ANSIBLE_VERSION
-ARG ANSIBLE_LINT
-ENV ANSIBLE_CORE_VERSION ${ANSIBLE_CORE_VERSION}
-ENV ANSIBLE_VERSION ${ANSIBLE_VERSION}
-ENV ANSIBLE_LINT ${ANSIBLE_LINT}
+# Avoid apt prompts
+ENV DEBIAN_FRONTEND=noninteractive
 
-# Labels.
-LABEL maintainer="will@willhallonline.co.uk" \
-    org.label-schema.schema-version="1.0" \
-    org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.name="willhallonline/ansible" \
-    org.label-schema.description="Ansible inside Docker" \
-    org.label-schema.url="https://github.com/willhallonline/docker-ansible" \
-    org.label-schema.vcs-url="https://github.com/willhallonline/docker-ansible" \
-    org.label-schema.vendor="Will Hall Online" \
-    org.label-schema.docker.cmd="docker run --rm -it -v $(pwd):/ansible -v ~/.ssh/id_rsa:/root/id_rsa willhallonline/ansible:2.11-ubuntu-22.04"
+# Update apt and install packages
+RUN apt update && \
+    apt upgrade -y && \
+    apt install git ssh python software-properties-common file vim sudo curl net-tools iputils-* iproute2 -y && \
+    apt clean && rm -rf /var/lib/apt/lists/*
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get install -y gnupg2 python3-pip sshpass git openssh-client && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get clean
+# Prevent system from being 'minimized'
+RUN yes | unminimize
 
-RUN python3 -m pip install --upgrade pip cffi && \
-    pip3 install ansible-core==${ANSIBLE_CORE_VERSION} && \
-    pip3 install ansible==${ANSIBLE_VERSION} ansible-lint==${ANSIBLE_LINT} && \
-    pip3 install mitogen jmespath && \
-    pip install --upgrade pywinrm && \
-    rm -rf /root/.cache/pip
+WORKDIR /root
+RUN add-apt-repository --yes --update ppa:ansible/ansible && \
+    apt install ansible && \
+    ssh-keygen -t rsa -f /root/shared/id_rsa -q -N "" && \
+    ansible-galaxy collection install paloaltonetworks.panos && \
+    pip install pan-python pan-os-python
 
-RUN mkdir /ansible && \
-    mkdir -p /etc/ansible && \
-    echo 'localhost' > /etc/ansible/hosts
+# Clone repo
+RUN git clone https://github.com/profg-ul/eku-ccdc.git
 
-WORKDIR /ansible
-
-CMD [ "ansible-playbook", "--version" ]
+WORKDIR /root/eku-ccdc/scripts/ansible-playbooks
+RUN git pull

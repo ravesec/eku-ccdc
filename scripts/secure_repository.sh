@@ -4,7 +4,7 @@ script_name="script_name.sh"
 usage="./$script_name"
 
 # Import environment variables
-. ../../config_files/ekurc
+. ../config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"

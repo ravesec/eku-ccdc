@@ -44,8 +44,8 @@ key="$(cat $key_path | grep "_COOKIE_KEY_" | cut -d ',' -f2 | tr -d " ,');")"
 query="UPDATE ps_employee SET passwd = MD5('$key$prestashop_admin_password') WHERE firstname = 'Greg';"
 
 info "Resetting prestashop DB_USER and DB_PASSWD"
-sed -i "/_DB_USER_\$/c\define('_DB_USER_', 'sysadmin');" /var/www/html/prestashop/config/settings.inc.php
-sed -i "/_DB_PASSWD_\$/c\define('_DB_PASSWD_', '$prestashop_new_db_user_password');" /var/www/html/prestashop/config/settings.inc.php
+sed -i "/_DB_USER_/c\define('_DB_USER_', '$prestashop_new_db_user_password');" $key_path
+sed -i "/_DB_PASSWD_/c\define('_DB_PASSWD_', '$prestashop_new_db_user_password');" $key_path
 
 info "Changing prestashop admin password"
 mysql -u"sysadmin" -p"$prestashop_new_db_user_password" -D"prestashop" -e"$query" --verbose

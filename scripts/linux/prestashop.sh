@@ -29,7 +29,11 @@ fi
 # Secure the mysql installation
 query="CREATE USER 'sysadmin'@'localhost' IDENTIFIED BY '$prestashop_new_db_user_password';"
 info "Creating new DB user"
-mysql -u"root" -p"" -e"$query" --verbose
+mysql -u"root" -e"$query" --verbose
+
+info "Granting perms to new user"
+query="GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, LOCK TABLES ON prestashop.* TO 'sysadmin'@'localhost'; FLUSH PRIVILEGES;"
+mysql -u"root" -e"$query" --verbose
 
 info "Starting the MySQL secure installation script..."
 mysql_secure_installation

@@ -5,7 +5,7 @@ sudo apt update
 sudo apt install --yes python3 pip apt-transport-https ca-certificates curl software-properties-common
 pip install pwn pan-python pan-os-python
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+sudo add-apt-repository --yes "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
 apt-cache policy docker-ce
 sudo apt install --yes docker-ce
 sudo systemctl enable docker

@@ -41,7 +41,7 @@ printf "<!-- Network Configuration --!>\n\n%s\n\n%s\n\n" "$(cat /etc/network/int
 
 printf "<!-- Active Network Connections --!>\n\n%s\n\n" "$(ss -luntp)"
 
-printf "<!-- Running Processes --!>\n\n%s\n\n" "$(ps -aux)"
+printf "<!-- Running Processes --!>\n\n%s\n\n" "$(ps -aux && ps -ef --forest)"
 
 printf "<!-- DNS Information --!>\n\n%s\n\n%s\n\n" "$(cat /etc/hosts)" "$(cat /etc/resolv.conf)"
 

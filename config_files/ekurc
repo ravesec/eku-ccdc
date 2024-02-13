@@ -6,6 +6,7 @@ prestashop_admin_password="changeme"
 prestashop_new_db_user_password="changeme"
 centos_sql_password="changeme"
 palo_alto_password="changeme123!"
+repo_dir="$(find / -type d -name 'eku-ccdc' -print -quit 2>/dev/null)"
 
 # Functions to make output pretty.
 info() {
@@ -32,6 +33,23 @@ success() {
     # Green
     echo -e "$identifier[\e[32mSUCCESS\e[0m] $*"
 }
+
+
+# Function to check for repository security (are permissions set correctly to 0750?)
+check_security() {
+    source $repo_dir/config_files/perms_set
+    if [ "$perms_set" -eq 0 ]
+    then
+        # Repository not yet secured
+        warn "Repository permissions are not secure, running secure script..."
+        $repo_dir/scripts/linux/secure_repository.sh
+        echo "perms_set=1" > $repo_dir/config_files/perms_set
+    else
+        # Repository already secured
+        info "Repository is secure. Continuing!"
+    fi
+}
+    
 
 
 #TODO Create a function to restart services

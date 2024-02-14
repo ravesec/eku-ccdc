@@ -29,6 +29,9 @@ then error $usage
     exit 1
 fi
 
+# Check repository security requirement
+check_security
+
 # Main script here...
 
 

@@ -44,9 +44,6 @@ check_security() {
         warn "Repository permissions are not secure, running secure script..."
         $repo_dir/scripts/linux/secure_repository.sh
         echo "perms_set=1" > $repo_dir/config_files/perms_set
-    else
-        # Repository already secured
-        info "Repository is secure. Continuing!"
     fi
 }
     

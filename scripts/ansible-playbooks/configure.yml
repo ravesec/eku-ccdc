@@ -14,9 +14,7 @@
       username: "admin"
 
         # TODO: Set login banner to the warning banner
-        # TODO: Change Policies and Address Groups to Account for NAT
         # TODO: Change what interface syslog exits out of (device -> services -> syslog)
-        # TODO: Break File into Stages and make bash script
   tasks:
     - name: Create Allow-Ping Management Profile
       paloaltonetworks.panos.panos_management_profile:

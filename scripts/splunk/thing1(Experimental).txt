@@ -1,0 +1,505 @@
+{
+	"visualizations": {
+		"viz_vfQjhiTa": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_Vb8dKtmq"
+			},
+			"title": "E-Comm Traffic:  172.20.241.30  | 172.25.*.11",
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			},
+			"showProgressBar": false,
+			"showLastUpdated": false
+		},
+		"viz_XOzqUjAp": {
+			"type": "splunk.table",
+			"dataSources": {
+				"primary": "ds_uTGzcL3B"
+			},
+			"title": "Scanning Detection"
+		},
+		"viz_DScW0VG9": {
+			"type": "splunk.rectangle"
+		},
+		"viz_XsOTYJXI": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_2P5WzOY6"
+			},
+			"title": "Fedora Traffic: 172.20.241.40 | 172.25.*.39",
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			}
+		},
+		"viz_i1liosj4": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_JwG09RSb"
+			},
+			"title": "Debian Traffic: 172.20.240.20 | 172.25.*.20",
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			}
+		},
+		"viz_HWTpmPb0": {
+			"type": "splunk.line",
+			"title": "Ubuntu Traffic: 172.20.242.10 | 172.25.*.23",
+			"dataSources": {
+				"primary": "ds_rrqkxz7E"
+			},
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			}
+		},
+		"viz_b0yyiGZi": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_iFwvSBqN"
+			},
+			"title": "Windows 2019 Traffic: 172.20.242.200 | 172.25.*.27",
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			}
+		},
+		"viz_myx2aFOD": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_B9fnCJbG"
+			},
+			"title": "Docker(Win2016) Traffic: 172.20.240.10 | 172.25.*.97",
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			}
+		},
+		"viz_GtGtLUL9": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_Qv8bOB0K"
+			},
+			"title": "Splunk Traffic: 172.20.241.20 | 172.25.*.9",
+			"options": {
+				"legendTruncation": "ellipsisOff"
+			}
+		},
+		"viz_e9mLD27j": {
+			"type": "splunk.rectangle"
+		},
+		"viz_HulYEXNa": {
+			"type": "splunk.table",
+			"dataSources": {
+				"primary": "ds_FxU8geEE"
+			},
+			"title": "SSH Detection",
+			"showProgressBar": false,
+			"showLastUpdated": false
+		},
+		"viz_KUlHANT7": {
+			"type": "splunk.table",
+			"dataSources": {
+				"primary": "ds_S7PVVnvB"
+			},
+			"title": "Metasploit RvShell Detection",
+			"showProgressBar": false,
+			"showLastUpdated": false
+		},
+		"viz_pH3IRhK3": {
+			"type": "splunk.singlevalue",
+			"dataSources": {
+				"primary": "ds_ualY8xPu"
+			},
+			"title": "Remote Desktop Detection"
+		},
+		"viz_pX8S1Wq8": {
+			"type": "splunk.rectangle"
+		},
+		"viz_oyvFWQZl": {
+			"type": "splunk.table",
+			"dataSources": {
+				"primary": "ds_58icnzyO"
+			},
+			"title": "Threat Logs",
+			"eventHandlers": [
+				{
+					"type": "drilldown.linkToDashboard",
+					"options": {
+						"app": "search",
+						"dashboard": "threat_log",
+						"newTab": true
+					}
+				}
+			]
+		},
+		"viz_ZOMVnxqf": {
+			"type": "splunk.line",
+			"dataSources": {
+				"primary": "ds_ee4v9V5v"
+			},
+			"title": "Attack Surface Graph"
+		},
+		"viz_s33ZrILW": {
+			"type": "splunk.table",
+			"dataSources": {
+				"primary": "ds_SLgoebNI"
+			},
+			"title": "External Traffic"
+		},
+		"viz_VXmlfUqO": {
+			"type": "splunk.table",
+			"dataSources": {
+				"primary": "ds_seSOtaRk"
+			},
+			"title": "Detect Beaconing"
+		}
+	},
+	"dataSources": {
+		"ds_Vb8dKtmq": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.22.11 OR 172.20.241.30 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip"
+			},
+			"name": "E-Comm Traffic"
+		},
+		"ds_uTGzcL3B": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic\n| stats dc(dest_port) as num_dest_port dc(dest_ip) as num_dest_ip by src_ip\n| where num_dest_port >= 100 or num_dest_ip >= 100 ",
+				"queryParameters": {
+					"earliest": "rt-1m",
+					"latest": "rt"
+				}
+			},
+			"name": "Scan Detection"
+		},
+		"ds_2P5WzOY6": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.num.39 OR 172.20.241.40 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip"
+			},
+			"name": "Fedora Traffic"
+		},
+		"ds_JwG09RSb": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.num.20 OR 172.20.240.20 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip"
+			},
+			"name": "Debian Traffic"
+		},
+		"ds_rrqkxz7E": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.num.23 OR 172.20.242.10 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip"
+			},
+			"name": "Ubuntu Traffic"
+		},
+		"ds_iFwvSBqN": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.num.27 OR 172.20.242.200 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip"
+			},
+			"name": "Windows AD-DNS Traffic"
+		},
+		"ds_B9fnCJbG": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.num.97 OR 172.20.240.10 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip "
+			},
+			"name": "Docker Traffic"
+		},
+		"ds_Qv8bOB0K": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic dest_ip = 172.25.num.9 OR dest_ip = 172.20.241.20 src_zone=External\n| eval num=teamNum+20\n| timechart count by src_ip"
+			},
+			"name": "Traffic to Splunk"
+		},
+		"ds_FxU8geEE": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic application = ssh\n| table src_ip, dest_ip\n",
+				"queryParameters": {
+					"earliest": "rt-1m",
+					"latest": "rt"
+				}
+			},
+			"name": "SSH Detection"
+		},
+		"ds_S7PVVnvB": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic src_port = 4444\n| table src_ip, dest_ip",
+				"queryParameters": {
+					"earliest": "rt-1h",
+					"latest": "rt"
+				}
+			},
+			"name": "Inc Meterpreter Detection"
+		},
+		"ds_ualY8xPu": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic\n| stats dc(dest_port) by src_ip\n| where dest_port == 3389"
+			},
+			"name": "Remote Desktop Detection"
+		},
+		"ds_58icnzyO": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=\"pan:threat\"\n| cluster showcount=t\n| table cluster_count _raw src_ip dest_ip\n| sort -cluster_count",
+				"queryParameters": {}
+			},
+			"name": "Threat Log Generator"
+		},
+		"ds_ee4v9V5v": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=\"pan:traffic\" dest_ip = 172.25.num.11 OR 172.20.241.30 OR 172.25.num.39 OR 172.20.241.40 src_zone=External\n| eval num=teamNum+20\n| timechart count by dest_ip"
+			},
+			"name": "Traffic to Open-Face Machines"
+		},
+		"ds_SLgoebNI": {
+			"type": "ds.search",
+			"options": {
+				"query": "index=* sourcetype=pan:traffic src_zone=Internal OR src_zone=Public OR src_zone=User dest_ip = 10.*.*.*\n| table src_ip, src_port, dest_ip, dest_port"
+			},
+			"name": "Traffic Internal to External"
+		},
+		"ds_seSOtaRk": {
+			"type": "ds.search",
+			"options": {
+				"query": "eventtype=stream_dns message_type=Query\n| fields _time, query\n| streamstats current=f last(_time) AS last_time BY query\n| eval gap=last_time - _time\n| stats count avg(gap) AS AverageBeaconTime var(gap) AS VarianceBeaconTime BY query\n| eval AverageBeaconTime=round(AverageBeaconTime,3), VarianceBeaconTime=round(VarianceBeaconTime,3)\n| sort -count\n| where VarianceBeaconTime < 60 AND count > 2 AND AverageBeaconTime>1.000\n| table query VarianceBeaconTime  count AverageBeaconTime",
+				"queryParameters": {
+					"earliest": "$global_time.earliest$",
+					"latest": "$global_time.latest$"
+				}
+			},
+			"name": "Malicious Beaconing Search"
+		}
+	},
+	"defaults": {
+		"dataSources": {
+			"ds.search": {
+				"options": {
+					"queryParameters": {
+						"latest": "$global_time.latest$",
+						"earliest": "$global_time.earliest$"
+					}
+				}
+			}
+		}
+	},
+	"inputs": {
+		"input_global_trp": {
+			"type": "input.timerange",
+			"options": {
+				"token": "global_time",
+				"defaultValue": "-24h@h,now"
+			},
+			"title": "Global Time Range"
+		},
+		"input_R1PCAteE": {
+			"options": {
+				"defaultValue": "1",
+				"token": "teamNum"
+			},
+			"title": "Team Number",
+			"type": "input.text"
+		}
+	},
+	"layout": {
+		"type": "absolute",
+		"options": {
+			"display": "auto-scale",
+			"height": 2000,
+			"width": 1800
+		},
+		"structure": [
+			{
+				"item": "viz_pX8S1Wq8",
+				"type": "block",
+				"position": {
+					"x": 0,
+					"y": 1260,
+					"w": 1800,
+					"h": 740
+				}
+			},
+			{
+				"item": "viz_e9mLD27j",
+				"type": "block",
+				"position": {
+					"x": 1460,
+					"y": 0,
+					"w": 340,
+					"h": 1250
+				}
+			},
+			{
+				"item": "viz_DScW0VG9",
+				"type": "block",
+				"position": {
+					"x": 0,
+					"y": 0,
+					"w": 1450,
+					"h": 1250
+				}
+			},
+			{
+				"item": "viz_vfQjhiTa",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 10,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_XOzqUjAp",
+				"type": "block",
+				"position": {
+					"x": 1470,
+					"y": 10,
+					"w": 320,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_XsOTYJXI",
+				"type": "block",
+				"position": {
+					"x": 490,
+					"y": 10,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_i1liosj4",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 320,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_HWTpmPb0",
+				"type": "block",
+				"position": {
+					"x": 970,
+					"y": 10,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_b0yyiGZi",
+				"type": "block",
+				"position": {
+					"x": 490,
+					"y": 320,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_myx2aFOD",
+				"type": "block",
+				"position": {
+					"x": 970,
+					"y": 320,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_GtGtLUL9",
+				"type": "block",
+				"position": {
+					"x": 490,
+					"y": 630,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_HulYEXNa",
+				"type": "block",
+				"position": {
+					"x": 1470,
+					"y": 320,
+					"w": 320,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_KUlHANT7",
+				"type": "block",
+				"position": {
+					"x": 1470,
+					"y": 630,
+					"w": 320,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_pH3IRhK3",
+				"type": "block",
+				"position": {
+					"x": 1470,
+					"y": 940,
+					"w": 320,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_oyvFWQZl",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 940,
+					"w": 1430,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_ZOMVnxqf",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 630,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_s33ZrILW",
+				"type": "block",
+				"position": {
+					"x": 970,
+					"y": 630,
+					"w": 470,
+					"h": 300
+				}
+			},
+			{
+				"item": "viz_VXmlfUqO",
+				"type": "block",
+				"position": {
+					"x": 10,
+					"y": 1270,
+					"w": 1430,
+					"h": 300
+				}
+			}
+		],
+		"globalInputs": [
+			"input_global_trp",
+			"input_R1PCAteE"
+		]
+	},
+	"description": "",
+	"title": "General Overview"
+}

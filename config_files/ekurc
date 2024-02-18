@@ -42,7 +42,7 @@ check_security() {
     then
         # Repository not yet secured
         warn "Repository permissions are not secure, running secure script..."
-        $repo_dir/scripts/linux/secure_repository.sh
+        sudo $repo_dir/scripts/linux/secure_repository.sh
         echo "perms_set=1" > $repo_dir/config_files/perms_set
     fi
 }

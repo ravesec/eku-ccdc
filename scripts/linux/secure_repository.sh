@@ -20,6 +20,8 @@ fi
 # Find the repo root and do o-rwx, g-w
 repo_dir="$(find / -type d -name 'eku-ccdc' 2>/dev/null)"
 find $repo_dir -exec chmod 0750 -- {} +
+chattr +a "$repo_dir/config_files/.history"
+chattr +i "$repo_dir/scripts/linux/slack/api_key" "$repo_dir/scripts/linux/slack/webhook_url"
 success "Fixed repo permissions!"
 
 exit 0 # Script ended successfully

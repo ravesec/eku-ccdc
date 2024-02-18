@@ -5,7 +5,7 @@
 #
 # Description: A bash script that configures the firewall automatically using Palo Alto's XML API.
 #
-# Dependencies: ../../config_files/ekurc, ../../config_files/perms_set
+# Dependencies: $repo_root/config_files/ekurc, $repo_root/config_files/perms_set
 # Created: 02/12/2024
 # Usage: <./xml_api.sh>
 
@@ -33,8 +33,11 @@ team_number=0 #TODO: CHANGEME!!!
 user="admin"
 password="Changeme123" #TODO: CHANGEME!!!
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Import environment variables
-source ../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 if [ "$team_number" -eq 0 ]
 then

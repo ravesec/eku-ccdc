@@ -15,8 +15,11 @@
 script_name="script_name.sh"
 usage="./$script_name <args>"
 
+# Get the path of the repository root
+repo_root=$(git rev-parse --show-toplevel)
+
 # Import environment variables
-. ../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"
@@ -33,7 +36,6 @@ fi
 check_security
 
 # Main script here...
-
 
 
 # Example logging message functions

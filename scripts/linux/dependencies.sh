@@ -5,7 +5,7 @@
 #
 # Description: Script that installs dependencies/packages for the github repository.
 #
-# Dependencies: ../../ekurc
+# Dependencies: $repo_root/config_files/ekurc
 # Created: 02/16/2024
 # Usage: <./dependencies.sh>
 
@@ -13,8 +13,11 @@
 script_name="dependencies.sh"
 usage="./$script_name <args>"
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Import environment variables
-source ../../config_files/ekurc
+source $repo_root/config_files/ekurc
 source /etc/os_release
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.

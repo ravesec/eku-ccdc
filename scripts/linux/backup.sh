@@ -6,10 +6,10 @@
 # Description: This script creates a backup of the files and directories passed in the arguments.
 #  This script works in tandem with ./restore.sh 
 #
-# Dependencies: ../../config_files/ekurc
+# Dependencies: $repo_root/config_files/ekurc
 #
 # Notes:
-#  Stores backup files in the path specified in ../../config_files/ekurc
+#  Stores backup files in the path specified in $repo_root/config_files/ekurc
 #  'Overwritten' backups are just renamed with a leading . and trailing ~, however they must be manually restored because the map
 #   and checksum data is deleted.
 #
@@ -21,8 +21,11 @@
 script_name="backup.sh"
 usage="Usage: ./$script_name <directory>"
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Import environment variables
-. ../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then error "This script must be ran as root!" >&2

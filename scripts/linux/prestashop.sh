@@ -5,7 +5,7 @@
 #
 # Description: Script to harden weak installs of prestashop.
 #
-# Dependencies: ../../config_files/ekurc
+# Dependencies: $repo_root/config_files/ekurc
 # Created: 02/06/2024
 # Usage: <./prestashop.sh>
 
@@ -13,8 +13,12 @@
 script_name="prestashop.sh"
 usage="./$script_name"
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Import environment variables
-. ../../config_files/ekurc
+source $repo_root/config_files/ekurc
+
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then error "This script must be ran as root!"
     exit 1

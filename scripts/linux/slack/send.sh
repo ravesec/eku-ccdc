@@ -14,8 +14,11 @@ aes_password=""
 script_name="send.sh"
 usage="./$script_name <message>"
 
+# Get the path of the repository root
+repo_root=$(git rev-parse --show-toplevel)
+
 # Import environment variables
-source ../../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 # Check for the correct number of arguments
 if [ "$#" -lt 1 ]

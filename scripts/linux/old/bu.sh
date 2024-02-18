@@ -8,6 +8,9 @@ then echo "This script must be ran as root!"
 	exit
 fi
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Get the name of the OS
 source /etc/os-release
 
@@ -15,7 +18,7 @@ source /etc/os-release
 mkdir -p /root/bu/$ID
 
 ## Backup everything except for /dev, /proc, /sys, /tmp, /run, /mnt, /media, /root/bu \(The backup folder\), and /lost+found
-rsync -aAXHv --exclude-from=../../config_files/excludelist / /root/bu/$ID
+rsync -aAXHv --exclude-from=$repo_root/config_files/excludelist / /root/bu/$ID
 
 # Ask the user if they would like to calculate the hashes of the backup folder.
 read -p "Would you like to calculate the hashes of everything in /root/bu/$ID?"

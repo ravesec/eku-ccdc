@@ -3,10 +3,10 @@
 script_name="secure_repository.sh"
 usage="./$script_name"
 
-# Import environment variables
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
 
-# Find the repo root
-repo_dir="$(find / -type d -name 'eku-ccdc' 2>/dev/null)"
+# Import environment variables
 source "$repo_dir/config_files/ekurc"
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.

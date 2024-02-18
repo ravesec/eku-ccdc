@@ -33,11 +33,14 @@ then # Based on RHEL, use their package manager
     yum install wget
     wget -O splunk_forwarder.rpm $splunk_package
     #yum install ./splunk_forwarder.rpm
+    info "Your package manager is yum!"
 else # Must be debian based, use apt
     splunk_package="$(cat ./forwarder_links.txt | grep '.deb$')"
     apt install wget
     wget -O splunk_forwarder.deb $splunk_package
     #apt install ./splunk_forwarder.rpm
+    info "Your package manager is apt!"
 fi
+success "The correct splunk forwarder for your OS has been downloaded. Please install it using the correct package manager."
 
 exit 0 # Script ended successfully

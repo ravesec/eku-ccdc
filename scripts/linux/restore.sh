@@ -15,8 +15,11 @@ usage="./restore.sh <directory>"
 
 #TODO: Provide the user with a menu of all current backups.
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Import environment variables
-. ../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then error "This script must be ran as root!"

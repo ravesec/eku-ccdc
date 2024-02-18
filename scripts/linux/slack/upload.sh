@@ -15,8 +15,11 @@ channel_id="C06K31XKY78" # Hard coded Slack channel ID
 script_name="upload.sh"
 usage="./$script_name <file_path>"
 
+# Get the path of the respository root
+repo_root=$(git rev-parse --show-toplevel)
+
 # Import environment variables
-source ../../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 # Check for the correct number of arguments
 if [ "$#" -ne 1 ]

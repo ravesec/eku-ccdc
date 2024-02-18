@@ -7,6 +7,9 @@ then echo "Script must be ran as root!"
 	exit
 fi
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Check for directory root argument
 if [ "$1" = "" ]
 then echo "USAGE: ./integrity.sh <directory root>"
@@ -19,7 +22,7 @@ touch /tmp/checksums
 chmod 444 /tmp/checksums /var/log/checksums.log
 
 # Install crontab from config files.
-crontab ../../config_files/crontab
+crontab $repo_root/config_files/crontab
 
 # Make sure argument is a valid directory
 if [[ -d $1 ]]

@@ -15,8 +15,11 @@
 script_name="script_name.sh"
 usage="\e[31m./$script_name <args>\e[0m"
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Import environment variables
-. ../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then echo "\e[31mError: This script must be ran as root!\e[0m" >&2

@@ -5,7 +5,7 @@
 #
 # Description: A command line app to send files and messages to slack channels.
 #
-# Dependencies: ../../../config_files/ekurc
+# Dependencies: $repo_root/config_files/ekurc
 # Created: 02/16/2024
 # Usage: <./client.sh>
 
@@ -16,8 +16,11 @@ usage="./$script_name"
 # todo: Get hostname
 client_dir=$(pwd)
 
+# Get the path of the repository root
+repo_root=$(git rev-parse --show-toplevel)
+
 # Import environment variables
-source ../../../config_files/ekurc
+source $repo_root/config_files/ekurc
 
 # Check for the correct number of arguments
 if [ "$#" -gt 0 ]

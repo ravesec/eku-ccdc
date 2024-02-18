@@ -8,8 +8,11 @@ then echo "This script must be ran as root!" >&2
     exit
 fi
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Banner creation
-cp ../../config_files/banner /etc/ssh/banner.txt
+cp $repo_root/config_files/banner /etc/ssh/banner.txt
 # Make sure banner.txt has 644 permissions
 chmod 644 /etc/ssh/banner.txt
 

@@ -6,6 +6,9 @@
 # Author: Raven
 #
 
+# Get the path of the repository root
+repo_root=$(get rev-parse --show-toplevel)
+
 # Ensure Root
 if [ "$EUID" -ne 0 ]
 then echo "This script must be ran as root!"
@@ -61,7 +64,7 @@ wd=$(pwd)
 cd /var/www/html
 ls -s $install_dir ./mirror
 cd $wd
-cp ../../config_files/default_mirror_site /etc/nginx/sites-enabled/default
+cp $repo_root/config_files/default_mirror_site /etc/nginx/sites-enabled/default
 
 # Restart nginx
 systemctl enable nginx

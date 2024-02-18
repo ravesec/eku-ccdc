@@ -33,6 +33,9 @@ team_number=0 #TODO: CHANGEME!!!
 user="admin"
 password="Changeme123" #TODO: CHANGEME!!!
 
+# Import environment variables
+source ../../config_files/ekurc
+
 if [ "$team_number" -eq 0 ]
 then
     error "Team number not set!"
@@ -58,8 +61,6 @@ usage="./$script_name"
 api="https://$host/api/" # api baseurl
 job_status_poll_speed=3 # Speed (in seconds) that the script checks for the commit status
 
-# Import environment variables
-. ../../config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"

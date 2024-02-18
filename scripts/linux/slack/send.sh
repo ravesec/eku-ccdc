@@ -9,7 +9,7 @@
 # Created: 02/17/2024
 # Usage: <./send.sh <message_to_send>>
 
-aes_password="ekuccdc2024!"
+aes_password=""
 
 script_name="send.sh"
 usage="./$script_name <message>"

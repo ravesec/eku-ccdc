@@ -31,11 +31,17 @@ host="172.20.242.150" # TODO: CHANGEME!!!
 management_subnet="172.20.242.0/24"
 team_number=0 #TODO: CHANGEME!!!
 user="admin"
-password="Changeme!" #TODO: CHANGEME!!!
+password="Changeme123" #TODO: CHANGEME!!!
 
 if [ "$team_number" -eq 0 ]
 then
     error "Team number not set!"
+    exit 1
+fi
+
+if [ "$password" == "Changeme123" ]
+then
+    error "Password cannot be default!"
     exit 1
 fi
 

@@ -9,12 +9,38 @@
 # Created: 02/12/2024
 # Usage: <./xml_api.sh>
 
+
+
+
+
+#TODO:
+# [ x ] Create tags to color zones
+# [ x ] Decompose bidirectional security policies
+# [   ] Dynamic content updates
+# [   ] Add permitted management IP and set services enabled
+# [   ] Change DNS servers to google
+# [   ] Edit DHCP settings
+# [   ] Send device system logs to splunk ? (auth-success graph?)
+# [   ] NGFW Advanced Features
+#
+# Create a script to delete admin accounts, as well as kill admin sessions
+# Disable telemetry (?)
+
 # Edit variables as required.
-host="192.168.1.41" # TODO: CHANGEME!!!
-management_subnet="192.168.1.0/24" # TODO: CHANGEME!!!
-team_number=21 #TODO: CHANGEME!!!
+host="172.20.242.150" # TODO: CHANGEME!!!
+management_subnet="172.20.242.0/24"
+team_number=0 #TODO: CHANGEME!!!
 user="admin"
 password="Changeme!" #TODO: CHANGEME!!!
+
+if [ "$team_number" -eq 0 ]
+then
+    error "Team number not set!"
+    exit 1
+fi
+
+
+# don't change these unless you know what you are doing
 third_octet=$((20+$team_number))
 pan_device="localhost.localdomain"
 pan_vsys="vsys1"
@@ -24,7 +50,7 @@ script_name="xml_api.sh"
 usage="./$script_name"
 
 api="https://$host/api/" # api baseurl
-commit_poll_speed=3 # Speed (in seconds) that the script checks for the commit status
+job_status_poll_speed=3 # Speed (in seconds) that the script checks for the commit status
 
 # Import environment variables
 . ../../config_files/ekurc
@@ -42,6 +68,10 @@ fi
 
 # Check repository security requirement
 check_security
+
+# Install packages assuming apt is the package manager
+apt update
+apt install -y libxml-xpath-perl libxml2-utils jq findutils curl
 
 action() { # action <action> <description> <xpath>/<cmd> <element>
     api_call="action_$1($2)"
@@ -82,28 +112,28 @@ action() { # action <action> <description> <xpath>/<cmd> <element>
     fi
 }
 
-check_commit_status() {
+check_job_status() {
     # Check the commit status for the job in $1 and echo the result.
     response=$(curl --location --globoff --insecure --silent --request GET --header "$header" "$api?type=op&cmd=<show><jobs><id>$1</id></jobs></show>")
     echo $(echo $response | xpath -e '/response/result/job/status/text()' 2>/dev/null)
 }
 
 commit() { #commit <description>
-    info "Starting commit: $1"
+    info "Starting Job: $1"
     job_id=$(curl --location --globoff --insecure --silent --request POST --header "$header" "$api?type=commit&cmd=<commit></commit>" | xpath -q -e '/response/result/job/text()')
 
     if [ ! -z "$job_id" ]
     then
-        status=$(check_commit_status $job_id)
+        status=$(check_job_status $job_id)
         while [ "$status" != "FIN" ]
         do
             info "Waiting for job $job_id ($1) to complete..."
-            sleep $commit_poll_speed
-            status=$(check_commit_status $job_id)
+            sleep $job_status_poll_speed
+            status=$(check_job_status $job_id)
         done
-        success "Commit $job_id: '$1' complete!"
+        success "Job $job_id: '$1' complete!"
     else
-        warn "No changes to commit!"
+        warn "Job $job_id: Nothing to do!"
     fi
 
 }
@@ -166,11 +196,16 @@ create_security_policies() { # create_security_policies
     # Internal Servers to Splunk
     action "set" "Security Policy 'Internal Servers to Splunk'" "$sec_policy_xpath[@name='internal-servers-to-splunk']" "<to><member>Public</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member></source><destination><member>splunk</member><member>splunk-nat</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>any</member></application><service><member>splunk-indexing-service</member><member>splunk-syslog-service</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all company servers to communicate with Splunk.</description>" &
 
-    # Internal Servers to DNS/NTP
-    action "set" "Security Policy 'Internal Servers to DNS/NTP'" "$sec_policy_xpath[@name='bidir-servers-to-dns_ntp']" "<to><member>Internal</member><member>Public</member><member>User</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member><member>dns-servers</member><member>dns-servers-nat</member><member>ntp-servers</member><member>ntp-servers-nat</member></source><destination><member>all-company-servers</member><member>dns-servers</member><member>dns-servers-nat</member><member>ntp-servers</member><member>ntp-servers-nat</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>dns</member><member>ntp</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all company servers to communicate with internal DNS and NTP servers bi-directionally.</description><log-setting>Splunk</log-setting>" &
+    #action "set" "Security Policy 'Internal Servers to DNS/NTP'" "$sec_policy_xpath[@name='bidir-servers-to-dns_ntp']" "<to><member>Internal</member><member>Public</member><member>User</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member><member>dns-servers</member><member>dns-servers-nat</member><member>ntp-servers</member><member>ntp-servers-nat</member></source><destination><member>all-company-servers</member><member>dns-servers</member><member>dns-servers-nat</member><member>ntp-servers</member><member>ntp-servers-nat</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>dns</member><member>ntp</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all company servers to communicate with internal DNS and NTP servers bi-directionally.</description><log-setting>Splunk</log-setting>" &
 
-    # Webmail to Active Directory
-    action "set" "Security Policy 'Webmail to Active Directory'" "$sec_policy_xpath[@name='bidir-active-directory-to-webmail']" "<to><member>Public</member><member>User</member></to><from><member>Public</member><member>User</member></from><source><member>fedora-webmail</member><member>windows-server-2019</member></source><destination><member>fedora-webmail</member><member>windows-server-2019</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>windows-active-directory</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow the active directory server to communicate with the mailserver bi-directionally.</description><log-setting>Splunk</log-setting>" &
+    # Internal Servers to DNS/NTP (TODO: NEW RULE)
+    action "set" "Security Policy 'Internal Servers to DNS/NTP'" "$sec_policy_xpath[@name='servers-to-dns_ntp']" "<to><member>Internal</member><member>User</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member></source><destination><member>dns-servers</member><member>dns-servers-nat</member><member>ntp-servers</member><member>ntp-servers-nat</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>dns</member><member>ntp</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all servers to communicate with the dns and ntp servers.</description><log-setting>Splunk</log-setting>" &
+
+
+    # Webmail to Active Directory (TODO: NEW RULE)
+    action "set" "Security Policy 'Webmail to Active Directory'" "$sec_policy_xpath[@name='webmail-to-active-directory']" "<to><member>User</member></to><from><member>Public</member></from><source><member>fedora-webmail</member></source><destination><member>windows-server-2019</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>windows-active-directory</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow the webmail server to communicate with the active directory server.</description><log-setting>Splunk</log-setting>" &
+
+    #action "set" "Security Policy 'Webmail to Active Directory'" "$sec_policy_xpath[@name='bidir-active-directory-to-webmail']" "<to><member>Public</member><member>User</member></to><from><member>Public</member><member>User</member></from><source><member>fedora-webmail</member><member>windows-server-2019</member></source><destination><member>fedora-webmail</member><member>windows-server-2019</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>windows-active-directory</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow the active directory server to communicate with the mailserver bi-directionally.</description><log-setting>Splunk</log-setting>" &
 
     # GUIs to Splunk
     action "set" "Security Policy 'GUIs to Splunk'" "$sec_policy_xpath[@name='guis-to-splunk']" "<to><member>Public</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member></source><destination><member>splunk</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>web-browsing</member></application><service><member>splunk-web-service</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all company machines with a GUI to access the Splunk server's web UI.</description>" &
@@ -255,6 +290,7 @@ log_profiles_xpath="$full_xpath/log-settings/profiles/entry"
 srvc_route_xpath="$device_xpath/deviceconfig/system/route"
 sec_policy_xpath="$full_xpath/rulebase/security/rules/entry"
 dsec_policy_xpath="$full_xpath/rulebase/default-security-rules/rules/entry"
+tag_object_xpath="$full_xpath/tag/entry"
 
 # TODO: Get a list of pre-existing management profiles for later deletion
 
@@ -310,6 +346,12 @@ action "set" "ICMP-Ping Application Group" "$app_group_xpath[@name='icmp-ping']"
 
 # Create Active Directory Application Group
 action "set" "Active Directory Application Group" "$app_group_xpath[@name='windows-active-directory']" "<members><member>active-directory</member><member>ldap</member><member>ms-ds-smb</member><member>kerberos</member></members>" &
+
+# Create Zone Tags
+action "set" "External Zone Tag" "$tag_object_xpath[@name='External']" "<color>color14</color><comments>The External zone (ethernet1/3)</comments>" &
+action "set" "Public Zone Tag" "$tag_object_xpath[@name='Public']" "<color>color24</color><comments>The Public zone (ethernet1/1)</comments>" & 
+action "set" "User Zone Tag" "$tag_object_xpath[@name='User']" "<color>color1</color><comments>The User zone (ethernet1/4)</comments>" & 
+action "set" "Internal Zone Tag" "$tag_object_xpath[@name='Internal']" "<color>color13</color><comments>The Internal zone (ethernet1/2)</comments>" & 
 
 address_object_pid_array=()
 
@@ -423,13 +465,17 @@ while [ -e "/proc/$log_forwarding_pid" ]; do sleep 0.1; done && action "edit" "I
 while [ -e "/proc/$address_groups_pid" ] || [ -e "/proc/$log_forwarding_pid" ]; do sleep 0.1; done && create_security_policies & security_policy_pid=$!
 
 # Commit Changes after security policies are made
-while [ -e "/proc/$security_policy_pid" ]; do sleep 0.1; done && commit "Finalize Changes"
+while [ -e "/proc/$security_policy_pid" ]; do sleep 0.1; done && commit "Finalize Stage One Changes"
 
 # Clear All Sessions
 action "op" "Clear All Sessions" "<clear><session><all/></session></clear>"
 
 # Kill All Admin Sessions
 action "op" "Delete Admin Sessions" "<delete><admin-sessions></admin-sessions></delete>"
+
+#TODO: After update check, download content updates
+
+# After content update download, install content updates
 
 # Firewall configured!
 success "Script complete!"

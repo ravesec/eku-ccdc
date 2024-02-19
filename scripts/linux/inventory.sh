@@ -6,8 +6,19 @@ then echo "This script must be ran as root!"
 	exit
 fi
 
+# Get the path of the repository root
+repo_root=$(git rev-parse --show-toplevel)
+
+# Import environment variables
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
+
+# Safely source /etc/os-release
+read -r ID PRETTY_NAME VERSION NAME < <(. /etc/os-release; echo $ID $PRETTY_NAME $VERSION $NAME)
+
 # Print System name
-source /etc/os-release
 echo "<!-- Inventory for $PRETTY_NAME --!>"
 echo ""
 

@@ -9,10 +9,16 @@ then echo "This script must be ran as root!"
 fi
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
 
-# Get the name of the OS
-source /etc/os-release
+# Import repo environment variables
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
+
+# Safely source /os/release
+read -r ID < <(. /etc/os-release; echo $ID)
 
 # Create Backup Folder
 mkdir -p /root/bu/$ID

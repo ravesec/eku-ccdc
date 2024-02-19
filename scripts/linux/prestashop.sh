@@ -14,10 +14,13 @@ script_name="prestashop.sh"
 usage="./$script_name"
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source $repo_root/config_files/ekurc
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then error "This script must be ran as root!"

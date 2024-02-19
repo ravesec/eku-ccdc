@@ -14,11 +14,16 @@ script_name="dependencies.sh"
 usage="./$script_name <args>"
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source $repo_root/config_files/ekurc
-source /etc/os_release
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
+
+# Safely source /etc/os-release
+read -r ID < <(. /etc/os-release; echo $ID)
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"
@@ -30,9 +35,6 @@ if [ "$#" -gt 0 ]
 then error $usage
     exit 1
 fi
-
-# Check repository security requirement
-check_security
 
 # Main script here...
 

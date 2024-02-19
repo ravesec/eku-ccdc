@@ -49,7 +49,7 @@ job_status_poll_rate=3 # Rate (in seconds) that the script checks for the commit
 repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source $repo_root/config_files/ekurc
+. $repo_root/config_files/ekurc
 
 if [ "$team_number" -eq 0 ]
 then
@@ -69,7 +69,7 @@ fi
 #fi
 
 # Safely source /etc/os-release
-read -r ID VERSION_ID PRETTY_NAME < <(. /etc/os-release; echo $ID $VERSION_ID $PRETTY_NAME)
+read -r ID PRETTY_NAME < <(. /etc/os-release; echo $ID $PRETTY_NAME)
 
 # Throw a warning if the distribution is not Ubuntu Linux
 if [ "$ID" == "ubuntu" ]

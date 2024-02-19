@@ -9,7 +9,13 @@ then echo "This script must be ran as root!" >&2
 fi
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
+
+# Import environment variables
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
 
 # Banner creation
 cp $repo_root/config_files/banner /etc/ssh/banner.txt

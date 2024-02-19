@@ -33,26 +33,7 @@ team_number=0 #TODO: CHANGEME!!!
 user="admin"
 password="Changeme123" #TODO: CHANGEME!!!
 
-# Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
-
-# Import environment variables
-source $repo_root/config_files/ekurc
-
-if [ "$team_number" -eq 0 ]
-then
-    error "Team number not set!"
-    exit 1
-fi
-
-if [ "$password" == "Changeme123" ]
-then
-    error "Password cannot be default!"
-    exit 1
-fi
-
-
-# don't change these unless you know what you are doing
+# Don't change these unless you know what you are doing
 third_octet=$((20+$team_number))
 pan_device="localhost.localdomain"
 pan_vsys="vsys1"
@@ -62,13 +43,46 @@ script_name="xml_api.sh"
 usage="./$script_name"
 
 api="https://$host/api/" # api baseurl
-job_status_poll_speed=3 # Speed (in seconds) that the script checks for the commit status
+job_status_poll_rate=3 # Rate (in seconds) that the script checks for the commit status
 
+# Get the path of the repository root
+repo_root=$(git rev-parse --show-toplevel)
 
-if [ "$EUID" -ne 0 ] # Superuser requirement.
-then error "This script must be ran as root!"
+# Import environment variables
+source $repo_root/config_files/ekurc
+
+if [ "$team_number" -eq 0 ]
+then
+    error "Team number is set to 0!"
     exit 1
 fi
+
+if [ "$password" == "Changeme123" ]
+then
+    error "Password cannot be default!"
+    exit 1
+fi
+
+#if [ "$EUID" -ne 0 ] # Superuser requirement.
+#then error "This script must be ran as root!"
+#    exit 1
+#fi
+
+# Safely source /etc/os-release
+read -r ID VERSION_ID PRETTY_NAME < <(. /etc/os-release; echo $ID $VERSION_ID $PRETTY_NAME)
+
+# Throw a warning if the distribution is not Ubuntu Linux
+if [ "$ID" == "ubuntu" ]
+then
+    warn "You are running this script on $PRETTY_NAME, but it was designed to be ran on Ubuntu 20.04. This script may not work correctly!\n\nContinue anyway? (Y/n)\n"
+    read -n 1 -s yn
+
+    if [ "$yn" == "n" ]
+    then
+        exit 1
+    fi
+fi
+
 
 # Check for the correct number of arguments
 if [ "$#" -gt 0 ]
@@ -79,8 +93,17 @@ fi
 # Check repository security requirement
 check_security
 
+# If apt has not been updated in some time, update the apt cache
+current_time=$(date +%s)
+last_updated_time=$(date -r /var/cache/apt/pkgcache.bin +%s)
+time_difference=$(( ($current_time - $last_updated_time) / 60 ))
+
+if [ $time_difference -gt 240 ] # Four hours
+then
+    apt update
+fi
+
 # Install packages assuming apt is the package manager
-apt update
 apt install -y libxml-xpath-perl libxml2-utils jq findutils curl
 
 action() { # action <action> <description> <xpath>/<cmd> <element>

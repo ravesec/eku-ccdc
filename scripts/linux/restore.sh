@@ -16,10 +16,13 @@ usage="./restore.sh <directory>"
 #TODO: Provide the user with a menu of all current backups.
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
+
+# Check repository security requirement
+check_security
 
 # Import environment variables
-source $repo_root/config_files/ekurc
+. $repo_root/config_files/ekurc
 
 if [ "$EUID" -ne 0 ] # Superuser requirement. Echo the error to stderr and return exit code 1.
 then error "This script must be ran as root!"

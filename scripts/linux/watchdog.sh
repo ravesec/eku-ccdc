@@ -4,7 +4,7 @@
 # script_name.sh
 #
 # Description: A template for bash scripts created by Raven Dean. NOTE that there are special
-#  commands in $repo_root/config_files/ekurc to output log messages to the terminal. These include
+#  commands in ../../config_files/ekurc to output log messages to the terminal. These include
 #  info, debug, warn, error, and success.
 #
 # Dependencies: N/A
@@ -16,10 +16,13 @@ script_name="script_name.sh"
 usage="./$script_name <args>"
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source $repo_root/config_files/ekurc
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"
@@ -33,7 +36,6 @@ then error $usage
 fi
 
 # Main script here...
-
 
 
 # Example logging message functions

@@ -8,7 +8,13 @@ then echo "Script must be ran as root!"
 fi
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
+
+# Import repo environment variables
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
 
 # Check for directory root argument
 if [ "$1" = "" ]

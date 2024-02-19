@@ -7,6 +7,15 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Get the repository root
+repo_root=$(git rev-parse --show-toplevel)
+
+# Import environment variables
+. $repo_root/config_files/ekurc
+
+# Check the repository security requirement
+check_security
+
 printf "/******************************/
 /* OS and Account Information */
 /******************************/\n\n"
@@ -68,7 +77,7 @@ printf "/**********************************/
 /* Dangerous Binaries (SUID/SGID) */
 /**********************************/\n\n"
 #TODO Find SUID/SGID executables on the system
-find / -type f -executable \( -perm -4000 -o -perm -2000 \) -exec ls -lah {} \; 2>/dev/null | grep -v "/usr | grep -v "/root/bu" | grep -v "/bin" | grep -v "/sbin"
+#find / -type f -executable \( -perm -4000 -o -perm -2000 \) -exec ls -lah {} \; 2>/dev/null | grep -v "/usr | grep -v "/root/bu" | grep -v "/bin" | grep -v "/sbin"
 
 #TODO Check for services in /etc/init.d
 

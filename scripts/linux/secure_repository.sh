@@ -7,7 +7,7 @@ usage="./$script_name"
 repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source "$repo_dir/config_files/ekurc"
+. "$repo_dir/config_files/ekurc"
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"

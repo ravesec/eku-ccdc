@@ -20,7 +20,7 @@ client_dir=$(pwd)
 repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source $repo_root/config_files/ekurc
+. $repo_root/config_files/ekurc
 
 # Check for the correct number of arguments
 if [ "$#" -gt 0 ]

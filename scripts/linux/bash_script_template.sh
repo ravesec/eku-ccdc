@@ -19,7 +19,10 @@ usage="./$script_name <args>"
 repo_root=$(git rev-parse --show-toplevel)
 
 # Import environment variables
-source $repo_root/config_files/ekurc
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
 
 if [ "$EUID" -ne 0 ] # Superuser requirement.
 then error "This script must be ran as root!"
@@ -31,9 +34,6 @@ if [ "$#" -lt 1 ]
 then error $usage
     exit 1
 fi
-
-# Check repository security requirement
-check_security
 
 # Main script here...
 

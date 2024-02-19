@@ -7,7 +7,13 @@
 #
 
 # Get the path of the repository root
-repo_root=$(get rev-parse --show-toplevel)
+repo_root=$(git rev-parse --show-toplevel)
+
+# Import environment variables
+. $repo_root/config_files/ekurc
+
+# Check repository security requirement
+check_security
 
 # Ensure Root
 if [ "$EUID" -ne 0 ]

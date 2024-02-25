@@ -36,7 +36,7 @@ then
 fi
 
 info "This script requires 'openssl' and 'jq'!"
-webhook_url=$(openssl enc -aes-256-cbc -d -salt -pass pass:$aes_password -in ./webhook_link 2>/dev/null)
+webhook_url=$(openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -d -salt -pass pass:$aes_password -in ./webhook_link 2>/dev/null)
 
 if [ "$?" -eq 1 ]
 then

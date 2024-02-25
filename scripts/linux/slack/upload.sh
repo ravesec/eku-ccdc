@@ -37,15 +37,12 @@ then
 fi
 
 info "This script requires 'openssl' and 'jq'!"
-api_key=$(openssl enc -aes-256-cbc -d -salt -pass pass:$aes_password -in ./api_key 2>/dev/null)
-
+api_key=$(openssl enc -aes-256-cbc -md sha512 -pbkdf2 -iter 1000000 -d -salt -pass pass:$aes_password -in ./api_key 2>/dev/null)
 if [ "$?" -eq 1 ]
 then
     error "Decryption of webhook url failed. Is the password set correctly?"
     exit 1
 fi
-
-#debug $api_key
 
 if [ ! -f "$1" ]
 then
@@ -57,11 +54,11 @@ file_path="$1"
 system_fingerprint=$(echo "$(uname -s -n -o -i) $(date)")
 
 # Upload the file.
-curl --silent -F file=@$1 -F "initial_comment=Upload from $system_fingerprint" -F channels=$channel_id -H "Authorization: Bearer $api_key" https://slack.com/api/files.upload 2>&1 > /dev/null
+response=$(curl --silent -F file=@$1 -F "initial_comment=Upload from $system_fingerprint" -F channels=$channel_id -H "Authorization: Bearer $api_key" https://slack.com/api/files.upload)
 
 if [ "$?" -ne 0 ]
 then
-    error "File failed to upload!"
+    error "File failed to upload!\nResponse: $response"
     exit 1
 fi
 

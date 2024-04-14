@@ -1,0 +1,2 @@
+#!/bin/bash
+wall "test"

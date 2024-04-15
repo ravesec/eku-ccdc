@@ -23,8 +23,7 @@ def main():
             password = input(f"Enter password for {name}\'s root: " )
             os.system("stty echo")
             print("")
-            else:
-                execute(ip, "/etc/setup", name, password)
+            execute(ip, "/etc/destSetup", name, password)
         else:
             print("""
 -h    |    Help menu (This guy)
@@ -44,19 +43,25 @@ def main():
             if(password.lower() in ("b")):
                 print(f"Bypassing {name}")
             else:
-                execute(ip, "/etc/setup", name, password)
+                execute(ip, "/etc/destSetup", name, password)
 def sendFile(address, source, dest, nameAddress):
-    scp_command = f'scp {source} root@{address}:{dest}'
-    subprocess.run(scp_command, shell=True, check=True)
-    print(f"Script copied to {nameAddress}")
+    try:
+        scp_command = f'scp {source} root@{address}:{dest}'
+        subprocess.run(scp_command, shell=True, check=True)
+        print(f"Script copied to {nameAddress}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 def execute(ip, path, name, password):
-    ssh_client = paramiko.SSHClient()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh_client.connect(ip, username="root", password=password)
-                
-    stdin, stdout, stderr = ssh_client.exec_command(f"bash {path}")
-    print(f"Executing setup script on {name}...")
-    time.sleep(5)
+    try:
+        ssh_client = paramiko.SSHClient()
+        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh_client.connect(ip, username="root", password=password)
+                    
+        stdin, stdout, stderr = ssh_client.exec_command(f"bash {path}")
+        print(f"Executing setup script on {name}...")
+        time.sleep(5)
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 def switch(ip):
     if ip == "172.20.240.20":
         return "Debian"

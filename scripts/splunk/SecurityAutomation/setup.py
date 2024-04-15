@@ -24,10 +24,7 @@ def main():
             os.system("stty echo")
             print("")
             else:
-                ssh_client = paramiko.SSHClient()
-                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh_client.connect(ip, username="root", password=password)
-                execute("/etc/setup", ssh_client, name)
+                execute(ip, "/etc/setup", name, password)
         else:
             print("""
 -h    |    Help menu (This guy)
@@ -47,15 +44,16 @@ def main():
             if(password.lower() in ("b")):
                 print(f"Bypassing {name}")
             else:
-                ssh_client = paramiko.SSHClient()
-                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh_client.connect(ip, username="root", password=password)
-                execute("/etc/setup", ssh_client, name)
+                execute(ip, "/etc/setup", name, password)
 def sendFile(address, source, dest, nameAddress):
     scp_command = f'scp {source} root@{address}:{dest}'
     subprocess.run(scp_command, shell=True, check=True)
     print(f"Script copied to {nameAddress}")
-def execute(path, ssh_client, name):
+def execute(ip, path, name, password):
+    ssh_client = paramiko.SSHClient()
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.connect(ip, username="root", password=password)
+                
     stdin, stdout, stderr = ssh_client.exec_command(f"bash {path}")
     print(f"Executing setup script on {name}...")
     time.sleep(5)

@@ -23,7 +23,8 @@ def main():
             password = input(f"Enter password for {name}\'s root: " )
             os.system("stty echo")
             print("")
-            execute(ip, "/etc/destSetup", name, password)
+            path = "/etc/destSetup " + name
+            execute(ip, path, name, password)
         else:
             print("""
 -h    |    Help menu (This guy)
@@ -64,13 +65,13 @@ def execute(ip, path, name, password):
         print(f"An error occurred: {str(e)}")
 def switch(ip):
     if ip == "172.20.240.20":
-        return "Debian"
+        return "debian"
     elif ip == "172.20.241.30":
-        return "CentOS"
+        return "centos"
     elif ip == "172.20.241.40":
-        return "Fedora"
+        return "fedora"
     elif ip == "172.20.242.10":
-        return "Ubuntu"
+        return "ubuntu"
     else:
         return "NOT FOUND"
 main()

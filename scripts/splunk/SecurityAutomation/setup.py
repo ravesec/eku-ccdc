@@ -25,11 +25,26 @@ def main():
             print("")
             path = "/etc/destSetup " + name
             execute(ip, path, name, password)
+        elif(sys.argv[1] == "-s" or sys.argv[1] == "-S"):
+            option = input("Configure the splunk machine for automation? ")
+            if(option.lower() in ('y')):
+                names = ["centos", "debian", "ubuntu", "fedora"]
+                for name in names:
+                    user = name+"User"
+                    os.system("useradd "+user)
+                    os.system("stty -echo")
+                    password = input(f"Enter password for {name}User: "
+                    os.system("stty echo")
+                    os.system("echo "+user+":"+password+" | chpasswd")
+            else:
+                print("Exiting.")
         else:
             print("""
 -h    |    Help menu (This guy)
 
 -t    |    Targeted setup. Asks for specific ip address. Designed to be used for reinstalls or in the case of a machine reset.
+
+-s    |    Splunk setup. Designed to be run once at the beginning of the competition. Sets up the splunk machine for automation.
 
 """)
     else:
@@ -45,6 +60,7 @@ def main():
                 print(f"Bypassing {name}")
             else:
                 execute(ip, "/etc/destSetup", name, password)
+        os.system(f"python3 {sys.argv[0]} -s")
 def sendFile(address, source, dest, nameAddress):
     try:
         scp_command = f'scp {source} root@{address}:{dest}'

@@ -20,6 +20,7 @@ yum install -y python3
 mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/secService.py /etc/secService.py
 mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/security.sh /usr/bin/security
 mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/security.py /usr/bin/security.py
+rm /etc/eku-ccdc/scripts/splunk/SecurityAutomation/secBrain.py
 systemctl daemon reload
 systemctl enable security.service
 systemctl start security.service
@@ -39,3 +40,4 @@ then
 apt-get update && apt-get install -y python3
 echo "dswqgudhq"
 fi
+rm $0

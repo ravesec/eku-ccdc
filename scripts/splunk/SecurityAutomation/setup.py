@@ -60,7 +60,6 @@ def main():
                 print(f"Bypassing {name}")
             else:
                 execute(ip, "/etc/destSetup", name, password)
-        os.system(f"python3 {sys.argv[0]} -s")
 def sendFile(address, source, dest, nameAddress):
     try:
         scp_command = f'scp {source} root@{address}:{dest}'

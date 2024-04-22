@@ -52,7 +52,13 @@ EOFA
 yum install -y python3
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "splunkListener ALL=(ALL) NOPASSWD:python3 /etc/secListener.py" >> /etc/sudoers
+echo "splunkListener ALL=(ALL) NOPASSWD:python3 /bin/python3 /etc/secListener.py \"1\"" >> /etc/sudoers
+echo "splunkListener ALL=(ALL) NOPASSWD:python3 /bin/python3 /etc/secListener.py \"2\"" >> /etc/sudoers
+echo "splunkListener ALL=(ALL) NOPASSWD:python3 /bin/python3 /etc/secListener.py \"3\"" >> /etc/sudoers
+echo "splunkListener ALL=(ALL) NOPASSWD:python3 /bin/python3 /etc/secListener.py \"4\"" >> /etc/sudoers
+echo "splunkListener ALL=(ALL) NOPASSWD:python3 /bin/python3 /etc/secListener.py \"999\"" >> /etc/sudoers
+chmod +x /etc/secListener.py
+chattr +i /etc/secListener.py
 fi
 if [ $machine=="debian" ]
 then

@@ -33,7 +33,7 @@ def main():
                     user = name+"User"
                     os.system("useradd "+user)
                     os.system("stty -echo")
-                    password = input(f"Enter password for {name}User: "
+                    password = input(f"Enter password for {name}User: ")
                     os.system("stty echo")
                     os.system("echo "+user+":"+password+" | chpasswd")
             else:

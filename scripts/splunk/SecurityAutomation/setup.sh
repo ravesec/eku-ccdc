@@ -20,6 +20,8 @@ yum install -y python3
 mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/secService.py /etc/secService.py
 mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/security.sh /usr/bin/security
 mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/security.py /usr/bin/security.py
+chmod +x /usr/bin/security
+chmod +x /usr/bin/security.py
 rm /etc/eku-ccdc/scripts/splunk/SecurityAutomation/secBrain.py
 systemctl daemon reload
 systemctl enable security.service

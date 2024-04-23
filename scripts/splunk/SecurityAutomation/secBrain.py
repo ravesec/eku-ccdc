@@ -22,7 +22,7 @@ def execute(ip, path, name, user, password, alert):
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(ip, username=user, password=password)
                     
-        stdin, stdout, stderr = ssh_client.exec_command(f"sudo python3 {path} {alert}")
+        stdin, stdout, stderr = ssh_client.exec_command(f"sudo python3 {path} {name} {alert}")
         print(f"Executing alert script on {name}...")
         time.sleep(5)
     except Exception as e:

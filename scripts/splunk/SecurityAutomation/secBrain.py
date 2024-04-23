@@ -4,18 +4,13 @@ import subprocess
 import paramiko
 
 ips = ["172.20.240.20", "172.20.241.30", "172.20.241.40", "172.20.242.10"] #TODO: Change these for your network, these are default for ccdc environemnts as of 2023-2024
-centosPass = "changeme" #TODO: Change these passwords as any changes need to be made"
-fedoraPass = "changeme"
-debianPass = "changeme"
-ubuntuPass = "changeme"
 def main():
     if(len(sys.argv) == 1):
         print("Invalid usage.")
     else:
         alert = sys.argv[1]
         for ip in ips:
-            password = switch(ip) + "Pass"
-            execute(ip, "/etc/secListener.py", switch(ip), "splunkListener", password, alert)
+            execute(ip, "/etc/secListener.py", switch(ip), "splunkListener", passSwitch(ip), alert)
 def execute(ip, path, name, user, password, alert):
     try:
         ssh_client = paramiko.SSHClient()
@@ -36,6 +31,17 @@ def switch(ip):
         return "fedora"
     elif ip == "172.20.242.10":
         return "ubuntu"
+    else:
+        return "NOT FOUND"
+def passSwitch(ip):
+    if ip == "172.20.240.20":
+        return "changeme"
+    elif ip == "172.20.241.30":
+        return "changeme"
+    elif ip == "172.20.241.40":
+        return "changeme"
+    elif ip == "172.20.242.10":
+        return "changeme"
     else:
         return "NOT FOUND"
 main()

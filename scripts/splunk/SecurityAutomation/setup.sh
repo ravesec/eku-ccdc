@@ -52,11 +52,11 @@ EOFA
 yum install -y python3
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py centos 3" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py centos 4" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py centos 999" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 3" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 4" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 999" >> /etc/sudoers
 chmod +x /etc/secListener.py
 chattr +i /etc/secListener.py
 fi
@@ -117,11 +117,11 @@ EOFA
 yum install -y python3
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py fedora 1" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py fedora 2" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py fedora 3" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py fedora 4" >> /etc/sudoers
-echo "splunkListener ALL=(ALL) NOPASSWD: /bin/python3 /etc/secListener.py fedora 999" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 1" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 2" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 3" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 4" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 999" >> /etc/sudoers
 chmod +x /etc/secListener.py
 chattr +i /etc/secListener.py
 fi

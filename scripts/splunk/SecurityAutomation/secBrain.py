@@ -15,7 +15,7 @@ def main():
         alert = sys.argv[1]
         for ip in ips:
             password = switch(ip) + "Pass"
-            execute(ip, "etc/secListener.py", switch(ip), "splunkListener", password, alert)
+            execute(ip, "/etc/secListener.py", switch(ip), "splunkListener", password, alert)
 def execute(ip, path, name, user, password, alert):
     try:
         ssh_client = paramiko.SSHClient()

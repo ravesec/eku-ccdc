@@ -20,6 +20,9 @@ def execute(ip, path, name, user, password, alert):
                     
         stdin, stdout, stderr = ssh_client.exec_command(f"echo {password} | sudo -S python3 {path} {name} {alert}")
         print(f"Executing alert script on {name}...")
+        error = stderr.read().decode('utf-8')
+        if(len(error) > 0):
+            print(f"An error occured: {error}")
         time.sleep(5)
     except Exception as e:
         print(f"An error occurred: {str(e)}")

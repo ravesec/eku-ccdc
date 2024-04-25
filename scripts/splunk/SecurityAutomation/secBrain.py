@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import paramiko
+import time
 
 ips = ["172.20.240.20", "172.20.241.30", "172.20.241.40", "172.20.242.10"] #TODO: Change these for your network, these are default for ccdc environemnts as of 2023-2024
 def main():
@@ -17,7 +18,7 @@ def execute(ip, path, name, user, password, alert):
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(ip, username=user, password=password)
                     
-        stdin, stdout, stderr = ssh_client.exec_command(f"sudo python3 {path} {name} {alert}")
+        stdin, stdout, stderr = ssh_client.exec_command(f"echo {password} | sudo -S python3 {path} {name} {alert}")
         print(f"Executing alert script on {name}...")
         time.sleep(5)
     except Exception as e:

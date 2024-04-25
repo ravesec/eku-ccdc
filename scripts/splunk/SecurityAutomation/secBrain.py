@@ -11,9 +11,10 @@ def main():
     else:
         alert = sys.argv[1]
         for ip in ips:
-            execute(ip, "/etc/secListener.py", switch(ip), "splunkListener", passSwitch(ip), alert)
-def execute(ip, path, name, user, password, alert):
+            execute(ip, "/etc/secListener.py", switch(ip), "splunkListener", alert)
+def execute(ip, path, name, user, alert):
     try:
+        password = passSwitch(ip)
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh_client.connect(ip, username=user, password=password)

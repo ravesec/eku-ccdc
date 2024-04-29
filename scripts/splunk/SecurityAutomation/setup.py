@@ -49,6 +49,11 @@ def main():
 """)
     else:
         os.system("mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/setup.sh /etc/setup")
+        os.system("mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/secBrain.py /etc/secBrain.py")
+        os.system("mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/centosAlert.sh /opt/splunk/bin/scripts/centosAlert.sh")
+        os.system("mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/fedoraAlert.sh /opt/splunk/bin/scripts/fedoraAlert.sh")
+        os.system("mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/debianAlert.sh /opt/splunk/bin/scripts/debianAlert.sh")
+        os.system("mv /etc/eku-ccdc/scripts/splunk/SecurityAutomation/ubuntuAlert.sh /opt/splunk/bin/scripts/ubuntuAlert.sh")
         for ip in ips:
             name = switch(ip)
             sendFile(ip, "/etc/setup", "/etc/destSetup", name)

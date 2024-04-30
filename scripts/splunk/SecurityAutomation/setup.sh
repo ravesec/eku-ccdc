@@ -57,7 +57,8 @@ EOFA
 yum install -y python3
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "sshd: 10. \n" >> /etc/hosts.deny
+echo "sshd: 10.
+" >> /etc/hosts.deny
 systemctl reload sshd
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers
@@ -124,7 +125,8 @@ main()
 EOFA
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "sshd: 10. \n" >> /etc/hosts.deny
+echo "sshd: 10.
+" >> /etc/hosts.deny
 systemctl reload sshd
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers
@@ -191,7 +193,8 @@ EOFA
 yum install -y python3
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "sshd: 10. \n" >> /etc/hosts.deny
+echo "sshd: 10.
+" >> /etc/hosts.deny
 systemctl reload sshd
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 1" >> /etc/sudoers
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py fedora 2" >> /etc/sudoers
@@ -258,7 +261,8 @@ main()
 EOFA
 adduser splunkListener
 echo splunkListener:changeme | chpasswd
-echo "sshd: 10. \n" >> /etc/hosts.deny
+echo "sshd: 10.
+" >> /etc/hosts.deny
 systemctl reload sshd
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 1" >> /etc/sudoers
 echo "splunkListener ALL = NOPASSWD: /bin/python3 /etc/secListener.py centos 2" >> /etc/sudoers

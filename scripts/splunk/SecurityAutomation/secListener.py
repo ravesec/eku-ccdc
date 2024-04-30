@@ -23,18 +23,23 @@ def response(value):
     if(value == "999"):
         os.system("wall \"Splunk has detected a possible compromise of itself. Blocking Splunk. Automated alerts will no longer come in until manually opened again.\"")
         os.system("echo \"sshd: 172.20.241.20 \n\" >> /etc/hosts.deny")
+        os.system("systemctl reload sshd")
     elif(value == "1"):
         os.system("wall \"Splunk has detected a possible compromise of the CentOS machine. Isolating.\"")
         os.system("echo \"sshd: 172.20.241.30 \n\" >> /etc/hosts.deny")
+        os.system("systemctl reload sshd")
     elif(value == "2"):
         os.system("wall \"Splunk has detected a possible compromise of the Fedora machine. Isolating.\"")
         os.system("echo \"sshd: 172.20.241.40 \n\" >> /etc/hosts.deny")
+        os.system("systemctl reload sshd")
     elif(value == "3"):
         os.system("wall \"Splunk has detected a possible compromise of the Debian machine. Isolating.\"")
         os.system("echo \"sshd: 172.20.240.20 \n\" >> /etc/hosts.deny")
+        os.system("systemctl reload sshd")
     elif(value == "4"):
         os.system("wall \"Splunk has detected a possible compromise of the Ubuntu machine. Isolating.\"")
         os.system("echo \"sshd: 172.20.242.10 \n\" >> /etc/hosts.deny")
+        os.system("systemctl reload sshd")
 def killProcess(name):
     ps_output = subprocess.check_output(["ps", "-ef"])
     ps_lines = ps_output.decode("utf-8").split("\n")

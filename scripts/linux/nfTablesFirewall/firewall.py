@@ -20,15 +20,15 @@ def main():
                     print("List of tables: ")
                     for table in tableList:
                         print(table)
-                    option = input("Which table would you like to move to? ")
                     y = True
                     while(y):
+                        option = input("Which table would you like to move to? ")
                         for table in tableList:
                             if(table == option):
                                 y = False
                         if(y):
                             print("Invalid selection.")
-                    if(tableCommand(option) == "quit")
+                    if(tableCommand(option) == "quit"):
                         return
                 elif(option.lower() in ('add')):
                     print("Adding a table...")
@@ -116,7 +116,7 @@ def chainCommand(table, chain):
                     os.system("nft add rule "+table+" "+chain+" "+type+" sport { "+exclude+" } accept")
                 elif(stance.lower() in ('destination')):
                     os.system("nft add rule "+table+" "+chain+" "+type+" dport { "+exclude+" } accept")
-        print(f"New rule added to {chain}.")
+            print(f"New rule added to {chain}.")
         else:
             printHelp()
 def getTableList():

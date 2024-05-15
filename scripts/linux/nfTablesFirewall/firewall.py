@@ -28,7 +28,8 @@ def main():
                                 y = False
                         if(y):
                             print("Invalid selection.")
-                    tableCommand(option)
+                    if(tableCommand(option) == "quit")
+                        return
                 elif(option.lower() in ('add')):
                     print("Adding a table...")
                     name = input("Enter table name: ")
@@ -51,7 +52,8 @@ def tableCommand(table):
             print(f"Chain {name} added to {table}")
         elif(option.lower() in ('chain')):
             chain = input("Enter chain to move to: ")
-            chainCommand(table, chain)
+            if(chainCommand(table, chain) == "quit"):
+                return "quit"
         elif(option.lower() in ('clear')):
             print(f"Please note, this will remove all rules in the table {table}. Doing so could result in a loss of firewall function if this table contains firewall rules.")
             option = input(f"Are you sure you would like to clear {table}? ")
@@ -63,6 +65,8 @@ def tableCommand(table):
             os.system("nft flush chain "+table+" "+chain)
             os.system("nft delete chain "+table+" "+chain)
             print(f"{chain} deleted.")
+        elif(option.lower() in ('quit')):
+            return "quit"
         else:
             printHelp()
 def chainCommand(table, chain):
@@ -71,6 +75,8 @@ def chainCommand(table, chain):
         option = input(f"[Command@{table}:{chain}]# ")
         if(option.lower() in ('exit')):
             return
+        elif(option.lower() in ('quit')):
+            return "quit"
         else:
             printHelp()
 def getTableList():

@@ -77,6 +77,46 @@ def chainCommand(table, chain):
             return
         elif(option.lower() in ('quit')):
             return "quit"
+        elif(option.lower() in ('add')):
+            print(f"Adding exclusion to chain {chain}.")
+            y = True
+            while(y):
+                option = input("Exclude IP or Port? ")
+                if(option.lower() in ('ip', 'port')):
+                    y = False
+            y = True
+            while(y):
+                stance = input(f"Filter by source or destination {option}? ")
+                if(stance.lower() in ('source', 'destination')):
+                    y = False
+            if(option.lower() in ('ip')):
+                ips = input("Enter list of IPs to exclude seperated by spaces: ")
+                list = ips.split(" ")
+                exclude = list[0]
+                list.pop[0]
+                for ip in list:
+                    exclude = exclude + ", "+ip
+                if(stance.lower() in ('source')):
+                    os.system("nft add rule "+table+" "+chain+" ip saddr { "+exclude+" } accept")
+                elif(stance.lower() in ('destination')):
+                    os.system("nft add rule "+table+" "+chain+" ip daddr { "+exclude+" } accept")
+            elif(option.lower() in ('port')):
+                y = True
+                while(y):
+                    type = input("tcp or udp? ")
+                    if(type.lower() in ('tcp', 'udp')):
+                        y = False
+                ports = input("Enter list of ports/services(http/https/ssh) to exclude seperated by spaces: ")
+                list = ports.split(" ")
+                exclude = list[0]
+                list.pop[0]
+                for port in list:
+                    exclude = exclude + ", "+port
+                if(stance.lower() in ('source')):
+                    os.system("nft add rule "+table+" "+chain+" "+type+" sport { "+exclude+" } accept")
+                elif(stance.lower() in ('destination')):
+                    os.system("nft add rule "+table+" "+chain+" "+type+" dport { "+exclude+" } accept")
+        print(f"New rule added to {chain}.")
         else:
             printHelp()
 def getTableList():
@@ -100,6 +140,7 @@ Command line arguments:
 In-Program Commands:
 
     help           |     Displays this help menu.
+    quit           |     Quits out of program.
 
     Core Commands:
     

@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import argparse
 from datetime import datetime
 
 def main():
@@ -65,8 +66,10 @@ In-Program Commands:
     
     Table Commands:
     
-    add            |     Adds a new chain to the selected table.
     chain          |     Changes command focus to a specific chain within the table.
+    add            |     Adds a new chain to the selected table.
+    clear          |     Clears out the current table. This will remove all rules associated with the current table.
+    delete         |     Removes a stated chain from the current table.
     
     Chain Commands:
 
@@ -80,11 +83,32 @@ def tableCommand(table):
             return
         elif(option.lower() in ('add')):
             print(f"Adding chain to {table}")
+            name = input("Enter name for new chain: ")
+            hook = input("Enter chain hook(ingress, preroute, input, forward, output, postroute): ")
+            type = input("Enter chain type(nat, route, filter): ")
+            priority = input("Enter chain priority: ")
+            os.system("nft add chain "+table+" "+name+" { type "+type+" hook "+hook+" priority "+priority+" ; policy drop; }")
+            print(f"Chain {name} added to {table}")
         elif(option.lower() in ('chain')):
-            
+            chain = input("Enter chain to move to: ")
+            chainCommand(table, chain)
+        elif(option.lower() in ('clear')):
+            print(f"Please note, this will remove all rules in the table {table}. Doing so could result in a loss of firewall function if this table contains firewall rules.")
+            option = input(f"Are you sure you would like to clear {table}? ")
+            if(option.lower() in ('y', 'yes')):
+                os.system("nft flush table "+table)
+                print(f"{table} cleared.")
+        elif(option.lower() in ('delete')):
+            chain = input("What chain would you like to remove? ")
+            os.system("nft flush chain "+table+" "+chain)
+            os.system("nft delete chain "+table+" "+chain)
+            print(f"{chain} deleted.")
 def chainCommand(table, chain):
     x = True
     while(x):
+        option = input(f"[Command@{table}:{chain}]# ")
+        if(option.lower() in ('exit')):
+            return
         
 def getTableList():
     tableList = []

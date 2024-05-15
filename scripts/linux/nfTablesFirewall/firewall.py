@@ -10,19 +10,7 @@ def main():
     else:
         if(len(sys.argv) == 2):
             if(sys.argv[1].lower() in ('-h', '--help', 'help')):
-                print("""
-Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.
-
-
-Command line arguments:
-
--h , --help    |     Displays this help menu and exits.
-
-
-In-Program Commands:
-
-help           |     Displays this help menu.
-""")
+                printHelp()
         else:
             x = True
             while(x):
@@ -46,35 +34,7 @@ help           |     Displays this help menu.
                     name = input("Enter table name: ")
                     os.system("nft add table "+name)
                 else:
-                    print("""
-Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.
-
-
-Command line arguments:
-
-    -h , --help    |     Displays this help menu and exits.
-
-
-In-Program Commands:
-
-    help           |     Displays this help menu.
-
-    Core Commands:
-    
-    table          |     Changes command focus to a specific table.
-    add            |     Adds a new table to the ip family.
-    
-    Table Commands:
-    
-    chain          |     Changes command focus to a specific chain within the table.
-    add            |     Adds a new chain to the selected table.
-    clear          |     Clears out the current table. This will remove all rules associated with the current table.
-    delete         |     Removes a stated chain from the current table.
-    
-    Chain Commands:
-
-
-""")
+                    printHelp()
 def tableCommand(table):
     x = True
     while(x):
@@ -103,13 +63,16 @@ def tableCommand(table):
             os.system("nft flush chain "+table+" "+chain)
             os.system("nft delete chain "+table+" "+chain)
             print(f"{chain} deleted.")
+        else:
+            printHelp()
 def chainCommand(table, chain):
     x = True
     while(x):
         option = input(f"[Command@{table}:{chain}]# ")
         if(option.lower() in ('exit')):
             return
-        
+        else:
+            printHelp()
 def getTableList():
     tableList = []
     tableOutput = subprocess.check_output(["nft", "list tables"])
@@ -118,4 +81,34 @@ def getTableList():
         lineList = line.split(" ")
         tableList.append(lineList[-1])
     return tableList
+def printHelp():
+    print("""
+Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.
+
+
+Command line arguments:
+
+    -h , --help    |     Displays this help menu and exits.
+
+
+In-Program Commands:
+
+    help           |     Displays this help menu.
+
+    Core Commands:
+    
+    table          |     Changes command focus to a specific table.
+    add            |     Adds a new table to the ip family.
+    
+    Table Commands:
+    
+    chain          |     Changes command focus to a specific chain within the table.
+    add            |     Adds a new chain to the selected table.
+    clear          |     Clears out the current table. This will remove all rules associated with the current table.
+    delete         |     Removes a stated chain from the current table.
+    
+    Chain Commands:
+
+
+""")
 main()

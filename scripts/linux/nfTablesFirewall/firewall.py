@@ -87,7 +87,7 @@ def tableCommand(table):
             hook = input("Enter chain hook(ingress, preroute, input, forward, output, postroute): ")
             type = input("Enter chain type(nat, route, filter): ")
             priority = input("Enter chain priority: ")
-            os.system("nft add chain "+table+" "+name+" { type "+type+" hook "+hook+" priority "+priority+" ; policy drop; }")
+            os.system("nft add chain "+table+" "+name+" \{ type "+type+" hook "+hook+" priority "+priority+" \; policy drop\; \}")
             print(f"Chain {name} added to {table}")
         elif(option.lower() in ('chain')):
             chain = input("Enter chain to move to: ")

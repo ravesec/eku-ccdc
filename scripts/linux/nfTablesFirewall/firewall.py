@@ -140,6 +140,7 @@ Command line arguments:
 In-Program Commands:
 
     help           |     Displays this help menu.
+    exit           |     Exits out of current command focus and returns to the previous layer. (ex. using "exit" while in a specific chain moves the focus to the table that contains the chain)
     quit           |     Quits out of program.
 
     Core Commands:
@@ -156,6 +157,8 @@ In-Program Commands:
     
     Chain Commands:
 
-
+    add            |     Adds a new rule to the selected chain.
+    
+    
 """)
 main()

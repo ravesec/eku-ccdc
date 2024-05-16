@@ -95,7 +95,7 @@ def chainCommand(table, chain):
                 ips = input("Enter list of IPs to exclude seperated by spaces: ")
                 list = ips.split(" ")
                 exclude = list[0]
-                list.pop[0]
+                del list[0]
                 for ip in list:
                     exclude = exclude + ", "+ip
                 if(stance.lower() in ('source')):
@@ -111,7 +111,7 @@ def chainCommand(table, chain):
                 ports = input("Enter list of ports/services(http/https/ssh) to exclude seperated by spaces: ")
                 list = ports.split(" ")
                 exclude = list[0]
-                list.pop[0]
+                del list[0]
                 for port in list:
                     exclude = exclude + ", "+port
                 if(stance.lower() in ('source')):
@@ -134,8 +134,11 @@ def getChainList(table):
     command = f"list table {table}"
     chainOuput = subprocess.check_output(["nft", command])
     chainListRaw = chainOutput.decode('utf-8').split("chain")
+    del chainListRaw[0]
     for line in chainListRaw:
-        print(line)
+        lineList = line.split(" ")
+        chainList.append(lineList[1])
+    return chainList
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

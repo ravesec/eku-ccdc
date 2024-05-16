@@ -68,7 +68,9 @@ def tableCommand(table):
         elif(option.lower() in ('quit')):
             return "quit"
         elif(option.lower() in ('view')):
-            getChainList(table)
+            chainList = getChainList(table)
+            for chain in chainList:
+                print(chain)
         else:
             printHelp()
 def chainCommand(table, chain):
@@ -132,7 +134,7 @@ def getTableList():
 def getChainList(table):
     chainList = []
     command = f"list table {table}"
-    chainOuput = subprocess.check_output(["nft", command])
+    chainOutput = subprocess.check_output(["nft", command])
     chainListRaw = chainOutput.decode('utf-8').split("chain")
     del chainListRaw[0]
     for line in chainListRaw:

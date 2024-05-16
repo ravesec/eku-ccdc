@@ -34,6 +34,8 @@ def main():
                     print("Adding a table...")
                     name = input("Enter table name: ")
                     os.system("nft add table "+name)
+                elif(option.lower() in ('panic')):
+                    panic()
                 else:
                     printHelp()
 def tableCommand(table):
@@ -51,7 +53,18 @@ def tableCommand(table):
             os.system("nft add chain "+table+" "+name+" \{ type "+type+" hook "+hook+" priority "+priority+" \; policy drop\; \}")
             print(f"Chain {name} added to {table}")
         elif(option.lower() in ('chain')):
-            chain = input("Enter chain to move to: ")
+            chainList = getChainList(table)
+            print(f"List of chains in {table}:")
+            for chain in chainList:
+                print(chain)
+            y = True
+            while(y):
+                option = input("Which table would you like to move to? ")
+                for table in tableList:
+                    if(table == option):
+                        y = False
+                if(y):
+                    print("Invalid selection.")
             if(chainCommand(table, chain) == "quit"):
                 return "quit"
         elif(option.lower() in ('clear')):
@@ -71,6 +84,8 @@ def tableCommand(table):
             chainList = getChainList(table)
             for chain in chainList:
                 print(chain)
+        elif(option.lower() in ('panic')):
+            panic()
         else:
             printHelp()
 def chainCommand(table, chain):
@@ -121,6 +136,8 @@ def chainCommand(table, chain):
                 elif(stance.lower() in ('destination')):
                     os.system("nft add rule "+table+" "+chain+" "+type+" dport { "+exclude+" } accept")
             print(f"New rule added to {chain}.")
+        elif(option.lower() in ('panic')):
+            panic()
         else:
             printHelp()
 def getTableList():
@@ -176,6 +193,7 @@ In-Program Commands:
     help           |     Displays this help menu.
     exit           |     Exits out of current command focus and returns to the previous layer. (ex. using "exit" while in a specific chain moves the focus to the table that contains the chain)
     quit           |     Quits out of program.
+    panic          |     Activates/Deactivates panic mode. Will only prompt confirmation when disabling panic mode.
 
     Core Commands:
     
@@ -188,6 +206,7 @@ In-Program Commands:
     add            |     Adds a new chain to the selected table.
     clear          |     Clears out the current table. This will remove all rules associated with the current table.
     delete         |     Removes a stated chain from the current table.
+    view           |     Displays all chains present within the current table.
     
     Chain Commands:
 

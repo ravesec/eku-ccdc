@@ -141,6 +141,26 @@ def getChainList(table):
         lineList = line.split(" ")
         chainList.append(lineList[1])
     return chainList
+def panic():
+    tableList = getTableList()
+    x = False
+    for table in tableList:
+        if(table == "PANIC"):
+            x = True
+    if(x):
+        option = input("Panic mode is currently enabled. Would you like to disable it? ")
+        if(option.lower() in ('y', 'yes')):
+            os.system("nft flush table PANIC")
+            os.system("nft delete table PANIC")
+            print("Panic mode deactivated.")
+        else:
+            print("Panic mode remaining on.")
+    else:
+        print("Enabling panic mode...")
+        os.system("nft add table PANIC")
+        os.system("nft add chain PANIC panicChainIn \{ type input hook filter priority -100 \; policy drop\; \}")
+        os.system("nft add chain PANIC panicChainOut \{ type output hook filter priority -100 \; policy drop\; \}")
+        print("Panic mode activated. All traffic in and out blocked.")
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

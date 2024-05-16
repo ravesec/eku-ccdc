@@ -67,6 +67,8 @@ def tableCommand(table):
             print(f"{chain} deleted.")
         elif(option.lower() in ('quit')):
             return "quit"
+        elif(option.lower() in ('view')):
+            getChainList(table)
         else:
             printHelp()
 def chainCommand(table, chain):
@@ -127,6 +129,13 @@ def getTableList():
         lineList = line.split(" ")
         tableList.append(lineList[-1])
     return tableList
+def getChainList(table):
+    chainList = []
+    command = f"list table {table}"
+    chainOuput = subprocess.check_output(["nft", command])
+    chainListRaw = chainOutput.decode('utf-8').split("chain")
+    for line in chainListRaw:
+        print(line)
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

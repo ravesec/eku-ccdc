@@ -36,6 +36,8 @@ def main():
                     os.system("nft add table "+name)
                 elif(option.lower() in ('panic')):
                     panic()
+                elif(option.lower() in ('exit', 'quit')):
+                    return
                 else:
                     printHelp()
 def tableCommand(table):
@@ -59,13 +61,13 @@ def tableCommand(table):
                 print(chain)
             y = True
             while(y):
-                option = input("Which table would you like to move to? ")
-                for table in tableList:
-                    if(table == option):
+                option = input("Which chain would you like to move to? ")
+                for chain in chainList:
+                    if(chain == option):
                         y = False
                 if(y):
                     print("Invalid selection.")
-            if(chainCommand(table, chain) == "quit"):
+            if(chainCommand(table, option) == "quit"):
                 return "quit"
         elif(option.lower() in ('clear')):
             print(f"Please note, this will remove all rules in the table {table}. Doing so could result in a loss of firewall function if this table contains firewall rules.")

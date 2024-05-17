@@ -32,7 +32,13 @@ def main():
                         return
                 elif(option.lower() in ('add')):
                     print("Adding a table...")
-                    name = input("Enter table name: ")
+                    y = True
+                    while(y):
+                        name = input("Enter table name: ")
+                        if spacePresent(name):
+                            print("Invalid name, spaces not permitted.")
+                        else:
+                            y = False
                     os.system("nft add table "+name)
                 elif(option.lower() in ('panic')):
                     panic()
@@ -48,7 +54,13 @@ def tableCommand(table):
             return
         elif(option.lower() in ('add')):
             print(f"Adding chain to {table}")
-            name = input("Enter name for new chain: ")
+            y = True
+            while(y):
+                name = input("Enter name for new chain: ")
+                if spacePresent(name):
+                    print("Invalid name, spaces not permitted.")
+                else:
+                    y = False
             hook = input("Enter chain hook(ingress, preroute, input, forward, output, postroute): ")
             type = input("Enter chain type(nat, route, filter): ")
             priority = input("Enter chain priority: ")
@@ -180,6 +192,12 @@ def panic():
         os.system("nft add chain PANIC panicChainIn \{ type input hook filter priority -100 \; policy drop\; \}")
         os.system("nft add chain PANIC panicChainOut \{ type output hook filter priority -100 \; policy drop\; \}")
         print("Panic mode activated. All traffic in and out blocked.")
+def spacePresent(input):
+    inputList = input.split(" ")
+    if(len(inputList) != 1):
+        return True
+    else:
+        return False
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

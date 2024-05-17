@@ -86,6 +86,9 @@ def tableCommand(table):
             option = input(f"Are you sure you would like to clear {table}? ")
             if(option.lower() in ('y', 'yes')):
                 os.system("nft flush table "+table)
+                chainList = getChainList(table)
+                for chain in chainList:
+                    os.system("nft delete chain "+table+" "+chain)
                 print(f"{table} cleared.")
         elif(option.lower() in ('delete')):
             chain = input("What chain would you like to remove? ")

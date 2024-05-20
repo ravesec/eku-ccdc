@@ -5,7 +5,10 @@ import argparse
 from datetime import datetime
 
 def main():
-    if(os.getuid() != 0):
+    if "SSH_CONNECTION" in os.environ:
+        print("Unable to be run remotely.")
+        return
+    elif(os.getuid() != 0):
         print("Access Denied. Must be run as root.")
     else:
         if(len(sys.argv) == 2):

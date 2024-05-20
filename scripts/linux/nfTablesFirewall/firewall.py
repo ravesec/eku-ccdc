@@ -5,7 +5,7 @@ import argparse
 from datetime import datetime
 
 def main():
-    if "SSH_CONNECTION" in os.environ:
+    if ("SSH_CONNECTION" in os.environ) or ("SSH_CLIENT" in os.environ) or ("SSH_TTY" in os.environ):
         print("Unable to be run remotely.")
         return
     elif(os.getuid() != 0):
@@ -195,8 +195,8 @@ def panic():
     else:
         print("Enabling panic mode...")
         os.system("nft add table PANIC")
-        os.system("nft add chain PANIC panicChainIn \{ type input hook filter priority -100 \; policy drop\; \}")
-        os.system("nft add chain PANIC panicChainOut \{ type output hook filter priority -100 \; policy drop\; \}")
+        os.system("nft add chain PANIC panicChainIn \{ type filter hook input priority -100 \; policy drop\; \}")
+        os.system("nft add chain PANIC panicChainOut \{ type filter hook output priority -100 \; policy drop\; \}")
         print("Panic mode activated. All traffic in and out blocked.")
 def spacePresent(input):
     inputList = input.split(" ")

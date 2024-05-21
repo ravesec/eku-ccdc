@@ -243,8 +243,8 @@ def blackList():
         ip = input("Enter IP to add to blacklist: ")
         option = input(f"Confirmation: Adding {ip} to blacklist: ")
         if(option.lower() in ('y', 'yes')):
-            os.system("nft add rule blackList blockIn ip saddr { "+ip+" } drop")
-            os.system("nft add rule blackList blockOut ip daddr { "+ip+" } drop")
+            os.system("nft add rule blacklist blockIn ip saddr { "+ip+" } drop")
+            os.system("nft add rule blacklist blockOut ip daddr { "+ip+" } drop")
             blackList = getBlackList()
             y = False
             for heldIP in blackList:
@@ -265,8 +265,8 @@ def blackList():
         index = 0
         for ip in blackList:
             if(ip == option):
-                os.system("nft remove rule blackList blockIn handle "+index)
-                os.system("nft remove rule blackList blockOut handle "+index)
+                os.system("nft remove rule blacklist blockIn handle "+index)
+                os.system("nft remove rule blacklist blockOut handle "+index)
                 index = index+1
         if(isInList(option, blackList)):
             print(f"Error removing {option} from blacklist.")

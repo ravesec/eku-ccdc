@@ -45,6 +45,8 @@ def main():
                     os.system("nft add table "+name)
                 elif(option.lower() in ('panic')):
                     panic()
+                elif(option.lower() in ('blacklist')):
+                    blackList()
                 elif(option.lower() in ('exit', 'quit')):
                     return
                 else:
@@ -113,6 +115,8 @@ def tableCommand(table):
                 print(chain)
         elif(option.lower() in ('panic')):
             panic()
+        elif(option.lower() in ('blacklist')):
+            blackList()
         else:
             printHelp()
 def chainCommand(table, chain):
@@ -165,6 +169,8 @@ def chainCommand(table, chain):
             print(f"New rule added to {chain}.")
         elif(option.lower() in ('panic')):
             panic()
+        elif(option.lower() in ('blacklist')):
+            blackList()
         else:
             printHelp()
 def getTableList():
@@ -205,12 +211,71 @@ def panic():
         os.system("nft add chain PANIC panicChainIn \{ type filter hook input priority -100 \; policy drop\; \}")
         os.system("nft add chain PANIC panicChainOut \{ type filter hook output priority -100 \; policy drop\; \}")
         print("Panic mode activated. All traffic in and out blocked.")
+def blackList():
+    blackList = getBlackList()
+    print("Current list of blacklisted IPs:")
+    for ip in blackList:
+        print(ip)
+    x = True
+    while(x):
+        option = input("Would you like to add or remove an IP? ")
+        if(option.lower() in ('add', 'remove')):
+            x = False
+        else:
+            print("Invalid input.")
+    if(option.lower() in ('add')):
+        ip = input("Enter IP to add to blacklist: ")
+        option = input(f"Confirmation: Adding {ip} to blacklist: ")
+        if(option.lower() in ('y', 'yes')):
+            os.system("nft add rule blackList blockIn ip saddr { "+ip+" } drop")
+            os.system("nft add rule blackList blockOut ip daddr { "+ip+" } drop")
+            blackList = getBlackList()
+            y = False
+            for heldIP in blackList:
+                if(heldIP == ip):
+                    y = True
+            if(y):
+                print(f"IP {ip} successfully added to blacklist.")
+            else:
+                print(f"Error adding {ip} to blacklist.")
+    elif(option.lower() in ('remove')):
+        x = True
+        while(x):
+            option = input("Enter IP to remove from blacklist: ")
+            if(isInList(option, blackList)):
+                x = False
+            else:
+                print(f"{option} not in blacklist.")
+        index = 0
+        for ip in blackList:
+            if(ip == option):
+                os.system("nft remove rule blackList blockIn handle "+index)
+                os.system("nft remove rule blackList blockOut handle "+index)
+                index = index+1
+        if(isInList(option, blackList)):
+            print(f"Error removing {option} from blacklist.")
+        else:
+            print(f"{option} successfully removed.")
+def getBlackList():
+    blackList = []
+    blackListOutput = subprocess.check_output(["nft", "list table blacklist"])
+    blackListRaw = blackListOutput.decode("utf-8").split("saddr ")
+    del(blackListRaw[0])
+    for line in blackListRaw:
+        ipSplit = line.split(" ")
+        blackList.append(ipSplit[0])
+    return blackList
 def spacePresent(input):
     inputList = input.split(" ")
     if(len(inputList) != 1):
         return True
     else:
         return False
+def isInList(value, list):
+    for thing in list:
+        if(thing == value):
+            return True
+    return False
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.
@@ -227,6 +292,7 @@ In-Program Commands:
     exit           |     Exits out of current command focus and returns to the previous layer. (ex. using "exit" while in a specific chain moves the focus to the table that contains the chain)
     quit           |     Quits out of program.
     panic          |     Activates/Deactivates panic mode. Will only prompt confirmation when disabling panic mode.
+    blacklist      |     Enters blacklist management menu. (WIP)
 
     Core Commands:
     

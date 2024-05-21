@@ -16,8 +16,8 @@ def main():
     os.system("nft add table blacklist")
     os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")
     os.system("nft add chain firewall output \{ type filter hook output priority 0 \; policy drop\; \}")
-    os.system("nft add chain blackList blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
-    os.system("nft add chain blackList blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
+    os.system("nft add chain blacklist blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
+    os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
     for service in requiredServicesTCP:
         os.system("nft add rule firewall input tcp sport { "+service+" } accept")
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")

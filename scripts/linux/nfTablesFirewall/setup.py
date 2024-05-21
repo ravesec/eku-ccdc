@@ -13,7 +13,7 @@ outOnlyIPs = []
 
 def main():
     os.system("nft add table firewall")
-    os.system("nft add table blackList")
+    os.system("nft add table blacklist")
     os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")
     os.system("nft add chain firewall output \{ type filter hook output priority 0 \; policy drop\; \}")
     os.system("nft add chain blackList blockIn \{ type filter hook input priority -99 \; policy accept\; \}")

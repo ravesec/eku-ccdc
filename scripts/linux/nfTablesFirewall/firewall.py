@@ -228,6 +228,7 @@ def panic():
         os.system("nft add chain PANIC panicChainOut \{ type filter hook output priority -100 \; policy drop\; \}")
         print("Panic mode activated. All traffic in and out blocked.")
 def blackList():
+    return #TODO: REMOVE WHEN HANDLE ISSUES FIXED
     blackList = getBlackList()
     print("Current list of blacklisted IPs:")
     for ip in blackList:

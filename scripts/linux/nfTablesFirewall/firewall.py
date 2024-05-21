@@ -262,7 +262,7 @@ def blackList():
             for ip in blackList:
                 if(ip[0] == option):
                     x = True
-            if(!x):
+            if(not x):
                 print(f"{option} not in blacklist.")
         for ip in blackList:
             if(ip[0] == option):
@@ -278,7 +278,7 @@ def blackList():
         else:
             print(f"Error removing {ip} from blacklist.")
 def getBlackList():
-    blackList = [][]
+    blackList = [[]]
     blackListOutput = subprocess.check_output(["nft", "-a list table blacklist"])
     blackListRaw = blackListOutput.decode("utf-8").split("saddr ")
     del(blackListRaw[0])
@@ -287,7 +287,7 @@ def getBlackList():
         ipSplit = line.split(" ")
         blackList.append(ipSplit[0])
         blackList[x].append(ipSplit[4])
-        x++
+        x = x+1
     return blackList
 def spacePresent(input):
     inputList = input.split(" ")

@@ -90,7 +90,7 @@ def tableCommand(table):
                 priorityNum = int(priority)
                 if(priorityNum < -99):
                     option("Adding this chain would override the blacklist(priority -99) and/or panic mode(priority -100). Are you sure?")
-                    if(option.lower() in ('y', 'yes'):
+                    if(option.lower() in ('y', 'yes')):
                         y = False
             os.system("nft add chain "+table+" "+name+" \{ type "+type+" hook "+hook+" priority "+priority+" \; policy drop\; \}")
             print(f"Chain {name} added to {table}")

@@ -265,9 +265,10 @@ def blackList():
         index = 0
         for ip in blackList:
             if(ip == option):
-                os.system("nft remove rule blacklist blockIn handle "+index)
-                os.system("nft remove rule blacklist blockOut handle "+index)
+                os.system("nft delete rule blacklist blockIn handle "+str(index))
+                os.system("nft delete rule blacklist blockOut handle "+str(index))
                 index = index+1
+        blackList = getBlackList()
         if(isInList(option, blackList)):
             print(f"Error removing {option} from blacklist.")
         else:

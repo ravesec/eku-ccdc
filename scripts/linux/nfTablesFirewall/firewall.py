@@ -232,7 +232,7 @@ def blackList():
     blackList = getBlackList()
     print("Current list of blacklisted IPs:")
     for ip in blackList:
-        print(ip)
+        print(ip[0] + " ("+ip[1]+")")
     x = True
     while(x):
         option = input("Would you like to add or remove an IP? ")
@@ -249,7 +249,7 @@ def blackList():
             blackList = getBlackList()
             y = False
             for heldIP in blackList:
-                if(heldIP == ip):
+                if(heldIP[0] == ip):
                     y = True
             if(y):
                 print(f"IP {ip} successfully added to blacklist.")
@@ -259,29 +259,35 @@ def blackList():
         x = True
         while(x):
             option = input("Enter IP to remove from blacklist: ")
-            if(isInList(option, blackList)):
-                x = False
-            else:
+            for ip in blackList:
+                if(ip[0] == option):
+                    x = True
+            if(!x):
                 print(f"{option} not in blacklist.")
-        index = 0
         for ip in blackList:
-            if(ip == option):
-                os.system("nft delete rule blacklist blockIn handle "+str(index))
-                os.system("nft delete rule blacklist blockOut handle "+str(index))
-                index = index+1
+            if(ip[0] == option):
+                os.system("nft delete rule blacklist blockIn handle "+ip[1])
+                os.system("nft delete rule blacklist blockOut handle "+ip[1])
         blackList = getBlackList()
-        if(isInList(option, blackList)):
-            print(f"Error removing {option} from blacklist.")
+        y = False
+        for heldIP in blackList:
+            if(heldIP[0] == ip):
+                y = True
+        if(y):
+            print(f"{ip} successfully removed from blacklist.")
         else:
-            print(f"{option} successfully removed.")
+            print(f"Error removing {ip} from blacklist.")
 def getBlackList():
-    blackList = []
-    blackListOutput = subprocess.check_output(["nft", "list table blacklist"])
+    blackList = [][]
+    blackListOutput = subprocess.check_output(["nft", "-a list table blacklist"])
     blackListRaw = blackListOutput.decode("utf-8").split("saddr ")
     del(blackListRaw[0])
+    x = 0
     for line in blackListRaw:
         ipSplit = line.split(" ")
         blackList.append(ipSplit[0])
+        blackList[x].append(ipSplit[4])
+        x++
     return blackList
 def spacePresent(input):
     inputList = input.split(" ")
@@ -310,7 +316,7 @@ In-Program Commands:
     exit           |     Exits out of current command focus and returns to the previous layer. (ex. using "exit" while in a specific chain moves the focus to the table that contains the chain)
     quit           |     Quits out of program.
     panic          |     Activates/Deactivates panic mode. Will only prompt confirmation when disabling panic mode.
-    blacklist      |     Enters blacklist management menu. (WIP)
+    blacklist      |     Enters blacklist management menu. (NOT FUNCTIONAL)
 
     Core Commands:
     

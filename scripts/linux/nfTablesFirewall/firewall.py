@@ -43,6 +43,22 @@ def main():
                         else:
                             y = False
                     os.system("nft add table "+name)
+                elif(option.lower() in ('delete')):
+                    tableList = getTableList()
+                    for table in tableList:
+                        print(table)
+                    y = True
+                    while(y):
+                        option = input("Enter table to remove: ")
+                        if(isInList(option, tableList)):
+                            y = False
+                        else:
+                            print("Invalid selection")
+                    os.system("nft delete table "+option)
+                    if(isInList(option, tableList)):
+                        print(f"Error removing {option}")
+                    else:
+                        print(f"Successfully removed {option}")
                 elif(option.lower() in ('panic')):
                     panic()
                 elif(option.lower() in ('blacklist')):
@@ -298,6 +314,7 @@ In-Program Commands:
     
     table          |     Changes command focus to a specific table.
     add            |     Adds a new table to the ip family.
+    delete         |     Removes a table from the ip family.
     
     Table Commands:
     

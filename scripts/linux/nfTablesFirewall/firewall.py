@@ -263,14 +263,15 @@ def blackList():
     elif(option.lower() in ('remove')):
         x = True
         while(x):
-            index = -1
+            index = 0
             option = input("Enter IP or handle to remove from blacklist: ")
             for ip in blackList:
                 if(ip[0] == option):
                     x = False
-                elif(ip[1] == option):
+                if(ip[1] == option):
                     x = False
-                index = index+1
+                if(x):
+                    index = index+1
             if(x):
                 optionList = option.split(".")
                 if(len(optionList) == 1):
@@ -287,9 +288,9 @@ def blackList():
             if(heldIP[0] == option or heldIP[1] == option):
                 y = False
         if(y):
-            print(f"{ip} successfully removed from blacklist.")
+            print(f"{blackList[index][0]} successfully removed from blacklist.")
         else:
-            print(f"Error removing {ip} from blacklist.")
+            print(f"Error removing {blackList[index][0]} from blacklist.")
 def getBlackList():
     blackList = [[]]
     blackListOutput = subprocess.check_output(["nft -a list table blacklist"], shell=True)

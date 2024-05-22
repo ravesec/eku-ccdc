@@ -267,11 +267,15 @@ def blackList():
             option = input("Enter IP or handle to remove from blacklist: ")
             for ip in blackList:
                 if(ip[0] == option):
-                    x = True
+                    x = False
                 elif(ip[1] == option):
-                    x = True
-            if(not x):
-                print(f"{option} not in blacklist.")
+                    x = False
+            if(x):
+                optionList = option.split(".")
+                if(len(optionList) == 1):
+                    print(f"{option} not in blacklist.")
+                else:
+                    print(f"No IP connecting to handle {option}")
             index = index+1
         confirm = input(f"Confirmation: Removing {blackList[index][0]} from blacklist: ")
         if(confirm.lower() in ('y', 'yes')):
@@ -299,7 +303,7 @@ def getBlackList():
         handle = handleList[0]
         itemList.append(handle)
         blackList.append(itemList)
-    del(blacklist[0])
+    del(blackList[0])
     return blackList
 def spacePresent(input):
     inputList = input.split(" ")

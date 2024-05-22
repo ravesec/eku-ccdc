@@ -228,11 +228,13 @@ def panic():
         os.system("nft add chain PANIC panicChainOut \{ type filter hook output priority -100 \; policy drop\; \}")
         print("Panic mode activated. All traffic in and out blocked.")
 def blackList():
-    return #TODO: REMOVE WHEN HANDLE ISSUES FIXED
     blackList = getBlackList()
-    print("Current list of blacklisted IPs:")
-    for ip in blackList:
-        print(ip[0] + " ("+ip[1]+")")
+    if(len(blackList) == 0):
+        print("No IPs in blacklist.")
+    else:
+        print("Current list of blacklisted IPs:")
+        for ip in blackList:
+            print(ip[0] + " ("+ip[1]+")")
     x = True
     while(x):
         option = input("Would you like to add or remove an IP? ")
@@ -279,15 +281,18 @@ def blackList():
             print(f"Error removing {ip} from blacklist.")
 def getBlackList():
     blackList = [[]]
-    blackListOutput = subprocess.check_output(["nft", "-a list table blacklist"])
+    blackListOutput = subprocess.check_output(["nft -a list table blacklist"], shell=True)
     blackListRaw = blackListOutput.decode("utf-8").split("saddr ")
     del(blackListRaw[0])
-    x = 0
     for line in blackListRaw:
         ipSplit = line.split(" ")
-        blackList.append(ipSplit[0])
-        blackList[x].append(ipSplit[4])
-        x = x+1
+        itemList = []
+        itemList.append(ipSplit[0])
+        handleList = ipSplit[4].split("\n")
+        handle = handleList[0]
+        itemList.append(handle)
+        blackList.append(itemList)
+    del(blacklist[0])
     return blackList
 def spacePresent(input):
     inputList = input.split(" ")

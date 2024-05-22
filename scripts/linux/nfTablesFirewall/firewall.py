@@ -279,6 +279,7 @@ def blackList():
                 else:
                     print(f"No IP connecting to handle {option}")
         confirm = input(f"Confirmation: Removing {blackList[index][0]} from blacklist: ")
+        ip = blackList[index][0]
         if(confirm.lower() in ('y', 'yes')):
             os.system("nft delete rule blacklist blockIn handle "+str(blackList[index][1]))
             os.system("nft delete rule blacklist blockOut handle "+str(int(blackList[index][1])+1))
@@ -288,9 +289,9 @@ def blackList():
             if(heldIP[0] == option or heldIP[1] == option):
                 y = False
         if(y):
-            print(f"{blackList[index][0]} successfully removed from blacklist.")
+            print(f"{ip} successfully removed from blacklist.")
         else:
-            print(f"Error removing {blackList[index][0]} from blacklist.")
+            print(f"Error removing {ip} from blacklist.")
 def getBlackList():
     blackList = [[]]
     blackListOutput = subprocess.check_output(["nft -a list table blacklist"], shell=True)

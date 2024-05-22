@@ -262,25 +262,25 @@ def blackList():
                 print(f"Error adding {ip} to blacklist.")
     elif(option.lower() in ('remove')):
         x = True
-        index = -1
         while(x):
+            index = -1
             option = input("Enter IP or handle to remove from blacklist: ")
             for ip in blackList:
                 if(ip[0] == option):
                     x = False
                 elif(ip[1] == option):
                     x = False
+                index = index+1
             if(x):
                 optionList = option.split(".")
                 if(len(optionList) == 1):
                     print(f"{option} not in blacklist.")
                 else:
                     print(f"No IP connecting to handle {option}")
-            index = index+1
         confirm = input(f"Confirmation: Removing {blackList[index][0]} from blacklist: ")
         if(confirm.lower() in ('y', 'yes')):
-            os.system("nft delete rule blacklist blockIn handle "+blackList[index][1])
-            os.system("nft delete rule blacklist blockOut handle "+blackList[index][1]+1)
+            os.system("nft delete rule blacklist blockIn handle "+str(blackList[index][1]))
+            os.system("nft delete rule blacklist blockOut handle "+str(blackList[index][1]+1))
         blackList = getBlackList()
         y = True
         for heldIP in blackList:

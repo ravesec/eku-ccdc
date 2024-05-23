@@ -18,7 +18,9 @@ def main():
             x = True
             while(x):
                 option = input("[Command@Core]# ")
-                if(option.lower() in ('table')):
+                if(option.lower() in ('')):
+                    pass
+                elif(option.lower() in ('table')):
                     tableList = getTableList()
                     print("List of tables: ")
                     for table in tableList:
@@ -72,7 +74,9 @@ def tableCommand(table):
     x = True
     while(x):
         option = input(f"[Command@{table}]# ")
-        if(option.lower() in ('exit')):
+        if(option.lower() in ('')):
+            pass
+        elif(option.lower() in ('exit')):
             return
         elif(option.lower() in ('add')):
             print(f"Adding chain to {table}")
@@ -141,7 +145,9 @@ def chainCommand(table, chain):
     x = True
     while(x):
         option = input(f"[Command@{table}:{chain}]# ")
-        if(option.lower() in ('exit')):
+        if(option.lower() in ('')):
+            pass
+        elif(option.lower() in ('exit')):
             return
         elif(option.lower() in ('quit')):
             return "quit"
@@ -242,7 +248,9 @@ def blackList():
             for ip in blackList:
                 print(ip[0] + " ("+ip[1]+")")
         option = input("[Command@Blacklist]# ")
-        if(option.lower() in ('add')):
+        if(option.lower() in ('')):
+            pass
+        elif(option.lower() in ('add')):
             ip = input("Enter IP to add to blacklist: ")
             option = input(f"Confirmation: Adding {ip} to blacklist: ")
             if(option.lower() in ('y', 'yes')):

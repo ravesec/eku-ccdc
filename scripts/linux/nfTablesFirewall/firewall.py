@@ -334,7 +334,7 @@ In-Program Commands:
     exit           |     Exits out of current command focus and returns to the previous layer. (ex. using "exit" while in a specific chain moves the focus to the table that contains the chain)
     quit           |     Quits out of program.
     panic          |     Activates/Deactivates panic mode. Will only prompt confirmation when disabling panic mode.
-    blacklist      |     Enters blacklist management menu. (NOT FUNCTIONAL)
+    blacklist      |     Enters blacklist management menu.
 
     Core Commands:
     

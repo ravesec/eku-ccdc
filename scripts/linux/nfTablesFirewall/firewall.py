@@ -62,7 +62,8 @@ def main():
                 elif(option.lower() in ('panic')):
                     panic()
                 elif(option.lower() in ('blacklist')):
-                    blackList()
+                    if(blackList() == "quit"):
+                        return
                 elif(option.lower() in ('exit', 'quit')):
                     return
                 else:
@@ -132,7 +133,8 @@ def tableCommand(table):
         elif(option.lower() in ('panic')):
             panic()
         elif(option.lower() in ('blacklist')):
-            blackList()
+            if(blackList() == "quit"):
+                return "quit"
         else:
             printHelp()
 def chainCommand(table, chain):
@@ -186,7 +188,8 @@ def chainCommand(table, chain):
         elif(option.lower() in ('panic')):
             panic()
         elif(option.lower() in ('blacklist')):
-            blackList()
+            if(blackList() == "quit"):
+                return "quit"
         else:
             printHelp()
 def getTableList():
@@ -228,70 +231,75 @@ def panic():
         os.system("nft add chain PANIC panicChainOut \{ type filter hook output priority -100 \; policy drop\; \}")
         print("Panic mode activated. All traffic in and out blocked.")
 def blackList():
-    blackList = getBlackList()
-    if(len(blackList) == 0):
-        print("No IPs in blacklist.")
-    else:
-        print("Current list of blacklisted IPs:")
-        for ip in blackList:
-            print(ip[0] + " ("+ip[1]+")")
-    x = True
-    while(x):
-        option = input("Would you like to add or remove an IP? ")
-        if(option.lower() in ('add', 'remove')):
-            if(option.lower() in ('remove') and len(blackList) == 0):
-                print("Cannot remove from blacklist. No IPs present.")
-            else:
-                x = False
-        else:
-            print("Invalid input.")
-    if(option.lower() in ('add')):
-        ip = input("Enter IP to add to blacklist: ")
-        option = input(f"Confirmation: Adding {ip} to blacklist: ")
-        if(option.lower() in ('y', 'yes')):
-            os.system("nft add rule blacklist blockIn ip saddr { "+ip+" } drop")
-            os.system("nft add rule blacklist blockOut ip daddr { "+ip+" } drop")
-            blackList = getBlackList()
-            y = False
-            for heldIP in blackList:
-                if(heldIP[0] == ip):
-                    y = True
-            if(y):
-                print(f"IP {ip} successfully added to blacklist.")
-            else:
-                print(f"Error adding {ip} to blacklist.")
-    elif(option.lower() in ('remove')):
-        x = True
-        while(x):
-            index = 0
-            option = input("Enter IP or handle to remove from blacklist: ")
-            for ip in blackList:
-                if(ip[0] == option):
-                    x = False
-                if(ip[1] == option):
-                    x = False
-                if(x):
-                    index = index+1
-            if(x):
-                optionList = option.split(".")
-                if(len(optionList) == 1):
-                    print(f"{option} not in blacklist.")
-                else:
-                    print(f"No IP connecting to handle {option}")
-        confirm = input(f"Confirmation: Removing {blackList[index][0]} from blacklist: ")
-        ip = blackList[index][0]
-        if(confirm.lower() in ('y', 'yes')):
-            os.system("nft delete rule blacklist blockIn handle "+str(blackList[index][1]))
-            os.system("nft delete rule blacklist blockOut handle "+str(int(blackList[index][1])+1))
+    z = True
+    while(z):
+        os.system("clear")
         blackList = getBlackList()
-        y = True
-        for heldIP in blackList:
-            if(heldIP[0] == option or heldIP[1] == option):
-                y = False
-        if(y):
-            print(f"{ip} successfully removed from blacklist.")
+        if(len(blackList) == 0):
+            print("No IPs in blacklist.")
         else:
-            print(f"Error removing {ip} from blacklist.")
+            print("Current list of blacklisted IPs:")
+            for ip in blackList:
+                print(ip[0] + " ("+ip[1]+")")
+        option = input("[Command@Blacklist]# ")
+        if(option.lower() in ('add')):
+            ip = input("Enter IP to add to blacklist: ")
+            option = input(f"Confirmation: Adding {ip} to blacklist: ")
+            if(option.lower() in ('y', 'yes')):
+                os.system("nft add rule blacklist blockIn ip saddr { "+ip+" } drop")
+                os.system("nft add rule blacklist blockOut ip daddr { "+ip+" } drop")
+                blackList = getBlackList()
+                y = False
+                for heldIP in blackList:
+                    if(heldIP[0] == ip):
+                        y = True
+                if(y):
+                    print(f"IP {ip} successfully added to blacklist.")
+                else:
+                    print(f"Error adding {ip} to blacklist.")
+        elif(option.lower() in ('remove')):
+            x = True
+            if(len(blackList) == 0):
+                x = False
+                print("Cannot remove from blacklist. No IPs present.")
+            while(x):
+                index = 0
+                option = input("Enter IP or handle to remove from blacklist: ")
+                for ip in blackList:
+                    if(ip[0] == option):
+                        x = False
+                    if(ip[1] == option):
+                        x = False
+                    if(x):
+                        index = index+1
+                if(x):
+                    optionList = option.split(".")
+                    if(len(optionList) == 1):
+                        print(f"{option} not in blacklist.")
+                    else:
+                        print(f"No IP connecting to handle {option}")
+            confirm = input(f"Confirmation: Removing {blackList[index][0]} from blacklist: ")
+            ip = blackList[index][0]
+            if(confirm.lower() in ('y', 'yes')):
+                os.system("nft delete rule blacklist blockIn handle "+str(blackList[index][1]))
+                os.system("nft delete rule blacklist blockOut handle "+str(int(blackList[index][1])+1))
+            blackList = getBlackList()
+            y = True
+            for heldIP in blackList:
+                if(heldIP[0] == option or heldIP[1] == option):
+                    y = False
+            if(y):
+                print(f"{ip} successfully removed from blacklist.")
+            else:
+                print(f"Error removing {ip} from blacklist.")
+        elif(option.lower() in ('exit')):
+            return
+        elif(option.lower() in ('quit')):
+            return "quit"
+        elif(option.lower() in ('panic')):
+            panic()
+        else:
+            printHelp()
 def getBlackList():
     blackList = [[]]
     blackListOutput = subprocess.check_output(["nft -a list table blacklist"], shell=True)

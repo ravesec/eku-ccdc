@@ -20,7 +20,9 @@ def main():
     os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
     for service in requiredServicesTCP:
         os.system("nft add rule firewall input tcp sport { "+service+" } accept")
+        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+        os.system("nft add rule firewall output tcp sport { "+service+" } accept")
     for service in inOnlyServicesTCP:
         os.system("nft add rule firewall input tcp sport { "+service+" } accept")
     for service in outOnlyServicesTCP:

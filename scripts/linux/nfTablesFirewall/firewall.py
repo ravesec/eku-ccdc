@@ -273,7 +273,7 @@ def blackList():
                     print(f"IP {ip} successfully added to blacklist.")
                 else:
                     print(f"Error adding {ip} to blacklist.")
-        elif(option.lower() == 'remove'):
+        elif(option.lower() == 'delete'):
             x = True
             if(len(blackList) == 0):
                 x = False
@@ -377,6 +377,11 @@ In-Program Commands:
     Chain Commands:
 
     add            |     Adds a new rule to the selected chain.
+    
+    Blacklist Commands:
+    
+    add            |     Adds a new IP to the blacklist.
+    delete         |     Removes an IP from the blacklist.
     
     
 """)

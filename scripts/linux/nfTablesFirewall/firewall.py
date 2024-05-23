@@ -18,9 +18,9 @@ def main():
             x = True
             while(x):
                 option = input("[Command@Core]# ")
-                if(option.lower() in ('')):
+                if(option.lower() == ''):
                     pass
-                elif(option.lower() in ('table')):
+                elif(option.lower() == 'table'):
                     tableList = getTableList()
                     print("List of tables: ")
                     for table in tableList:
@@ -35,7 +35,7 @@ def main():
                             print("Invalid selection.")
                     if(tableCommand(option) == "quit"):
                         return
-                elif(option.lower() in ('add')):
+                elif(option.lower() == 'add'):
                     print("Adding a table...")
                     y = True
                     while(y):
@@ -45,7 +45,7 @@ def main():
                         else:
                             y = False
                     os.system("nft add table "+name)
-                elif(option.lower() in ('delete')):
+                elif(option.lower() == 'delete'):
                     tableList = getTableList()
                     for table in tableList:
                         print(table)
@@ -61,12 +61,12 @@ def main():
                         print(f"Error removing {option}")
                     else:
                         print(f"Successfully removed {option}")
-                elif(option.lower() in ('panic')):
+                elif(option.lower() == 'panic'):
                     panic()
-                elif(option.lower() in ('blacklist')):
+                elif(option.lower() == 'blacklist'):
                     if(blackList() == "quit"):
                         return
-                elif(option.lower() in ('exit', 'quit')):
+                elif(option.lower() == 'exit'):
                     return
                 else:
                     printHelp()
@@ -74,11 +74,11 @@ def tableCommand(table):
     x = True
     while(x):
         option = input(f"[Command@{table}]# ")
-        if(option.lower() in ('')):
+        if(option.lower() == ''):
             pass
-        elif(option.lower() in ('exit')):
+        elif(option.lower() == 'exit'):
             return
-        elif(option.lower() in ('add')):
+        elif(option.lower() == 'add'):
             print(f"Adding chain to {table}")
             y = True
             while(y):
@@ -99,7 +99,7 @@ def tableCommand(table):
                         y = False
             os.system("nft add chain "+table+" "+name+" \{ type "+type+" hook "+hook+" priority "+priority+" \; policy drop\; \}")
             print(f"Chain {name} added to {table}")
-        elif(option.lower() in ('chain')):
+        elif(option.lower() == 'chain'):
             chainList = getChainList(table)
             print(f"List of chains in {table}:")
             for chain in chainList:
@@ -114,7 +114,7 @@ def tableCommand(table):
                     print("Invalid selection.")
             if(chainCommand(table, option) == "quit"):
                 return "quit"
-        elif(option.lower() in ('clear')):
+        elif(option.lower() == 'clear'):
             print(f"Please note, this will remove all rules in the table {table}. Doing so could result in a loss of firewall function if this table contains firewall rules.")
             option = input(f"Are you sure you would like to clear {table}? ")
             if(option.lower() in ('y', 'yes')):
@@ -123,20 +123,28 @@ def tableCommand(table):
                 for chain in chainList:
                     os.system("nft delete chain "+table+" "+chain)
                 print(f"{table} cleared.")
-        elif(option.lower() in ('delete')):
-            chain = input("What chain would you like to remove? ")
+        elif(option.lower() == 'delete'):
+            option = input("What chain would you like to remove? ")
             os.system("nft flush chain "+table+" "+chain)
             os.system("nft delete chain "+table+" "+chain)
-            print(f"{chain} deleted.")
-        elif(option.lower() in ('quit')):
+            chainList = getChainList()
+            z = False
+            for chain in chainList:
+                if(chain == option):
+                    z = True
+            if(z):
+                print(f"{option} deleted.")
+            else:
+                print(f"Error removing {option}.")
+        elif(option.lower() == 'quit'):
             return "quit"
-        elif(option.lower() in ('view')):
+        elif(option.lower() == 'view'):
             chainList = getChainList(table)
             for chain in chainList:
                 print(chain)
-        elif(option.lower() in ('panic')):
+        elif(option.lower() == 'panic'):
             panic()
-        elif(option.lower() in ('blacklist')):
+        elif(option.lower() == 'blacklist'):
             if(blackList() == "quit"):
                 return "quit"
         else:
@@ -145,13 +153,13 @@ def chainCommand(table, chain):
     x = True
     while(x):
         option = input(f"[Command@{table}:{chain}]# ")
-        if(option.lower() in ('')):
+        if(option.lower() == ''):
             pass
-        elif(option.lower() in ('exit')):
+        elif(option.lower() == 'exit'):
             return
-        elif(option.lower() in ('quit')):
+        elif(option.lower() == 'quit'):
             return "quit"
-        elif(option.lower() in ('add')):
+        elif(option.lower() == 'add'):
             print(f"Adding exclusion to chain {chain}.")
             y = True
             while(y):
@@ -191,9 +199,9 @@ def chainCommand(table, chain):
                 elif(stance.lower() in ('destination')):
                     os.system("nft add rule "+table+" "+chain+" "+type+" dport { "+exclude+" } accept")
             print(f"New rule added to {chain}.")
-        elif(option.lower() in ('panic')):
+        elif(option.lower() == 'panic'):
             panic()
-        elif(option.lower() in ('blacklist')):
+        elif(option.lower() == 'blacklist'):
             if(blackList() == "quit"):
                 return "quit"
         else:
@@ -248,9 +256,9 @@ def blackList():
             for ip in blackList:
                 print(ip[0] + " ("+ip[1]+")")
         option = input("[Command@Blacklist]# ")
-        if(option.lower() in ('')):
+        if(option.lower() == ''):
             pass
-        elif(option.lower() in ('add')):
+        elif(option.lower() == 'add'):
             ip = input("Enter IP to add to blacklist: ")
             option = input(f"Confirmation: Adding {ip} to blacklist: ")
             if(option.lower() in ('y', 'yes')):
@@ -265,7 +273,7 @@ def blackList():
                     print(f"IP {ip} successfully added to blacklist.")
                 else:
                     print(f"Error adding {ip} to blacklist.")
-        elif(option.lower() in ('remove')):
+        elif(option.lower() == 'remove'):
             x = True
             if(len(blackList) == 0):
                 x = False
@@ -300,11 +308,11 @@ def blackList():
                 print(f"{ip} successfully removed from blacklist.")
             else:
                 print(f"Error removing {ip} from blacklist.")
-        elif(option.lower() in ('exit')):
+        elif(option.lower() == 'exit'):
             return
-        elif(option.lower() in ('quit')):
+        elif(option.lower() == 'quit'):
             return "quit"
-        elif(option.lower() in ('panic')):
+        elif(option.lower() == 'panic'):
             panic()
         else:
             printHelp()

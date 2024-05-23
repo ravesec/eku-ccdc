@@ -1,7 +1,7 @@
 import os
 import sys
 
-requiredServicesTCP = ["53", "ssh"]  #TODO: Add all services/ports and all IPs that you want allowed by default
+requiredServicesTCP = ["53", "ssh", "http", "https"]  #TODO: Add all services/ports and all IPs that you want allowed by default
 inOnlyServicesTCP = []
 outOnlyServicesTCP = []
 requiredServicesUDP = []

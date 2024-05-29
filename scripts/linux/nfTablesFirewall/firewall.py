@@ -237,18 +237,21 @@ def getRuleList(table, chain):
     ruleList = [[]]
     command = f"nft -a list table {table}"
     ruleListOutput = subprocess.check_output([command], shell=True)
-    splitter = f"chain {chain}" + "{"
+    splitter = f"chain {chain}" + " {"
     ruleListRaw = ruleListOutput.decode("utf-8").split(splitter)
     del(ruleListRaw[0])
-    ruleListRawStr = ruleListRaw[1]
+    ruleListRawStr = ruleListRaw[0]
     ruleListRaw = ruleListRawStr.split("}")
     ruleListRawStr = ruleListRaw[0]
     ruleListRaw = ruleListRawStr.split("\n")
     del(ruleListRaw[0])
-    del(ruleListRaw[1])
+    del(ruleListRaw[0])
+    del(ruleListRaw[len(ruleListRaw)-1]
     for line in ruleListRaw:
         ruleInfo = line.split(" # handle ")
         ruleName = ruleInfo[0]
+        ruleNameList = ruleName.split("\t")
+        ruleName = ruleNameList[2]
         ruleHandle = ruleInfo[1]
         rule = [ruleName, ruleHandle]
         ruleList.append(rule)
@@ -257,7 +260,7 @@ def getRuleList(table, chain):
 def getChainInfo(table, chain):
     command = f"nft -a list table {table}"
     ruleListOutput = subprocess.check_output([command], shell=True)
-    splitter = f"chain {chain}" + "{"
+    splitter = f"chain {chain}" + " {"
     ruleListRaw = ruleListOutput.decode("utf-8").split(splitter)
     del(ruleListRaw[0])
     ruleListRaw = ruleListRaw.split("\n")

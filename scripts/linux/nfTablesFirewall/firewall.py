@@ -395,7 +395,8 @@ Firewall interface for linux machines using nftables. Written for use by EKU's C
 Command line arguments:
 
     -h , --help    |     Displays this help menu and exits.
-
+    -ba (ip)       |     Adds given IP to blacklist.
+    -br (ip)       |     Removes given IP from blacklist.
 
 In-Program Commands:
 

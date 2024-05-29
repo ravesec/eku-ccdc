@@ -204,6 +204,10 @@ def chainCommand(table, chain):
                 elif(stance.lower() in ('destination')):
                     os.system("nft add rule "+table+" "+chain+" "+type+" dport { "+exclude+" } accept")
             print(f"New rule added to {chain}.")
+        elif(option.lower() == 'list'):
+            ruleList = getRuleList(table, chain)
+            for rule in ruleList:
+                print(rule[0] + " ("+rule[1]+")")
         elif(option.lower() == 'panic'):
             panic()
         elif(option.lower() == 'blacklist'):
@@ -229,6 +233,35 @@ def getChainList(table):
         lineList = line.split(" ")
         chainList.append(lineList[1])
     return chainList
+def getRuleList(table, chain):
+    ruleList = [[]]
+    command = f"nft -a list table {table}"
+    ruleListOutput = subprocess.check_output([command], shell=True)
+    splitter = f"chain {chain}" + "{"
+    ruleListRaw = ruleListOutput.decode("utf-8").split(splitter)
+    del(ruleListRaw[0])
+    ruleListRawStr = ruleListRaw[1]
+    ruleListRaw = ruleListRawStr.split("}")
+    ruleListRawStr = ruleListRaw[0]
+    ruleListRaw = ruleListRawStr.split("\n")
+    del(ruleListRaw[0])
+    del(ruleListRaw[1])
+    for line in ruleListRaw:
+        ruleInfo = line.split(" # handle ")
+        ruleName = ruleInfo[0]
+        ruleHandle = ruleInfo[1]
+        rule = [ruleName, ruleHandle]
+        ruleList.append(rule)
+    del(ruleList[0])
+    return ruleList
+def getChainInfo(table, chain):
+    command = f"nft -a list table {table}"
+    ruleListOutput = subprocess.check_output([command], shell=True)
+    splitter = f"chain {chain}" + "{"
+    ruleListRaw = ruleListOutput.decode("utf-8").split(splitter)
+    del(ruleListRaw[0])
+    ruleListRaw = ruleListRaw.split("\n")
+    return ruleListRaw[1]
 def panic():
     tableList = getTableList()
     x = False
@@ -423,6 +456,7 @@ In-Program Commands:
     Chain Commands:
 
     add            |     Adds a new rule to the selected chain.
+    list           |     Lists all rules present in selected chain, along with their handles.
     
     Blacklist Commands:
     

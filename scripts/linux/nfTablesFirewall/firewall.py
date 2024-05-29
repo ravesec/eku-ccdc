@@ -5,7 +5,12 @@ import argparse
 from datetime import datetime
 
 def main():
-    if ("SSH_CONNECTION" in os.environ) or ("SSH_CLIENT" in os.environ) or ("SSH_TTY" in os.environ):
+    if(len(sys.argv) == 3):
+        if(sys.argv[1] == '-ba'):
+            print(addToBlackList(sys.argv[2]))
+        elif(sys.argv[1] == '-br'):
+            print(removeFromBlackList(sys.argv[2]))
+    elif ("SSH_CONNECTION" in os.environ) or ("SSH_CLIENT" in os.environ) or ("SSH_TTY" in os.environ):
         print("Unable to be run remotely.")
         return
     elif(os.getuid() != 0):
@@ -331,6 +336,46 @@ def getBlackList():
         blackList.append(itemList)
     del(blackList[0])
     return blackList
+def addToBlackList(ip):
+    tableList = getTableList()
+    x = True
+    for table in tableList:
+        if(table == "blacklist"):
+            x = False
+    if(x):
+        return "Blacklist table does not exist."
+    os.system("nft add rule blacklist blockIn ip saddr { "+ip+" } drop")
+    os.system("nft add rule blacklist blockOut ip daddr { "+ip+" } drop")
+    blackList = getBlackList()
+    x = True
+    for entry in blackList:
+        if(entry[0] == ip): 
+            x = False
+    if(x):
+        return f"Error adding {ip} to blacklist"
+    else:
+        return f"{ip} successfully added to blacklist."
+def removeFromBlackList(ip):
+    blackList = getBlackList()
+    x = True
+    index = 0
+    for entry in blackList:
+        if(entry[0] == ip): 
+            x = False
+        if(x):
+            index = index+1
+    if(x):
+        return "IP not found in blacklist."
+    os.system("nft delete rule blacklist blockIn handle "+str(blackList[index][1]))
+    os.system("nft delete rule blacklist blockOut handle "+str(int(blackList[index][1])+1))
+    x = True
+    for entry in blackList:
+        if(entry[0] == ip): 
+            x = False
+    if(x):
+        return f"{ip} successfully removed from blacklist."
+    else:
+        return f"Error removing {ip} from blacklist."
 def spacePresent(input):
     inputList = input.split(" ")
     if(len(inputList) != 1):

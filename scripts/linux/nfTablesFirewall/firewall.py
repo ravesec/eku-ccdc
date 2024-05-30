@@ -267,7 +267,7 @@ def getRuleList(table, chain):
     ruleListRaw = ruleListRawStr.split("\n")
     del(ruleListRaw[0])
     del(ruleListRaw[0])
-    del(ruleListRaw[len(ruleListRaw)-1]
+    del(ruleListRaw[len(ruleListRaw)-1])
     for line in ruleListRaw:
         ruleInfo = line.split(" # handle ")
         ruleName = ruleInfo[0]

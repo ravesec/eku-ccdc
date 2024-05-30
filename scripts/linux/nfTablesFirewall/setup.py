@@ -1,15 +1,16 @@
 import os
 import sys
 
-requiredServicesTCP = ["53", "ssh", "http", "https"]  #TODO: Add all services/ports and all IPs that you want allowed by default
-inOnlyServicesTCP = []
-outOnlyServicesTCP = []
-requiredServicesUDP = []
-inOnlyServicesUDP = []
-outOnlyServicesUDP = []
-requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
-inOnlyIPs = []
-outOnlyIPs = []
+#TODO: Add all services/ports and all IPs that you want allowed by default
+requiredServicesTCP = ["53", "http", "https"] #ports/services allowed to freely talk both ways
+inOnlyServicesTCP = [] #ports/services only allowed to recieve traffic, not send
+outOnlyServicesTCP = [] #ports/services only allowed to send traffic, not recieve
+requiredServicesUDP = [] #ports/services allowed to freely talk both ways
+inOnlyServicesUDP = [] #ports/services only allowed to recieve traffic, not send
+outOnlyServicesUDP = [] #ports/services only allowed to send traffic, not recieve
+requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"] #IPs allowed to send traffic to and recieve trafic from this machine
+inOnlyIPs = [] #IPs only allowed to send traffic to this machine.
+outOnlyIPs = [] #IPs only allowed to recieve traffic from this machine.
 
 def main():
     os.system("nft add table firewall")
@@ -24,16 +25,18 @@ def main():
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
     for service in inOnlyServicesTCP:
-        os.system("nft add rule firewall input tcp sport { "+service+" } accept")
+        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
     for service in outOnlyServicesTCP:
-        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+        os.system("nft add rule firewall output tcp sport { "+service+" } accept")
     for service in requiredServicesUDP:
         os.system("nft add rule firewall input udp sport { "+service+" } accept")
+        os.system("nft add rule firewall input udp dport { "+service+" } accept")
         os.system("nft add rule firewall output udp dport { "+service+" } accept")
+        os.system("nft add rule firewall output udp sport { "+service+" } accept")
     for service in inOnlyServicesUDP:
-        os.system("nft add rule firewall input udp sport { "+service+" } accept")
+        os.system("nft add rule firewall input udp dport { "+service+" } accept")
     for service in outOnlyServicesUDP:
-        os.system("nft add rule firewall output udp dport { "+service+" } accept")
+        os.system("nft add rule firewall output udp sport { "+service+" } accept")
     for ip in requiredIPs:
         os.system("nft add rule firewall input ip saddr { "+ip+" } accept")
         os.system("nft add rule firewall output ip daddr { "+ip+" } accept")

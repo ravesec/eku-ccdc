@@ -204,6 +204,24 @@ def chainCommand(table, chain):
                 elif(stance.lower() in ('destination')):
                     os.system("nft add rule "+table+" "+chain+" "+type+" dport { "+exclude+" } accept")
             print(f"New rule added to {chain}.")
+        elif(option.lower() == 'delete'):
+            ruleList = getRuleList(table, chain)
+            print(f"List of rules in {chain}:")
+            for rule in ruleList:
+                print(rule[0] + " ("+rule[1]+")")
+            x = True
+            while(x):
+                handle = input("Enter handle of rule you would like to remove: ")
+                for rule in ruleList:
+                    if(rule[1] == handle):
+                        ruleName = rule[0]
+                        x = False
+                if(x):
+                    print("Invalid selection.")
+            verification = input(f"Confirmation: Removing rule {ruleName} from chain {chain}? ")
+            if(verification.lower() == ('y', 'yes')):
+                command = f"nft delete rule {table} {chain} handle {handle}"
+                os.system(command)
         elif(option.lower() == 'list'):
             ruleList = getRuleList(table, chain)
             for rule in ruleList:
@@ -459,6 +477,7 @@ In-Program Commands:
     Chain Commands:
 
     add            |     Adds a new rule to the selected chain.
+    delete         |     Removes a stated rule from the current chain.
     list           |     Lists all rules present in selected chain, along with their handles.
     
     Blacklist Commands:

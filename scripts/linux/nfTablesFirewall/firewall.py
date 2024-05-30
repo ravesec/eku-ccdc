@@ -464,14 +464,11 @@ def portDefault(protocol, port):
             '443': 'HTTPS'
         }.get(port, "")
     elif(protocol == "udp"):
-        if(port == "53"):
-            return "DNS"
-        elif(port == "123"):
-            return "NTP"
-        elif(port == "220"):
-            return "IMAP"
-        else:
-            return ""
+        return {
+            '53': 'DNS',
+            '123': 'NTP',
+            '220': 'IMAP'
+        }.get(port, "")
     else:
         return ""
 def printHelp():

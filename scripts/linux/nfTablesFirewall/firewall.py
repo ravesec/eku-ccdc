@@ -208,7 +208,10 @@ def chainCommand(table, chain):
             ruleList = getRuleList(table, chain)
             print(f"List of rules in {chain}:")
             for rule in ruleList:
-                print(rule[0] + " ("+rule[1]+")")
+                if(len(rule[2]) != 0):
+                    print(rule[0] + " ("+rule[1]+")  ["+rule[2]+"]") 
+                else:
+                    print(rule[0] + " ("+rule[1]+")")
             x = True
             while(x):
                 handle = input("Enter handle of rule you would like to remove: ")
@@ -275,9 +278,10 @@ def getRuleList(table, chain):
         ruleName = ruleNameList[2]
         itemList = ruleName.split(" ")
         port = itemList[2]
+        protocol = itemList[0]
         ruleHandle = ruleInfo[1]
         rule = [ruleName, ruleHandle]
-        rule.append(portDefault(port))
+        rule.append(portDefault(protocol, port))
         ruleList.append(rule)
     del(ruleList[0])
     return ruleList
@@ -447,15 +451,27 @@ def isInList(value, list):
         if(thing == value):
             return True
     return False
-def portDefault(port):
-    if(port == "22"):
-        return "SSH"
-    elif(port == "53"):
-        return "DNS"
-    elif(port == "80"):
-        return "HTTP"
-    elif(port == "443"):
-        return "HTTPS"
+def portDefault(protocol, port):
+    if(protocol == "tcp"):
+        if(port == "22"):
+            return "SSH"
+        elif(port == "25"):
+            return "SMTP"
+        elif(port == "53"):
+            return "DNS"
+        elif(port == "80"):
+            return "HTTP"
+        elif(port == "443"):
+            return "HTTPS"
+        else:
+            return ""
+    elif(protocol == "udp"):
+        if(port == "53"):
+            return "DNS"
+        elif(port == "123"):
+            return "NTP"
+        else:
+            return ""
     else:
         return ""
 def printHelp():

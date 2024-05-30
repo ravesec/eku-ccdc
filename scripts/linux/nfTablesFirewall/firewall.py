@@ -453,24 +453,16 @@ def isInList(value, list):
     return False
 def portDefault(protocol, port):
     if(protocol == "tcp"):
-        if(port == "20"):
-            return "FTP"
-        elif(port == "22"):
-            return "SSH"
-        elif(port == "25"):
-            return "SMTP"
-        elif(port == "53"):
-            return "DNS"
-        elif(port == "80"):
-            return "HTTP"
-        elif(port == "110"):
-            return "POP3"
-        elif(port == "220"):
-            return "IMAP"
-        elif(port == "443"):
-            return "HTTPS"
-        else:
-            return ""
+        return {
+            '20': 'FTP',
+            '22': 'SSH',
+            '25': 'SMTP',
+            '53': 'DNS',
+            '80': 'HTTP',
+            '110': 'POP3',
+            '220': 'IMAP',
+            '443': 'HTTPS'
+        }.get(port, "")
     elif(protocol == "udp"):
         if(port == "53"):
             return "DNS"

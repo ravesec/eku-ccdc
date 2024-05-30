@@ -225,7 +225,10 @@ def chainCommand(table, chain):
         elif(option.lower() == 'list'):
             ruleList = getRuleList(table, chain)
             for rule in ruleList:
-                print(rule[0] + " ("+rule[1]+")")
+                if(len(rule[2]) != 0):
+                    print(rule[0] + " ("+rule[1]+")  ["+rule[2]+"]") 
+                else:
+                    print(rule[0] + " ("+rule[1]+")")
         elif(option.lower() == 'panic'):
             panic()
         elif(option.lower() == 'blacklist'):
@@ -270,8 +273,11 @@ def getRuleList(table, chain):
         ruleName = ruleInfo[0]
         ruleNameList = ruleName.split("\t")
         ruleName = ruleNameList[2]
+        itemList = ruleName.split(" ")
+        port = itemList[2]
         ruleHandle = ruleInfo[1]
         rule = [ruleName, ruleHandle]
+        rule.append(portDefault(port))
         ruleList.append(rule)
     del(ruleList[0])
     return ruleList
@@ -441,6 +447,17 @@ def isInList(value, list):
         if(thing == value):
             return True
     return False
+def portDefault(port):
+    if(port == "22"):
+        return "SSH"
+    elif(port == "53"):
+        return "DNS"
+    elif(port == "80"):
+        return "HTTP"
+    elif(port == "443"):
+        return "HTTPS"
+    else:
+        return ""
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

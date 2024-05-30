@@ -316,7 +316,6 @@ def panic():
 def blackList():
     z = True
     while(z):
-        os.system("clear")
         blackList = getBlackList()
         if(len(blackList) == 0):
             print("No IPs in blacklist.")

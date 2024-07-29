@@ -3,7 +3,7 @@ yum install -y nftables
 yum install -y python3
 if ! [ -d /etc/eku-ccdc ]
 then
-git clone https://github.com/ravesec/eku-ccdc /etc
+git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
 fi
 echo "Moving Manticore..."
 mkdir /etc/manticore

@@ -14,7 +14,7 @@ outOnlyIPs = [] #IPs only allowed to recieve traffic from this machine.
 
 def main():
     if(len(sys.argv) == 2):
-        if(sys.argv(1) == "splunk"):
+        if(sys.argv[1] == "splunk"):
             splSetup()
             return
     os.system("nft add table firewall")

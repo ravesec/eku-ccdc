@@ -5,7 +5,7 @@ def main():
     if(len(sys.argv) != 2):
         print("Invalid usage")
     else:
-        address = sys.argv(1)
+        address = sys.argv[1]
         try:
             os.system("stty -echo")
             password = input("Enter sysadmin password: ")

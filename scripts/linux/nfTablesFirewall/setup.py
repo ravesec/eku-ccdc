@@ -50,7 +50,6 @@ def main():
         os.system("nft add rule firewall output ip daddr { "+ip+" } accept")
     
     os.remove(sys.argv[0])
-main()
 def splSetup():
     requiredServicesTCP = ["53", "http", "https", "8080", "1893"] #ports/services allowed to freely talk both ways
     inOnlyServicesTCP = [] #ports/services only allowed to recieve traffic, not send
@@ -89,3 +88,4 @@ def splSetup():
     for ip in outOnlyIPs:
         os.system("nft add rule firewall output ip daddr { "+ip+" } accept")
     os.remove(sys.argv[0])
+main()

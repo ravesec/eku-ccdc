@@ -11,7 +11,7 @@ def main():
             password = input("Enter sysadmin password: ")
             ssh_client = paramiko.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(address, username=sysadmin, password=password)
+            ssh_client.connect(address, username="sysadmin", password=password)
             command = """cat <<EOFA > /etc/setup
 yum install -y nftables 
 yum install -y python3

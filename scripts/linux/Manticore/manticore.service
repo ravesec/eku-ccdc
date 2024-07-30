@@ -1,0 +1,12 @@
+[Unit]
+Description=Manticore listener service
+
+[Service]
+Type=forking
+Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
+ExecStart=/bin/bash -c 'python3 /etc/manticore/listener.py'
+StartLimitInterval=1s
+StartLimitBurst=999
+
+[Install]
+WantedBy=multi-user.target

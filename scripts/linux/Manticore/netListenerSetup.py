@@ -9,6 +9,7 @@ def main():
         try:
             os.system("stty -echo")
             password = input("Enter sysadmin password: ")
+            os.system("stty echo")
             ssh_client = paramiko.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
             ssh_client.connect(address, username="sysadmin", password=password)

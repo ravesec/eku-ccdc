@@ -1,4 +1,18 @@
 #!/bin/bash
+echo "Clearing splunk and installing new admin user..."
+/opt/splunk/bin/stop
+/opt/splunk/bin/splunk clean all -f
+echo "stty -echo"
+echo "Enter new splunk admin password: "
+read password
+cat <<EOFA > /opt/splunk/etc/system/local/user-seed.conf
+[user_info]
+USERNAME = admin
+PASSOWRD = $password
+EOFA
+echo "stty echo"
+/opt/splunk/bin/start
+echo "Splunk accounts reset."
 yum install -y nftables 
 yum install -y python3
 if ! [ -d /etc/eku-ccdc ]

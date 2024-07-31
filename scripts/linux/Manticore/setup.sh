@@ -50,7 +50,7 @@ StartLimitBurst=999
 [Install]
 WantedBy=multi-user.target
 EOFB
-rm $0
+rm /tmp/manticoreSetup
 EOFA
 echo "Setting up E-Comm listener..."
 python3 /etc/manticore/netListenerSetup.py "172.20.241.30"

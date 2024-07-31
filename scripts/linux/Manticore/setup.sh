@@ -26,6 +26,17 @@ rm /etc/manticore/setup.sh
 echo "Preventing password changes..."
 chattr +i /etc/passwd
 chattr +i /opt/splunk/etc/passwd
+cat <<EOFA > /etc/manticore/listenerSetup
+yum install -y nftables 
+yum install -y python3
+if ! [ -d /etc/eku-ccdc ]
+then
+git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
+fi
+mv /etc/eku-ccdc/scripts/linux/Manticore/listener.py /bin/manticoreListener
+chmod +x /bin/manticoreListener
+manticoreListener "1893"
+EOFA
 echo "Setting up E-Comm listener..."
 python3 /etc/manticore/netListenerSetup.py "172.20.241.30"
 echo "Setting up Fedora listener..."

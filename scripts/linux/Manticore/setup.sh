@@ -35,7 +35,22 @@ git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
 fi
 mv /etc/eku-ccdc/scripts/linux/Manticore/listener.py /bin/manticoreListener
 chmod +x /bin/manticoreListener
-manticoreListener "1893"
+manticoreListener "1893" &
+cat << EOFB > /etc/systemd/system/manticore.service
+[Unit]
+Description=Manticore listener service
+
+[Service]
+Type=forking
+Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
+ExecStart=/bin/bash -c 'manticoreListener "1893"'
+StartLimitInterval=1s
+StartLimitBurst=999
+
+[Install]
+WantedBy=multi-user.target
+EOFB
+rm $0
 EOFA
 echo "Setting up E-Comm listener..."
 python3 /etc/manticore/netListenerSetup.py "172.20.241.30"

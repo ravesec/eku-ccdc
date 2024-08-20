@@ -22,6 +22,7 @@ fi
 echo "Moving Manticore..."
 mkdir /etc/manticore
 mv /etc/eku-ccdc/scripts/linux/Manticore/* /etc/manticore
+mv /etc/Manticore.py /bin/manticore
 rm /etc/manticore/setup.sh
 echo "Preventing password changes..."
 chattr +i /etc/passwd

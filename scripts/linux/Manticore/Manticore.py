@@ -1,20 +1,26 @@
 #!/usr/bin/env python3
 import os
 import sys
+import subprocess
 import random
+import socket
+hosts = []
+hostList = subprocess.check_output(["cat", "/etc/manticore/hosts.list"])
+hosts = hostList.split("\n")
 def main():
     arguments = []
     for arg in sys.argv:
         arguments.append(arg)
     del(arguments[0])
-    message = encrypt("C17", "10.10.10.10")
-    binary = message.encode('utf-8')
-    decoded = decrypt(message)
-    print(binary)
-    print(message)
-    print(decoded)
-    option = input("Ddd")
-   
+    for argument in arguments:
+        if (argument.lower == "-b"):
+            address = arguments[1]
+            message = encrypt("C17", "10.10.10.10")
+            for host in hosts:
+                sock = socket.create_connection((host, 1893))
+                sock.send(message.encode('utf-8'))
+            del(arguments[0])
+            del(arguments[0])
 def encrypt(code, address):
     message = []
     firstNum = random.randint(1,9)

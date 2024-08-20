@@ -60,7 +60,8 @@ cat << EOFB > /etc/systemd/system/manticore.service
 Description=Manticore listener service
 
 [Service]
-Type=forking
+Type=simple
+Restart=on-failure
 Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
 ExecStart=/bin/bash -c 'manticoreListener "1893"'
 StartLimitInterval=1s

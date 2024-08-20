@@ -22,9 +22,27 @@ fi
 echo "Setting up Manticore..."
 mkdir /etc/manticore
 mv /etc/eku-ccdc/scripts/linux/Manticore/* /etc/manticore
-mv /etc/Manticore.py /bin/manticore
+mv /etc/manticore/Manticore.py /bin/manticore
+mv /etc/manticore/manticoreManager.py /bin/manticoreManager
 rm /etc/manticore/setup.sh
 touch /etc/manticore/hosts.list
+cat <<EOFA > /etc/systemd/system/manager.service
+[Unit]
+Description=Manticore management service
+
+[Service]
+Type=simple
+Restart=on-failure
+Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
+ExecStart=/bin/bash -c 'manticoreManager "1894"'
+StartLimitInterval=1s
+StartLimitBurst=999
+
+[Install]
+WantedBy=multi-user.target
+EOFA
+systemctl enable manager
+systemctl start manager
 echo "Preventing password changes..."
 chattr +i /etc/passwd
 chattr +i /opt/splunk/etc/passwd
@@ -37,7 +55,6 @@ git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
 fi
 mv /etc/eku-ccdc/scripts/linux/Manticore/listener.py /bin/manticoreListener
 chmod +x /bin/manticoreListener
-manticoreListener "1893" &
 cat << EOFB > /etc/systemd/system/manticore.service
 [Unit]
 Description=Manticore listener service
@@ -52,6 +69,8 @@ StartLimitBurst=999
 [Install]
 WantedBy=multi-user.target
 EOFB
+systemctl enable manticore
+systemctl start manticore
 rm /tmp/manticoreSetup
 EOFA
 echo "Setting up E-Comm listener..."

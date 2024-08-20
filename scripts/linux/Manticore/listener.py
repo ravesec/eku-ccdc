@@ -21,6 +21,14 @@ def main():
             if(messageArray[1] == "C17"):
                 address = messageArray[2]
                 firewall "-ba" f"{address}"
+            if(messageArray[1] == "H10"):
+                address = messageArray[2]
+                if(address = "172.20.241.20"):
+                    heartSock = socket.create_connection(("172.20.241.20", 1894))
+                    message = encrypt("H11", "0.0.0.0")
+                    heartSock.send(message.encode('utf-8'))
+                    heartSock.shutdown("SHUT_WR")
+                    heartSock.close()
 def decrypt(message):
     decoded = []
     messArray = message.split('-')
@@ -49,4 +57,28 @@ def decrypt(message):
     decoded.append(address)
     y = '-'
     return y.join(decoded)
+def encrypt(code, address):
+    message = []
+    firstNum = random.randint(1,9)
+    secondNum = random.randint(10,99)
+    character = code[:1]
+    num = int(code[1:])
+    charNum = ord(character)
+    key = "" + str(firstNum) + str(secondNum)
+    message.append(hex(int(key)))
+    operator = firstNum * secondNum
+    charNum = charNum + operator
+    num = num + operator
+    message.append(hex(charNum))
+    message.append(hex(num))
+    addr = address.split(".")
+    x = 0
+    for thing in addr:
+        addr[x] = hex(int(thing) + operator)
+        x = x + 1
+    y = '?'
+    addrCode = y.join(addr)
+    message.append(addrCode)
+    y = '-'
+    return y.join(message)
 main()

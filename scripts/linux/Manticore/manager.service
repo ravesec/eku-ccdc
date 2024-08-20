@@ -1,11 +1,11 @@
 [Unit]
-Description=Manticore listener service
+Description=Manticore management service
 
 [Service]
 Type=simple
 Restart=on-failure
 Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
-ExecStart=/bin/bash -c 'manticoreListener "1893"'
+ExecStart=/bin/bash -c 'manticoreManager "1894"'
 StartLimitInterval=1s
 StartLimitBurst=999
 

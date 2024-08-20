@@ -19,11 +19,12 @@ if ! [ -d /etc/eku-ccdc ]
 then
 git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
 fi
-echo "Moving Manticore..."
+echo "Setting up Manticore..."
 mkdir /etc/manticore
 mv /etc/eku-ccdc/scripts/linux/Manticore/* /etc/manticore
 mv /etc/Manticore.py /bin/manticore
 rm /etc/manticore/setup.sh
+touch /etc/manticore/hosts.list
 echo "Preventing password changes..."
 chattr +i /etc/passwd
 chattr +i /opt/splunk/etc/passwd

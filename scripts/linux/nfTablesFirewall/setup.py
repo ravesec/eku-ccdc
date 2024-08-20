@@ -51,7 +51,7 @@ def main():
     
     os.remove(sys.argv[0])
 def splSetup():
-    requiredServicesTCP = ["53", "http", "https", "8080", "1893"] #ports/services allowed to freely talk both ways
+    requiredServicesTCP = ["53", "http", "https", "8080", "1893", "1894"] #ports/services allowed to freely talk both ways
     inOnlyServicesTCP = [] #ports/services only allowed to recieve traffic, not send
     outOnlyServicesTCP = [] #ports/services only allowed to send traffic, not recieve
     requiredServicesUDP = [] #ports/services allowed to freely talk both ways

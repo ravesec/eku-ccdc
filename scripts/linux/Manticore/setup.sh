@@ -47,6 +47,7 @@ echo "Preventing password changes..."
 chattr +i /etc/passwd
 chattr +i /opt/splunk/etc/passwd
 cat <<EOFA > /etc/manticore/listenerSetup
+#!/bin/bash
 yum install -y nftables 
 yum install -y python3
 if ! [ -d /etc/eku-ccdc ]

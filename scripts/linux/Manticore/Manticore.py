@@ -28,6 +28,12 @@ def main():
                 sock = socket.create_connection((host, 1893))
                 sock.send(message.encode('utf-8'))
             del(arguments[0])
+        if (argument.lower() == "-fi"):
+            host = arguments[1]
+            message = encrypt("S99", host)
+            sock = socket.create_connection((host, 1893))
+            sock.send(message.encode('utf-8'))
+            del(arguments[0])
             del(arguments[0])
 def encrypt(code, address):
     message = []

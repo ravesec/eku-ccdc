@@ -86,3 +86,5 @@ mv /etc/eku-ccdc/scripts/linux/nfTablesFirewall/firewall.py /bin/firewall
 chmod +x /bin/firewall
 echo "Defaults env_keep += \"SSH_CONNECTION SSH_CLIENT SSH_TTY\"" >> /etc/sudoers
 python3 /etc/eku-ccdc/scripts/linux/nfTablesFirewall/setup.py "splunk"
+echo "Beginning remote setup..."
+manticore -i

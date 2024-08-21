@@ -15,7 +15,7 @@ def main():
     for argument in arguments:
         if (argument.lower == "-b"):
             address = arguments[1]
-            message = encrypt("C17", "10.10.10.10")
+            message = encrypt("C17", address)
             for host in hosts:
                 sock = socket.create_connection((host, 1893))
                 sock.send(message.encode('utf-8'))

@@ -31,8 +31,8 @@ def main():
                     heartSock.close()
             if(messageArray[1] == "S99"):
                 address = messageArray[2]
-                if(address = "172.20.241.20"):
-                    os.system("bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh &")
+                hostName = getHostName(address)
+                    os.system(f"bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh {hostName} &")
 def decrypt(message):
     decoded = []
     messArray = message.split('-')
@@ -85,4 +85,11 @@ def encrypt(code, address):
     message.append(addrCode)
     y = '-'
     return y.join(message)
+def getHostName(host_addr):
+    return {
+            "172.20.240.20": "debian",
+            "172.20.242.10": "ubuntu",
+            "172.20.241.30": "centos",
+            "172.20.241.40": "ecomm"
+        }.get(host, "")
 main()

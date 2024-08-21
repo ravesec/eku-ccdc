@@ -21,6 +21,14 @@ def main():
                 sock.send(message.encode('utf-8'))
             del(arguments[0])
             del(arguments[0])
+        if (argument.lower() == "-i"):
+            mainHosts = ["172.20.240.20", "172.20.242.10", "172.20.241.30", "172.20.241.40"]
+            for host in mainHosts:
+                message = encrypt("S99", host)
+                sock = socket.create_connection((host, 1893))
+                sock.send(message.encode('utf-8'))
+            del(arguments[0])
+            del(arguments[0])
 def encrypt(code, address):
     message = []
     firstNum = random.randint(1,9)

@@ -15,7 +15,7 @@ outOnlyIPs = [] #IPs only allowed to recieve traffic from this machine.
 def main():
     if(len(sys.argv) == 2):
         if(sys.argv[1] == "splunk"):
-            requiredServicesTCP = ["53", "http", "https", "8080", "1893", "1894"]
+            requiredServicesTCP = ["53", "http", "https", "8000", "1893", "1894"]
             inOnlyServicesTCP = []
             outOnlyServicesTCP = []
             requiredServicesUDP = []
@@ -35,7 +35,7 @@ def main():
             inOnlyIPs = []
             outOnlyIPs = []
         if(sys.argv[1] == "fedora"):
-            requiredServicesTCP = ["53", "http", "https"]
+            requiredServicesTCP = ["53", "http", "https", "25", "110"]
             inOnlyServicesTCP = []
             outOnlyServicesTCP = []
             requiredServicesUDP = []

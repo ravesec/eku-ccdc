@@ -68,7 +68,7 @@ def main():
                     else:
                         print(f"Successfully removed {option}")
                 elif(option.lower() == 'panic'):
-                    panic()
+                    dam()
                 elif(option.lower() == 'blacklist'):
                     if(blackList() == "quit"):
                         return
@@ -149,7 +149,7 @@ def tableCommand(table):
             for chain in chainList:
                 print(chain)
         elif(option.lower() == 'panic'):
-            panic()
+            dam()
         elif(option.lower() == 'blacklist'):
             if(blackList() == "quit"):
                 return "quit"
@@ -234,7 +234,7 @@ def chainCommand(table, chain):
                 else:
                     print(rule[0] + " ("+rule[1]+")")
         elif(option.lower() == 'panic'):
-            panic()
+            dam()
         elif(option.lower() == 'blacklist'):
             if(blackList() == "quit"):
                 return "quit"
@@ -294,7 +294,7 @@ def getChainInfo(table, chain):
     del(ruleListRaw[0])
     ruleListRaw = ruleListRaw.split("\n")
     return ruleListRaw[1]
-def panic():
+def dam():
     tableList = getTableList()
     x = False
     for table in tableList:

@@ -29,6 +29,10 @@ def main():
                     heartSock.send(message.encode('utf-8'))
                     heartSock.shutdown("SHUT_WR")
                     heartSock.close()
+            if(messageArray[1] == "S99"):
+                address = messageArray[2]
+                if(address = "172.20.241.20"):
+                    os.system("bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh &")
 def decrypt(message):
     decoded = []
     messArray = message.split('-')

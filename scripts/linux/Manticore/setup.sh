@@ -13,8 +13,19 @@ EOFA
 echo "stty echo"
 /opt/splunk/bin/start
 echo "Splunk accounts reset."
+echo "Preventing password changes..."
+chattr +i /etc/passwd
+chattr +i /opt/splunk/etc/passwd
 yum install -y nftables 
 yum install -y python3
+yum install -y pip
+pip install paramiko
+pip install os
+pip install sys
+pip install socket
+pip install subprocess
+pip install random
+pip install time
 if ! [ -d /etc/eku-ccdc ]
 then
 git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
@@ -43,9 +54,6 @@ WantedBy=multi-user.target
 EOFA
 systemctl enable manager
 systemctl start manager
-echo "Preventing password changes..."
-chattr +i /etc/passwd
-chattr +i /opt/splunk/etc/passwd
 cat <<EOFA > /etc/manticore/listenerSetup
 #!/bin/bash
 yum install -y nftables 

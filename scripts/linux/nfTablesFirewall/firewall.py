@@ -114,19 +114,19 @@ def main():
                         otherTablePres = True
                 print("EKU CCDC System Firewall Manager")
                 if(firewallPres):
-                    os.system("echo -e "+"Firewall Status: "+"\033[032m[GREEN]\033[0m")
+                    os.system("echo "+"Firewall Status: "+"\033[032m[GREEN]\033[0m")
                     if(not firewallInteg):
-                        os.system("echo -e "+"\033[133m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                        os.system("echo "+"\033[133m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
                 else:
-                    os.system("echo -e "+"Firewall Status: "+"\033[031m[INACTIVE]\033[0m")
+                    os.system("echo "+"Firewall Status: "+"\033[031m[INACTIVE]\033[0m")
                 if(blacklistPres):
-                    os.system("echo -e "+"Blacklist Status: "+"\033[032m[GREEN]\033[0m")
+                    os.system("echo "+"Blacklist Status: "+"\033[032m[GREEN]\033[0m")
                     if(not blacklistInteg):
-                        os.system("echo -e "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                        os.system("echo "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
                 else:
-                    os.system("echo -e "+"Blacklist Status: "+"\033[031m[INACTIVE]\033[0m")
+                    os.system("echo "+"Blacklist Status: "+"\033[031m[INACTIVE]\033[0m")
                 if(otherTablePres):
-                    os.system("echo -e "+"\033[133m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
+                    os.system("echo "+"\033[133m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
                 if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
                     print("\n")
                     ports = [[]]

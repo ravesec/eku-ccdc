@@ -114,13 +114,13 @@ def main():
                     print("EKU CCDC System Firewall Manager")
                     if(firewallPres):
                         os.system("echo -e "+"Firewall Status: "+"\033[0;32m[ACTIVE]\033[0m")
-                        if(!firewallInteg):
+                        if(not firewallInteg):
                             os.system("echo -e "+"\033[1;33m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
                     else:
                         os.system("echo -e "+"Firewall Status: "+"\033[0;31m[INACTIVE]\033[0m")
                     if(blacklistPres):
                         os.system("echo -e "+"Blacklist Status: "+"\033[0;32m[ACTIVE]\033[0m")
-                        if(!blacklistInteg):
+                        if(not blacklistInteg):
                             os.system("echo -e "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
                     else:
                         os.system("echo -e "+"Blacklist Status: "+"\033[0;31m[INACTIVE]\033[0m")

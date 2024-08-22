@@ -88,7 +88,7 @@ def main():
                 blacklistInteg = False
                 otherTablePres = False
                 os.system("clear")
-                tableList = getTableList
+                tableList = getTableList()
                 for table in tableList:
                     if(table == "firewall"):
                         firewallPres = True

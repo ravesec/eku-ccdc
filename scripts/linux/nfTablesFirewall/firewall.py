@@ -135,6 +135,7 @@ def main():
                         
                     print("Port Rules:")
                         
+                    option = input("Enter command: ")
                 else:
                     print("Terminating to avoid crashes due to missing structure.")
                     return

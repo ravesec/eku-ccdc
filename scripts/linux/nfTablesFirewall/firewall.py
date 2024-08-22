@@ -12,7 +12,8 @@ def main():
         elif(sys.argv[1] == '-br'):
             print(removeFromBlackList(sys.argv[2]))
     elif ("SSH_CONNECTION" in os.environ) or ("SSH_CLIENT" in os.environ) or ("SSH_TTY" in os.environ):
-        print("Unable to be run remotely.")
+        os.system("echo -e "+"\033[0;32m[RED]\033[0m")
+        #print("Unable to be run remotely.")
         return
     elif(os.getuid() != 0):
         print("Access Denied. Must be run as root.")
@@ -113,13 +114,13 @@ def main():
                             otherTablePres = True
                     print("EKU CCDC System Firewall Manager")
                     if(firewallPres):
-                        os.system("echo -e "+"Firewall Status: "+"\033[0;32m[ACTIVE]\033[0m")
+                        os.system("echo -e "+"Firewall Status: "+"\033[0;32m[GREEN]\033[0m")
                         if(not firewallInteg):
                             os.system("echo -e "+"\033[1;33m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
                     else:
                         os.system("echo -e "+"Firewall Status: "+"\033[0;31m[INACTIVE]\033[0m")
                     if(blacklistPres):
-                        os.system("echo -e "+"Blacklist Status: "+"\033[0;32m[ACTIVE]\033[0m")
+                        os.system("echo -e "+"Blacklist Status: "+"\033[0;32m[GREEN]\033[0m")
                         if(not blacklistInteg):
                             os.system("echo -e "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
                     else:

@@ -20,62 +20,123 @@ def main():
         if(len(sys.argv) == 2):
             if(sys.argv[1].lower() in ('-h', '--help', 'help')):
                 printHelp()
-        else:
-            x = True
-            while(x):
-                option = input("[Command@Core]# ")
-                if(option.lower() == ''):
-                    pass
-                elif(option.lower() == 'table'):
-                    tableList = getTableList()
-                    print("List of tables: ")
-                    for table in tableList:
-                        print(table)
-                    y = True
-                    while(y):
-                        option = input("Which table would you like to move to? ")
+            elif(sys.argv[1].lower() == "-e"):
+                x = True
+                while(x):
+                    option = input("[Command@Core]# ")
+                    if(option.lower() == ''):
+                        pass
+                    elif(option.lower() == 'table'):
+                        tableList = getTableList()
+                        print("List of tables: ")
                         for table in tableList:
-                            if(table == option):
+                            print(table)
+                        y = True
+                        while(y):
+                            option = input("Which table would you like to move to? ")
+                            for table in tableList:
+                                if(table == option):
+                                    y = False
+                            if(y):
+                                print("Invalid selection.")
+                        if(tableCommand(option) == "quit"):
+                            return
+                    elif(option.lower() == 'add'):
+                        print("Adding a table...")
+                        y = True
+                        while(y):
+                            name = input("Enter table name: ")
+                            if spacePresent(name):
+                                print("Invalid name, spaces not permitted.")
+                            else:
                                 y = False
-                        if(y):
-                            print("Invalid selection.")
-                    if(tableCommand(option) == "quit"):
-                        return
-                elif(option.lower() == 'add'):
-                    print("Adding a table...")
-                    y = True
-                    while(y):
-                        name = input("Enter table name: ")
-                        if spacePresent(name):
-                            print("Invalid name, spaces not permitted.")
-                        else:
-                            y = False
-                    os.system("nft add table "+name)
-                elif(option.lower() == 'delete'):
-                    tableList = getTableList()
-                    for table in tableList:
-                        print(table)
-                    y = True
-                    while(y):
-                        option = input("Enter table to remove: ")
+                        os.system("nft add table "+name)
+                    elif(option.lower() == 'delete'):
+                        tableList = getTableList()
+                        for table in tableList:
+                            print(table)
+                        y = True
+                        while(y):
+                            option = input("Enter table to remove: ")
+                            if(isInList(option, tableList)):
+                                y = False
+                            else:
+                                print("Invalid selection")
+                        os.system("nft delete table "+option)
                         if(isInList(option, tableList)):
-                            y = False
+                            print(f"Error removing {option}")
                         else:
-                            print("Invalid selection")
-                    os.system("nft delete table "+option)
-                    if(isInList(option, tableList)):
-                        print(f"Error removing {option}")
-                    else:
-                        print(f"Successfully removed {option}")
-                elif(option.lower() == 'panic'):
-                    dam()
-                elif(option.lower() == 'blacklist'):
-                    if(blackList() == "quit"):
+                            print(f"Successfully removed {option}")
+                    elif(option.lower() == 'panic'):
+                        dam()
+                    elif(option.lower() == 'blacklist'):
+                        if(blackList() == "quit"):
+                            return
+                    elif(option.lower() == 'exit'):
                         return
-                elif(option.lower() == 'exit'):
-                    return
-                else:
-                    printHelp()
+                    else:
+                        printHelp()
+            else:
+                x = True
+                while(x):
+                    inPres = False
+                    outPres = False
+                    firewallPres = False
+                    firewallInteg = False
+                    blacklistPres = False
+                    blacklistInteg = False
+                    otherTablePres = False
+                    os.system("clear")
+                    tableList = getTableList
+                    for table in tableList:
+                        if(table == "firewall"):
+                            firewallPres = True
+                            chainList = getChainList("firewall")
+                            for chain in chainList:
+                                if(chain == "input"):
+                                    inPres = True
+                                if(chain == "output"):
+                                    outPres = True
+                            if(inPres and outPres):
+                                firewallInteg = True
+                        if(table == "blacklist"):
+                            blacklistPres = True
+                            chainList = getChainList("blacklist")
+                            for chain in chainList:
+                                if(chain == "input"):
+                                    inPres = True
+                                if(chain == "output"):
+                                    outPres = True
+                            if(inPres and outPres):
+                                blacklistInteg = True
+                        else:
+                            otherTablePres = True
+                    print("EKU CCDC System Firewall Manager")
+                    if(firewallPres):
+                        os.system("echo -e "+"Firewall Status: "+"\033[0;32m[ACTIVE]\033[0m")
+                        if(!firewallInteg):
+                            os.system("echo -e "+"\033[1;33m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                    else:
+                        os.system("echo -e "+"Firewall Status: "+"\033[0;31m[INACTIVE]\033[0m")
+                    if(blacklistPres):
+                        os.system("echo -e "+"Blacklist Status: "+"\033[0;32m[ACTIVE]\033[0m")
+                        if(!blacklistInteg):
+                            os.system("echo -e "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                    else:
+                        os.system("echo -e "+"Blacklist Status: "+"\033[0;31m[INACTIVE]\033[0m")
+                    if(otherTablePres):
+                        os.system("echo -e "+"\033[1;33m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
+                    if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
+                        print("\n")
+                        ports = [[]]
+                        inputChain = getRuleList("firewall", "input")
+                        outputChain = getRulesList("firewall", "output")
+                        
+                        print("Port Rules:")
+                        
+                    else:
+                        print("Terminating to avoid crashes due to missing structure.")
+                        return
 def tableCommand(table):
     x = True
     while(x):
@@ -481,6 +542,7 @@ Command line arguments:
     -h , --help    |     Displays this help menu and exits.
     -ba (ip)       |     Adds given IP to blacklist.
     -br (ip)       |     Removes given IP from blacklist.
+    -e             |     Enters expert mode, allows for more in-depth customization of nfTables.
 
 In-Program Commands:
 

@@ -11,7 +11,7 @@ def main():
         activeHosts = []
         for host in possHosts:
             message = encrypt("H10", "172.20.241.20")
-            sendSock = socket.create_connection((host, 1893))
+            sendSock = socket.create_connection((host, 1893), timeout=5)
             sendSock.send(message.encode('utf-8'))
             array = sock.accept()
             conn = array[0]

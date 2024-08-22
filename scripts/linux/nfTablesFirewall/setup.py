@@ -63,9 +63,9 @@ def main():
     for service in outOnlyServicesTCP:
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
     for service in requiredServicesUDP:
-        #os.system("nft add rule firewall input udp sport { "+service+" } accept")
+        os.system("nft add rule firewall input udp sport { "+service+" } accept")
         os.system("nft add rule firewall input udp dport { "+service+" } accept")
-        #os.system("nft add rule firewall output udp dport { "+service+" } accept")
+        os.system("nft add rule firewall output udp dport { "+service+" } accept")
         os.system("nft add rule firewall output udp sport { "+service+" } accept")
     for service in inOnlyServicesUDP:
         os.system("nft add rule firewall input udp dport { "+service+" } accept")

@@ -77,67 +77,67 @@ def main():
                         return
                     else:
                         printHelp()
-            else:
-                x = True
-                while(x):
-                    inPres = False
-                    outPres = False
-                    firewallPres = False
-                    firewallInteg = False
-                    blacklistPres = False
-                    blacklistInteg = False
-                    otherTablePres = False
-                    os.system("clear")
-                    tableList = getTableList
-                    for table in tableList:
-                        if(table == "firewall"):
-                            firewallPres = True
-                            chainList = getChainList("firewall")
-                            for chain in chainList:
-                                if(chain == "input"):
-                                    inPres = True
-                                if(chain == "output"):
-                                    outPres = True
-                            if(inPres and outPres):
-                                firewallInteg = True
-                        if(table == "blacklist"):
-                            blacklistPres = True
-                            chainList = getChainList("blacklist")
-                            for chain in chainList:
-                                if(chain == "input"):
-                                    inPres = True
-                                if(chain == "output"):
-                                    outPres = True
-                            if(inPres and outPres):
-                                blacklistInteg = True
-                        else:
-                            otherTablePres = True
-                    print("EKU CCDC System Firewall Manager")
-                    if(firewallPres):
-                        os.system("echo -e "+"Firewall Status: "+"\033[0;32m[GREEN]\033[0m")
-                        if(not firewallInteg):
-                            os.system("echo -e "+"\033[1;33m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
+        else:
+            x = True
+            while(x):
+                inPres = False
+                outPres = False
+                firewallPres = False
+                firewallInteg = False
+                blacklistPres = False
+                blacklistInteg = False
+                otherTablePres = False
+                os.system("clear")
+                tableList = getTableList
+                for table in tableList:
+                    if(table == "firewall"):
+                        firewallPres = True
+                        chainList = getChainList("firewall")
+                        for chain in chainList:
+                            if(chain == "input"):
+                                inPres = True
+                            if(chain == "output"):
+                                outPres = True
+                        if(inPres and outPres):
+                            firewallInteg = True
+                    if(table == "blacklist"):
+                        blacklistPres = True
+                        chainList = getChainList("blacklist")
+                        for chain in chainList:
+                            if(chain == "input"):
+                                inPres = True
+                            if(chain == "output"):
+                                outPres = True
+                        if(inPres and outPres):
+                            blacklistInteg = True
                     else:
-                        os.system("echo -e "+"Firewall Status: "+"\033[0;31m[INACTIVE]\033[0m")
-                    if(blacklistPres):
-                        os.system("echo -e "+"Blacklist Status: "+"\033[0;32m[GREEN]\033[0m")
-                        if(not blacklistInteg):
-                            os.system("echo -e "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
-                    else:
-                        os.system("echo -e "+"Blacklist Status: "+"\033[0;31m[INACTIVE]\033[0m")
-                    if(otherTablePres):
-                        os.system("echo -e "+"\033[1;33m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
-                    if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
-                        print("\n")
-                        ports = [[]]
-                        inputChain = getRuleList("firewall", "input")
-                        outputChain = getRulesList("firewall", "output")
+                        otherTablePres = True
+                print("EKU CCDC System Firewall Manager")
+                if(firewallPres):
+                    os.system("echo -e "+"Firewall Status: "+"\033[0;32m[GREEN]\033[0m")
+                    if(not firewallInteg):
+                        os.system("echo -e "+"\033[1;33m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                else:
+                    os.system("echo -e "+"Firewall Status: "+"\033[0;31m[INACTIVE]\033[0m")
+                if(blacklistPres):
+                    os.system("echo -e "+"Blacklist Status: "+"\033[0;32m[GREEN]\033[0m")
+                    if(not blacklistInteg):
+                        os.system("echo -e "+"\033[1;33m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                else:
+                    os.system("echo -e "+"Blacklist Status: "+"\033[0;31m[INACTIVE]\033[0m")
+                if(otherTablePres):
+                    os.system("echo -e "+"\033[1;33m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
+                if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
+                    print("\n")
+                    ports = [[]]
+                    inputChain = getRuleList("firewall", "input")
+                    outputChain = getRulesList("firewall", "output")
                         
-                        print("Port Rules:")
+                    print("Port Rules:")
                         
-                    else:
-                        print("Terminating to avoid crashes due to missing structure.")
-                        return
+                else:
+                    print("Terminating to avoid crashes due to missing structure.")
+                    return
 def tableCommand(table):
     x = True
     while(x):

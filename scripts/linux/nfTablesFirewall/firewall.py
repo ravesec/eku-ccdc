@@ -634,7 +634,7 @@ Commands:
     
     quit           |     Quits the firewall manager.
     whitelist      |     Adds an IP address to the whitelist.
-"""
+""")
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

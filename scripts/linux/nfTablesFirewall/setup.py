@@ -6,8 +6,8 @@ import sys
 def main():
     if(len(sys.argv) == 2):
         if(sys.argv[1] == "splunk"):
-            requiredServicesTCP = ["53", "http", "https", "8000", "1893", "1894"]
-            inOnlyServicesTCP = []
+            requiredServicesTCP = ["53", "http", "https", "8000", "1894"]
+            inOnlyServicesTCP = ["1893"]
             outOnlyServicesTCP = []
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []
@@ -16,8 +16,8 @@ def main():
             inOnlyIPs = []
             outOnlyIPs = []
         if(sys.argv[1] == "centos"):
-            requiredServicesTCP = ["53", "http", "https", "1893", "1894"]
-            inOnlyServicesTCP = []
+            requiredServicesTCP = ["53", "http", "https", "1894"]
+            inOnlyServicesTCP = ["1893"]
             outOnlyServicesTCP = []
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []
@@ -26,8 +26,8 @@ def main():
             inOnlyIPs = []
             outOnlyIPs = []
         if(sys.argv[1] == "fedora"):
-            requiredServicesTCP = ["53", "http", "https", "25", "110", "1893", "1894"]
-            inOnlyServicesTCP = []
+            requiredServicesTCP = ["53", "http", "https", "25", "110", "1894"]
+            inOnlyServicesTCP = ["1893"]
             outOnlyServicesTCP = []
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []

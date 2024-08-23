@@ -198,6 +198,24 @@ def main():
                     print(whiteListIP)
                     print("\n")
                     option = input("Enter command: ")
+                    if(option.lower() == "whitelist"):
+                        length = 0
+                        while(length != 4 or length != 99):
+                            address = input("Enter IPv4 address to whitelist: ")
+                            if(address.lower() == "exit"):
+                                length = 99
+                            length = len(address.split("."))
+                            if(length != 4):
+                                print("Invalid address. Please re-enter the address or type 'exit' to exit.")
+                        if(length == 4):
+                            os.system("nft add rule firewall input ip saddr { "+address+" } accept")
+                            os.system("nft add rule firewall output ip daddr { "+address+" } accept")
+                            print(f"{address} added to whitelist")
+                    elif(option.lower() == "quit"):
+                        return
+                    else:
+                        printNormHelp()
+                            
                 else:
                     print("Terminating to avoid crashes due to missing structure.")
                     return
@@ -585,20 +603,19 @@ def portDefault(protocol, port):
             '53': 'DNS',
             '80': 'HTTP',
             '110': 'POP3',
-            '220': 'IMAP',
+            '143': 'IMAP',
             '443': 'HTTPS'
         }.get(port, "")
     elif(protocol == "udp"):
         return {
             '53': 'DNS',
             '123': 'NTP',
-            '220': 'IMAP'
         }.get(port, "")
     else:
         return ""
 def addOtherPorts(inputArray):
     portArray = inputArray
-    commonTCP = ["20", "22", "53", "80", "443"]
+    commonTCP = ["20", "22", "25", "53", "80", "110", "143", "443"]
     commonUDP = ["53", "123"]
     for port in commonTCP:
         if(not port in portArray):
@@ -609,6 +626,15 @@ def addOtherPorts(inputArray):
             value = "udp " + port + " " + portDefault("udp", port)
             portArray.append(value)
     return portArray
+def printNormHelp():
+    print("""
+Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.
+
+Commands:
+    
+    quit           |     Quits the firewall manager.
+    whitelist      |     Adds an IP address to the whitelist.
+"""
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

@@ -175,9 +175,9 @@ def main():
                     for port in ports:
                         if(port in inputPorts and port in outputPorts):
                             state = "both"
-                        elif(port in inputPort):
+                        elif(port in inputPorts):
                             state = "in"
-                        elif(port in outputPort):
+                        elif(port in outputPorts):
                             state = "out"
                         else:
                             state = "closed"

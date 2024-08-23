@@ -135,7 +135,8 @@ def main():
                     outputPorts = []
                     inputChain = getRuleList("firewall", "input")
                     outputChain = getRuleList("firewall", "output")
-                    for item in inputChain:
+                    for array in inputChain:
+                        item = array[0]
                         itemArray = item.split(" ")
                         protocol = itemArray[0]
                         if(itemArray[1] == "sport" or itemArray[1] == "dport"):
@@ -148,7 +149,8 @@ def main():
                         elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
                             if(itemArray[2] not in ipList):
                                 ipList.append(itemArray[2])
-                    for item in outputChain:
+                    for array in outputChain:
+                        item = array[0]
                         itemArray = item.split(" ")
                         protocol = itemArray[0]
                         if(itemArray[1] == "sport" or itemArray[1] == "dport"):

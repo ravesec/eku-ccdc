@@ -9,7 +9,7 @@ def main():
             requiredServicesTCP = ["53", "http", "https", "8000"]
             inOnlyServicesTCP = ["1894"]
             outOnlyServicesTCP = ["1893"]
-            requiredServicesUDP = ["123"]
+            requiredServicesUDP = ["53", "123"]
             inOnlyServicesUDP = []
             outOnlyServicesUDP = []
             requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
@@ -19,7 +19,7 @@ def main():
             requiredServicesTCP = ["53", "http", "https"]
             inOnlyServicesTCP = ["1893"]
             outOnlyServicesTCP = ["1894"]
-            requiredServicesUDP = ["123"]
+            requiredServicesUDP = ["53", "123"]
             inOnlyServicesUDP = []
             outOnlyServicesUDP = []
             requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
@@ -29,7 +29,7 @@ def main():
             requiredServicesTCP = ["53", "http", "https", "25", "110"]
             inOnlyServicesTCP = ["1893"]
             outOnlyServicesTCP = ["1894"]
-            requiredServicesUDP = ["123"]
+            requiredServicesUDP = ["53", "123"]
             inOnlyServicesUDP = []
             outOnlyServicesUDP = []
             requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
@@ -39,7 +39,7 @@ def main():
         requiredServicesTCP = ["53", "http", "https"] #ports/services allowed to freely talk both ways
         inOnlyServicesTCP = [] #ports/services only allowed to recieve traffic, not send
         outOnlyServicesTCP = [] #ports/services only allowed to send traffic, not recieve
-        requiredServicesUDP = [] #ports/services allowed to freely talk both ways
+        requiredServicesUDP = ["53"] #ports/services allowed to freely talk both ways
         inOnlyServicesUDP = [] #ports/services only allowed to recieve traffic, not send
         outOnlyServicesUDP = [] #ports/services only allowed to send traffic, not recieve
         requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"] #IPs allowed to send traffic to and recieve trafic from this machine

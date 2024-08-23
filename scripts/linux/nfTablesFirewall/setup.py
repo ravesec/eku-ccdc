@@ -6,8 +6,8 @@ import sys
 def main():
     if(len(sys.argv) == 2):
         if(sys.argv[1] == "splunk"):
-            requiredServicesTCP = ["53", "http", "https", "8000", "1894"]
-            inOnlyServicesTCP = ["1893"]
+            requiredServicesTCP = ["53", "http", "https", "8000", "1893"]
+            inOnlyServicesTCP = ["1894"]
             outOnlyServicesTCP = []
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []

@@ -147,7 +147,7 @@ def main():
                                 port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
                                 inputPorts.append(port)
                         elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
-                            if(itemArray[2] not in ipList):
+                            if(not itemArray[2] in ipList):
                                 ipList.append(itemArray[2])
                     for array in outputChain:
                         item = array[0]
@@ -161,16 +161,16 @@ def main():
                                 port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
                                 outputPorts.append(port)
                         elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
-                            if(itemArray[2] not in ipList):
+                            if(not itemArray[2] in ipList):
                                 ipList.append(itemArray[2])
                     ports = addOtherPorts(ports)
                     print("Port Rules:")
                     print("\n")
                     for port in inputPorts:
-                        if(port not in ports):
+                        if(not port in ports):
                             ports.append(port)
                     for port in outputPorts:
-                        if(port not in ports):
+                        if(not port in ports):
                             ports.append(port)
                     for port in ports:
                         if(port in inputPorts and port in outputPorts):
@@ -599,11 +599,11 @@ def addOtherPorts(inputArray):
     commonTCP = ["20", "22", "53", "80", "443"]
     commonUDP = ["53", "123"]
     for port in commonTCP:
-        if(port not in portArray):
+        if(not port in portArray):
             value = "TCP " + port + " " + portDefault("TCP", port)
             portArray.append(value)
     for port in commonUDP:
-        if(port not in portArray):
+        if(not port in portArray):
             value = "UDP " + port + " " + portDefault("UDP", port)
             portArray.append(value)
 def printHelp():

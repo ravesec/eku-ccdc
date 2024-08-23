@@ -163,7 +163,6 @@ def main():
                         elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
                             if(not itemArray[2] in ipList):
                                 ipList.append(itemArray[2])
-                    ports = addOtherPorts(ports)
                     print("Port Rules:")
                     print("\n")
                     for port in inputPorts:
@@ -172,6 +171,7 @@ def main():
                     for port in outputPorts:
                         if(not port in ports):
                             ports.append(port)
+                    ports = addOtherPorts(ports)
                     for port in ports:
                         if(port in inputPorts and port in outputPorts):
                             state = "both"
@@ -190,9 +190,11 @@ def main():
                         if(state == "closed"):
                             print(port + ": \033[31;1m[CLOSED]\033[0m")
                     print("\n")
-                    whiteListIP = ""
+                    whiteListIP = "Whitelisted IP Addresses: "
                     for ip in ipList:
-                        whiteListIP = whiteListIP + ", " + ip
+                        whiteListIP = whiteListIP + ip + ", "
+                    value = len(whiteListIP)-2
+                    whiteListIP = whiteListIP[:value]
                     print(whiteListIP)
                     print("\n")
                     option = input("Enter command: ")
@@ -600,11 +602,11 @@ def addOtherPorts(inputArray):
     commonUDP = ["53", "123"]
     for port in commonTCP:
         if(not port in portArray):
-            value = "TCP " + port + " " + portDefault("TCP", port)
+            value = "tcp " + port + " " + portDefault("tcp", port)
             portArray.append(value)
     for port in commonUDP:
         if(not port in portArray):
-            value = "UDP " + port + " " + portDefault("UDP", port)
+            value = "udp " + port + " " + portDefault("udp", port)
             portArray.append(value)
     return portArray
 def printHelp():

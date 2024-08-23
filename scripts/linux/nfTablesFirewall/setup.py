@@ -6,9 +6,9 @@ import sys
 def main():
     if(len(sys.argv) == 2):
         if(sys.argv[1] == "splunk"):
-            requiredServicesTCP = ["53", "http", "https", "8000", "1893"]
+            requiredServicesTCP = ["53", "http", "https", "8000"]
             inOnlyServicesTCP = ["1894"]
-            outOnlyServicesTCP = []
+            outOnlyServicesTCP = ["1893"]
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []
             outOnlyServicesUDP = []
@@ -16,9 +16,9 @@ def main():
             inOnlyIPs = []
             outOnlyIPs = []
         if(sys.argv[1] == "centos"):
-            requiredServicesTCP = ["53", "http", "https", "1894"]
+            requiredServicesTCP = ["53", "http", "https"]
             inOnlyServicesTCP = ["1893"]
-            outOnlyServicesTCP = []
+            outOnlyServicesTCP = ["1894"]
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []
             outOnlyServicesUDP = []
@@ -26,9 +26,9 @@ def main():
             inOnlyIPs = []
             outOnlyIPs = []
         if(sys.argv[1] == "fedora"):
-            requiredServicesTCP = ["53", "http", "https", "25", "110", "1894"]
+            requiredServicesTCP = ["53", "http", "https", "25", "110"]
             inOnlyServicesTCP = ["1893"]
-            outOnlyServicesTCP = []
+            outOnlyServicesTCP = ["1894"]
             requiredServicesUDP = ["123"]
             inOnlyServicesUDP = []
             outOnlyServicesUDP = []
@@ -52,7 +52,6 @@ def main():
     os.system("nft add chain blacklist blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
     os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
     for service in requiredServicesTCP:
-        os.system("nft add rule firewall input tcp sport { "+service+" } accept")
         os.system("nft add rule firewall input tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
@@ -63,8 +62,8 @@ def main():
         os.system("nft add rule firewall input tcp dport { "+service+" } accept")
     for service in outOnlyServicesTCP:
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
+        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
     for service in requiredServicesUDP:
-        os.system("nft add rule firewall input udp sport { "+service+" } accept")
         os.system("nft add rule firewall input udp dport { "+service+" } accept")
         os.system("nft add rule firewall output udp dport { "+service+" } accept")
         os.system("nft add rule firewall output udp sport { "+service+" } accept")
@@ -72,6 +71,7 @@ def main():
         os.system("nft add rule firewall input udp dport { "+service+" } accept")
     for service in outOnlyServicesUDP:
         os.system("nft add rule firewall output udp sport { "+service+" } accept")
+        os.system("nft add rule firewall output udp dport { "+service+" } accept")
     for ip in requiredIPs:
         os.system("nft add rule firewall input ip saddr { "+ip+" } accept")
         os.system("nft add rule firewall output ip daddr { "+ip+" } accept")

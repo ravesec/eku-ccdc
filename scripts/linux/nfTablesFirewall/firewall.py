@@ -618,12 +618,12 @@ def addOtherPorts(inputArray):
     commonTCP = ["20", "22", "25", "53", "80", "110", "143", "443"]
     commonUDP = ["53", "123"]
     for port in commonTCP:
-        if(not port in portArray):
-            value = "tcp " + port + " " + portDefault("tcp", port)
+        value = "tcp " + port + " " + portDefault("tcp", port)
+        if(not value in portArray):
             portArray.append(value)
     for port in commonUDP:
-        if(not port in portArray):
-            value = "udp " + port + " " + portDefault("udp", port)
+        value = "udp " + port + " " + portDefault("udp", port)
+        if(not value in portArray):
             portArray.append(value)
     return portArray
 def printNormHelp():

@@ -606,6 +606,7 @@ def addOtherPorts(inputArray):
         if(not port in portArray):
             value = "UDP " + port + " " + portDefault("UDP", port)
             portArray.append(value)
+    return portArray
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

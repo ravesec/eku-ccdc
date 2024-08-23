@@ -186,7 +186,7 @@ def main():
                         if(state == "in"):
                             print(port + ": \033[33;1m[IN ONLY]\033[0m")
                         if(state == "out"):
-                            print(port + ": \033[32;1m[OUT ONLY]\033[0m")
+                            print(port + ": \033[33;1m[OUT ONLY]\033[0m")
                         if(state == "closed"):
                             print(port + ": \033[31;1m[CLOSED]\033[0m")
                     print("\n")

@@ -199,13 +199,13 @@ def main():
                     print("\n")
                     option = input("Enter command: ")
                     if(option.lower() == "whitelist"):
-                        x = True
-                        while(x):
+                        y = True
+                        while(y):
                             address = input("Enter IPv4 address to whitelist: ")
                             length = len(address.split("."))
                             if(address.lower() == "exit" or length == 4):
-                                x = False
-                            if(not x):
+                                y = False
+                            if(not y):
                                 print("Invalid address. Please re-enter the address or type 'exit' to exit.")
                         if(length == 4):
                             os.system("nft add rule firewall input ip saddr { "+address+" } accept")

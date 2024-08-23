@@ -129,12 +129,70 @@ def main():
                     print("\033[33;1m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
                 if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
                     print("\n")
-                    ports = [[]]
+                    ports = []
+                    ipList = []
+                    inputPorts = []
+                    outputPorts = []
                     inputChain = getRuleList("firewall", "input")
                     outputChain = getRuleList("firewall", "output")
-                        
+                    for item in inputChain:
+                        itemArray = item.split(" ")
+                        protocol = itemArray[0]
+                        if(itemArray[1] == "sport" or itemArray[1] == "dport"):
+                            portNum = itemArray[2]
+                            if(portNum in inputPorts):
+                                pass
+                            else:
+                                port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
+                                inputPorts.append(port)
+                        elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
+                            if(itemArray[2] not in ipList):
+                                ipList.append(itemArray[2])
+                    for item in outputChain:
+                        itemArray = item.split(" ")
+                        protocol = itemArray[0]
+                        if(itemArray[1] == "sport" or itemArray[1] == "dport"):
+                            portNum = itemArray[2]
+                            if(portNum in outputPorts):
+                                pass
+                            else:
+                                port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
+                                outputPorts.append(port)
+                        elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
+                            if(itemArray[2] not in ipList):
+                                ipList.append(itemArray[2])
+                    ports = addOtherPorts(ports)
                     print("Port Rules:")
-                        
+                    print("\n")
+                    for port in inputPorts:
+                        if(port not in ports):
+                            ports.append(port)
+                    for port in outputPorts:
+                        if(port not in ports):
+                            ports.append(port)
+                    for port in ports:
+                        if(port in inputPorts and port in outputPorts):
+                            state = "both"
+                        elif(port in inputPort):
+                            state = "in"
+                        elif(port in outputPort):
+                            state = "out"
+                        else:
+                            state = "closed"
+                        if(state == "both"):
+                            print(port + ": \033[32;1m[OPEN]\033[0m")
+                        if(state == "in"):
+                            print(port + ": \033[33;1m[IN ONLY]\033[0m")
+                        if(state == "out"):
+                            print(port + ": \033[32;1m[OUT ONLY]\033[0m")
+                        if(state == "closed"):
+                            print(port + ": \033[31;1m[CLOSED]\033[0m")
+                    print("\n")
+                    whiteListIP = ""
+                    for ip in ipList:
+                        whiteListIP = whiteListIP + ", " + ip
+                    print(whiteListIP)
+                    print("\n")
                     option = input("Enter command: ")
                 else:
                     print("Terminating to avoid crashes due to missing structure.")
@@ -534,6 +592,18 @@ def portDefault(protocol, port):
         }.get(port, "")
     else:
         return ""
+def addOtherPorts(inputArray):
+    portArray = inputArray
+    commonTCP = ["20", "22", "53", "80", "443"]
+    commonUDP = ["53", "123"]
+    for port in commonTCP:
+        if(port not in portArray):
+            value = "TCP " + port + " " + portDefault("TCP", port)
+            portArray.append(value)
+    for port in commonUDP:
+        if(port not in portArray):
+            value = "UDP " + port + " " + portDefault("UDP", port)
+            portArray.append(value)
 def printHelp():
     print("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

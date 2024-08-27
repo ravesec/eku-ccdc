@@ -226,7 +226,7 @@ def main():
                                 y = False
                             else:
                                 protocol = input("Enter port protocol(TCP/UDP): ").lower()
-                                portNum = input("Enter port number to open: ")
+                                service = input("Enter port number to open: ")
                                 if(protocol == "tcp"):
                                     if(type == "input"):
                                         os.system("nft add rule firewall input tcp dport { "+service+" } accept")

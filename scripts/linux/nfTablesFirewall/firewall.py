@@ -211,6 +211,38 @@ def main():
                             os.system("nft add rule firewall input ip saddr { "+address+" } accept")
                             os.system("nft add rule firewall output ip daddr { "+address+" } accept")
                             print(f"{address} added to whitelist")
+                    elif(option.lower() == "open"):
+                        y = True
+                        z = False
+                        while(y):
+                            type = input("Open port for input, output, or both?(Type 'exit' to cancel) ").lower()
+                            if(not (type == "input" or type == "output" or type == "both")):
+                                print("Invalid entry, enter 'input', 'output', or 'both' to determine what openings the port needs.")
+                            elif(type == "cancel"):
+                                z = True
+                            else:
+                                y = False
+                            if(z):
+                                y = False
+                            else:
+                                protocol = input("Enter port protocol(TCP/UDP): ").lower()
+                                portNum = input("Enter port number to open: ")
+                                if(protocol == "tcp"):
+                                    if(type == "input"):
+                                        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
+                                    elif(type == "output"):
+                                        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+                                    elif(type == "both"):
+                                        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
+                                        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+                                elif(protocol == "udp"):
+                                    if(type == "input"):
+                                        os.system("nft add rule firewall input udp dport { "+service+" } accept")
+                                    elif(type == "output"):
+                                        os.system("nft add rule firewall output udp dport { "+service+" } accept")
+                                    elif(type == "both"):
+                                        os.system("nft add rule firewall input udp dport { "+service+" } accept")
+                                        os.system("nft add rule firewall output udp dport { "+service+" } accept")
                     elif(option.lower() == "quit"):
                         return
                     else:

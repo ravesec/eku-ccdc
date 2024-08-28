@@ -1,4 +1,21 @@
 #!/bin/bash
+echo "Enter new root password: "
+read rPass
+echo "root:$rPass" | chpasswd
+echo "Enter new sysadmin password: "
+read sPass
+echo "sysadmin:$sPass" | chpasswd
+echo "Clearing crontab..."
+echo "" > /etc/crontab
+echo "Removing ssh keys..."
+if [ -f /root/.ssh/authorized_keys ]
+then
+echo "" > /root/.ssh/authorized_keys
+fi
+if [ -f /home/sysadmin/.ssh/authorized_keys ] 
+then
+echo "" > /home/sysadmin/.ssh/authorized_keys ] 
+fi
 echo "Clearing splunk and installing new admin user..."
 /opt/splunk/bin/stop
 /opt/splunk/bin/splunk clean all -f

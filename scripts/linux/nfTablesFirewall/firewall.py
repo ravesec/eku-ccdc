@@ -101,7 +101,7 @@ def main():
                                 outPres = True
                         if(inPres and outPres):
                             firewallInteg = True
-                    if(table == "blacklist"):
+                    elif(table == "blacklist"):
                         blacklistPres = True
                         chainList = getChainList("blacklist")
                         for chain in chainList:
@@ -112,7 +112,10 @@ def main():
                         if(inPres and outPres):
                             blacklistInteg = True
                     else:
-                        otherTablePres = True
+                        if(len(table) == 0):
+                            pass
+                        else:
+                            otherTablePres = True
                 print("EKU CCDC System Firewall Manager")
                 if(firewallPres):
                     print("Firewall Status: \033[32;1m[GREEN]\033[0m")

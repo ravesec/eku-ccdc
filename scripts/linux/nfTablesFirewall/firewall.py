@@ -131,7 +131,7 @@ def main():
                     print("\n")
                     ports = []
                     ipList = []
-                    blackList = []
+                    bIpList = []
                     blackListArray = getBlackList()
                     inputPorts = []
                     outputPorts = []
@@ -166,7 +166,7 @@ def main():
                             if(not itemArray[2] in ipList):
                                 ipList.append(itemArray[2])
                     for entry in blackListArray:
-                        blackList.append(entry[0])
+                        bIpList.append(entry[0])
                     print("Port Rules:")
                     print("\n")
                     for port in inputPorts:
@@ -204,16 +204,16 @@ def main():
                         value = len(whiteListIP)-2
                         whiteListIP = whiteListIP[:value]
                         print(whiteListIP)
-                    if(len(blackList) == 0):
+                    if(len(bIpList) == 0):
                         print("No blacklisted IP Addresses.")
                         print("\n")
                     else:
-                        blackListIP = "Blacklisted IP Addresses: "
-                        for ip in blackList:
-                            blackListIP = blackListIP + ip + ", "
-                        value = len(blackListIP)-2
-                        blackListIP = blackListIP[:value]
-                        print(blackListIP)
+                        bIpListIP = "Blacklisted IP Addresses: "
+                        for ip in bIpList:
+                            bIpListIP = bIpListIP + ip + ", "
+                        value = len(bIpListIP)-2
+                        bIpListIP = bIpListIP[:value]
+                        print(bIpListIP)
                     print("\n")
                     option = input("Enter command: ")
                     if(option.lower() == "whitelist"):

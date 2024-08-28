@@ -194,18 +194,26 @@ def main():
                         if(state == "closed"):
                             print(port + ": \033[31;1m[CLOSED]\033[0m")
                     print("\n")
-                    whiteListIP = "Whitelisted IP Addresses: "
-                    for ip in ipList:
-                        whiteListIP = whiteListIP + ip + ", "
-                    value = len(whiteListIP)-2
-                    whiteListIP = whiteListIP[:value]
-                    print(whiteListIP)
-                    blackListIP = "Blacklisted IP Addresses: "
-                    for ip in blackList:
-                        blackListIP = blackListIP + ip + ", "
-                    value = len(blackListIP)-2
-                    blackListIP = blackListIP[:value]
-                    print(blackListIP)
+                    if(len(ipList) == 0):
+                        print("No whitelisted IP Addresses.")
+                        print("\n")
+                    else:
+                        whiteListIP = "Whitelisted IP Addresses: "
+                        for ip in ipList:
+                            whiteListIP = whiteListIP + ip + ", "
+                        value = len(whiteListIP)-2
+                        whiteListIP = whiteListIP[:value]
+                        print(whiteListIP)
+                    if(len(blackList) == 0):
+                        print("No blacklisted IP Addresses.")
+                        print("\n")
+                    else:
+                        blackListIP = "Blacklisted IP Addresses: "
+                        for ip in blackList:
+                            blackListIP = blackListIP + ip + ", "
+                        value = len(blackListIP)-2
+                        blackListIP = blackListIP[:value]
+                        print(blackListIP)
                     print("\n")
                     option = input("Enter command: ")
                     if(option.lower() == "whitelist"):

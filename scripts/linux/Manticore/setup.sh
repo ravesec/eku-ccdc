@@ -118,7 +118,7 @@ python3 /etc/eku-ccdc/scripts/linux/nfTablesFirewall/setup.py "splunk"
 echo "Beginning remote setup..."
 manticore -i
 echo "Beginning GUI setup..."
-yum update
-yum groupinstall "Server with GUI"
+yum update -y
+yum groupinstall -y "Server with GUI"
 systemctl set-default graphical
 reboot

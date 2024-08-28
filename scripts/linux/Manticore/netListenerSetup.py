@@ -10,13 +10,13 @@ def main():
         address = sys.argv[1]
         try:
             os.system("stty -echo")
-            password = input("Enter sysadmin password: ")
+            password = input("Enter root password: ")
             os.system("stty echo")
             ssh_client = paramiko.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(address, username="sysadmin", password=password)
+            ssh_client.connect(address, username="root", password=password)
 
-            scp_command = f'scp /etc/manticore/listenerSetup sysadmin@{address}:/tmp/manticoreSetup'
+            scp_command = f'scp /etc/manticore/listenerSetup root@{address}:/tmp/manticoreSetup'
             subprocess.run(scp_command, shell=True, check=True)
             print(f"Listener script copied over to {address}")
             

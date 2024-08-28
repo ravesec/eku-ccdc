@@ -57,12 +57,10 @@ def main():
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
         if(service == "1893" or service == "1894"):
-            #os.system("nft add rule firewall input tcp sport { "+service+" } accept")
             os.system("nft add rule firewall output tcp dport { "+service+" } accept")
     for service in inOnlyServicesTCP:
         os.system("nft add rule firewall input tcp dport { "+service+" } accept")
     for service in outOnlyServicesTCP:
-        #os.system("nft add rule firewall output tcp sport { "+service+" } accept")
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
     for service in requiredServicesUDP:
         os.system("nft add rule firewall input udp dport { "+service+" } accept")
@@ -72,7 +70,6 @@ def main():
     for service in inOnlyServicesUDP:
         os.system("nft add rule firewall input udp dport { "+service+" } accept")
     for service in outOnlyServicesUDP:
-        #os.system("nft add rule firewall output udp sport { "+service+" } accept")
         os.system("nft add rule firewall output udp dport { "+service+" } accept")
     for ip in requiredIPs:
         os.system("nft add rule firewall input ip saddr { "+ip+" } accept")

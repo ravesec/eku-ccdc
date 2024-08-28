@@ -54,6 +54,8 @@ mkdir /etc/manticore
 mv /etc/eku-ccdc/scripts/linux/Manticore/* /etc/manticore
 mv /etc/manticore/Manticore.py /bin/manticore
 mv /etc/manticore/manticoreManager.py /bin/manticoreManager
+chmod +x /bin/manticore
+chmod +x /bin/manticoreManager
 rm /etc/manticore/setup.sh
 touch /etc/manticore/hosts.list
 cat <<EOFA > /etc/systemd/system/manager.service

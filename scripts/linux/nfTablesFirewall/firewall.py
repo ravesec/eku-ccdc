@@ -131,6 +131,8 @@ def main():
                     print("\n")
                     ports = []
                     ipList = []
+                    blackList = []
+                    blackListArray = getBlackList()
                     inputPorts = []
                     outputPorts = []
                     inputChain = getRuleList("firewall", "input")
@@ -163,6 +165,8 @@ def main():
                         elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
                             if(not itemArray[2] in ipList):
                                 ipList.append(itemArray[2])
+                    for entry in blackListArray:
+                        blackList.append(entry[0])
                     print("Port Rules:")
                     print("\n")
                     for port in inputPorts:
@@ -196,6 +200,12 @@ def main():
                     value = len(whiteListIP)-2
                     whiteListIP = whiteListIP[:value]
                     print(whiteListIP)
+                    blackListIP = "Blacklisted IP Addresses: "
+                    for ip in blackList:
+                        blackListIP = blackListIP + ip + ", "
+                    value = len(blackListIP)-2
+                    blackListIP = blackListIP[:value]
+                    print(blackListIP)
                     print("\n")
                     option = input("Enter command: ")
                     if(option.lower() == "whitelist"):

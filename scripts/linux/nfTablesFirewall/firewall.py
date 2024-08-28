@@ -79,6 +79,7 @@ def main():
                         printHelp()
         else:
             x = True
+            message = ""
             while(x):
                 inPres = False
                 outPres = False
@@ -215,6 +216,8 @@ def main():
                         bIpListIP = bIpListIP[:value]
                         print(bIpListIP)
                     print("\n")
+                    print(message)
+                    print("\n")
                     option = input("Enter command: ")
                     if(option.lower() == "whitelist"):
                         y = True
@@ -264,7 +267,7 @@ def main():
                     elif(option.lower() == "quit"):
                         return
                     else:
-                        printNormHelp()
+                        message = NormHelp()
                             
                 else:
                     print("Terminating to avoid crashes due to missing structure.")
@@ -676,14 +679,15 @@ def addOtherPorts(inputArray):
         if(not value in portArray):
             portArray.append(value)
     return portArray
-def printNormHelp():
-    print("""
+def NormHelp():
+    return("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.
 
 Commands:
     
     quit           |     Quits the firewall manager.
     whitelist      |     Adds an IP address to the whitelist.
+    open           |     Opens a port as defined by user input.
 """)
 def printHelp():
     print("""

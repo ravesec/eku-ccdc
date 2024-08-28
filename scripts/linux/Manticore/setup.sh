@@ -1,9 +1,13 @@
 #!/bin/bash
 echo "Enter new root password: "
+stty -echo
 read rPass
+stty echo
 echo "root:$rPass" | chpasswd
 echo "Enter new sysadmin password: "
+stty -echo
 read sPass
+stty echo
 echo "sysadmin:$sPass" | chpasswd
 echo "Clearing crontab..."
 echo "" > /etc/crontab
@@ -19,7 +23,7 @@ fi
 echo "Clearing splunk and installing new admin user..."
 /opt/splunk/bin/splunk stop
 /opt/splunk/bin/splunk clean all -f
-echo "stty -echo"
+stty -echo
 echo "Enter new splunk admin password: "
 read password
 cat <<EOFA > /opt/splunk/etc/system/local/user-seed.conf
@@ -27,7 +31,7 @@ cat <<EOFA > /opt/splunk/etc/system/local/user-seed.conf
 USERNAME = admin
 PASSOWRD = $password
 EOFA
-echo "stty echo"
+stty echo
 /opt/splunk/bin/splunk start
 echo "Splunk accounts reset."
 echo "Preventing password changes..."
@@ -113,3 +117,8 @@ echo "Defaults env_keep += \"SSH_CONNECTION SSH_CLIENT SSH_TTY\"" >> /etc/sudoer
 python3 /etc/eku-ccdc/scripts/linux/nfTablesFirewall/setup.py "splunk"
 echo "Beginning remote setup..."
 manticore -i
+echo "Beginning GUI setup..."
+yum update
+yum groupinstall "Server with GUI"
+systemctl set-default graphical
+reboot

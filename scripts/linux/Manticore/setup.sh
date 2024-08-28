@@ -17,7 +17,7 @@ then
 echo "" > /home/sysadmin/.ssh/authorized_keys ] 
 fi
 echo "Clearing splunk and installing new admin user..."
-/opt/splunk/bin/stop
+/opt/splunk/bin/splunk stop
 /opt/splunk/bin/splunk clean all -f
 echo "stty -echo"
 echo "Enter new splunk admin password: "
@@ -28,7 +28,7 @@ USERNAME = admin
 PASSOWRD = $password
 EOFA
 echo "stty echo"
-/opt/splunk/bin/start
+/opt/splunk/bin/splunk start
 echo "Splunk accounts reset."
 echo "Preventing password changes..."
 chattr +i /etc/passwd

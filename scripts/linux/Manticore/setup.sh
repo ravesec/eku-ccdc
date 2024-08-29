@@ -38,6 +38,10 @@ echo "Preventing password changes..."
 yum install -y nftables 
 yum install -y python3
 yum install -y pip
+yum install -y python3-devel
+pip install wheel
+pip install python-magic
+pip install libmagic
 pip install paramiko
 pip install os
 pip install sys

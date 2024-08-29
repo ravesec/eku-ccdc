@@ -45,6 +45,7 @@ pip install socket
 pip install subprocess
 pip install random
 pip install time
+pip install file
 if ! [ -d /etc/eku-ccdc ]
 then
 git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc

@@ -238,6 +238,17 @@ def standMenu():
                     os.system("nft add rule firewall input ip saddr { "+address+" } accept")
                     os.system("nft add rule firewall output ip daddr { "+address+" } accept")
                     print(f"{address} added to whitelist")
+            if(option.lower() == "blacklist"):
+                y = True
+                while(y):
+                    address = input("Enter IPv4 address to blacklist: ")
+                    length = len(address.split("."))
+                    if(address.lower() == "exit" or length == 4):
+                        y = False
+                    if(not y):
+                        print("Invalid address. Please re-enter the address or type 'exit' to exit.")
+                if(length == 4):
+                    addToBlackList(address)
             elif(option.lower() == "open"):
                 y = True
                 z = False
@@ -693,6 +704,7 @@ Commands:
     
     quit           |     Quits the firewall manager.
     whitelist      |     Adds an IP address to the whitelist.
+    blacklist      |     Adds an IP address to the blacklist.
     open           |     Opens a port as defined by user input.
 """)
 def printHelp():

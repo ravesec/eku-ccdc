@@ -78,203 +78,206 @@ def main():
                     else:
                         printHelp()
         else:
-            x = True
-            message = ""
-            while(x):
-                inPres = False
-                outPres = False
-                firewallPres = False
-                firewallInteg = False
-                blacklistPres = False
-                blacklistInteg = False
-                otherTablePres = False
-                os.system("clear")
-                tableList = getTableList()
-                for table in tableList:
-                    if(table == "firewall"):
-                        firewallPres = True
-                        chainList = getChainList("firewall")
-                        for chain in chainList:
-                            if(chain == "input"):
-                                inPres = True
-                            if(chain == "output"):
-                                outPres = True
-                        if(inPres and outPres):
-                            firewallInteg = True
-                    elif(table == "blacklist"):
-                        blacklistPres = True
-                        chainList = getChainList("blacklist")
-                        for chain in chainList:
-                            if(chain == "input"):
-                                inPres = True
-                            if(chain == "output"):
-                                outPres = True
-                        if(inPres and outPres):
-                            blacklistInteg = True
-                    else:
-                        if(len(table) == 0):
-                            pass
-                        else:
-                            otherTablePres = True
-                print("EKU CCDC System Firewall Manager")
-                if(firewallPres):
-                    print("Firewall Status: \033[32;1m[GREEN]\033[0m")
-                    if(not firewallInteg):
-                        print("\033[33;1m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
+            if(standMenu()):
+                return
+def standMenu():
+x = True
+message = ""
+while(x):
+    inPres = False
+    outPres = False
+    firewallPres = False
+    firewallInteg = False
+    blacklistPres = False
+    blacklistInteg = False
+    otherTablePres = False
+    os.system("clear")
+    tableList = getTableList()
+    for table in tableList:
+        if(table == "firewall"):
+            firewallPres = True
+            chainList = getChainList("firewall")
+            for chain in chainList:
+                if(chain == "input"):
+                    inPres = True
+                if(chain == "output"):
+                    outPres = True
+            if(inPres and outPres):
+                firewallInteg = True
+        elif(table == "blacklist"):
+            blacklistPres = True
+            chainList = getChainList("blacklist")
+            for chain in chainList:
+                if(chain == "input"):
+                    inPres = True
+                if(chain == "output"):
+                    outPres = True
+            if(inPres and outPres):
+                blacklistInteg = True
+        else:
+            if(len(table) == 0):
+                pass
+            else:
+                otherTablePres = True
+    print("EKU CCDC System Firewall Manager")
+    if(firewallPres):
+        print("Firewall Status: \033[32;1m[GREEN]\033[0m")
+        if(not firewallInteg):
+            print("\033[33;1m[Caution: Firewall is active, however is missing a chain. Address this issue immediately.]\033[0m")
+    else:
+        print("Firewall Status: \033[31;1m[INACTIVE]\033[0m")
+    if(blacklistPres):
+        print("Blacklist Status: \033[32;1m[GREEN]\033[0m")
+        if(not blacklistInteg):
+            print("\033[33;1m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
+    else:
+        print("Blacklist Status: "+"\033[31;1m[INACTIVE]\033[0m")
+    if(otherTablePres):
+        print("\033[33;1m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
+    if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
+        print("\n")
+        ports = []
+        ipList = []
+        bIpList = []
+        blackListArray = getBlackList()
+        inputPorts = []
+        outputPorts = []
+        inputChain = getRuleList("firewall", "input")
+        outputChain = getRuleList("firewall", "output")
+        for array in inputChain:
+            item = array[0]
+            itemArray = item.split(" ")
+            protocol = itemArray[0]
+            if(itemArray[1] == "sport" or itemArray[1] == "dport"):
+                portNum = itemArray[2]
+                if(portNum in inputPorts):
+                    pass
                 else:
-                    print("Firewall Status: \033[31;1m[INACTIVE]\033[0m")
-                if(blacklistPres):
-                    print("Blacklist Status: \033[32;1m[GREEN]\033[0m")
-                    if(not blacklistInteg):
-                        print("\033[33;1m[Caution: Blacklist is active, however is missing a chain. Address this issue immediately.]\033[0m")
+                    port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
+                    inputPorts.append(port)
+            elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
+                if(not itemArray[2] in ipList):
+                    ipList.append(itemArray[2])
+        for array in outputChain:
+            item = array[0]
+            itemArray = item.split(" ")
+            protocol = itemArray[0]
+            if(itemArray[1] == "sport" or itemArray[1] == "dport"):
+                portNum = itemArray[2]
+                if(portNum in outputPorts):
+                    pass
                 else:
-                    print("Blacklist Status: "+"\033[31;1m[INACTIVE]\033[0m")
-                if(otherTablePres):
-                    print("\033[33;1m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
-                if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
-                    print("\n")
-                    ports = []
-                    ipList = []
-                    bIpList = []
-                    blackListArray = getBlackList()
-                    inputPorts = []
-                    outputPorts = []
-                    inputChain = getRuleList("firewall", "input")
-                    outputChain = getRuleList("firewall", "output")
-                    for array in inputChain:
-                        item = array[0]
-                        itemArray = item.split(" ")
-                        protocol = itemArray[0]
-                        if(itemArray[1] == "sport" or itemArray[1] == "dport"):
-                            portNum = itemArray[2]
-                            if(portNum in inputPorts):
-                                pass
-                            else:
-                                port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
-                                inputPorts.append(port)
-                        elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
-                            if(not itemArray[2] in ipList):
-                                ipList.append(itemArray[2])
-                    for array in outputChain:
-                        item = array[0]
-                        itemArray = item.split(" ")
-                        protocol = itemArray[0]
-                        if(itemArray[1] == "sport" or itemArray[1] == "dport"):
-                            portNum = itemArray[2]
-                            if(portNum in outputPorts):
-                                pass
-                            else:
-                                port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
-                                outputPorts.append(port)
-                        elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
-                            if(not itemArray[2] in ipList):
-                                ipList.append(itemArray[2])
-                    for entry in blackListArray:
-                        bIpList.append(entry[0])
-                    print("Port Rules:")
-                    print("\n")
-                    for port in inputPorts:
-                        if(not port in ports):
-                            ports.append(port)
-                    for port in outputPorts:
-                        if(not port in ports):
-                            ports.append(port)
-                    ports = addOtherPorts(ports)
-                    for port in ports:
-                        if(port in inputPorts and port in outputPorts):
-                            state = "both"
-                        elif(port in inputPorts):
-                            state = "in"
-                        elif(port in outputPorts):
-                            state = "out"
-                        else:
-                            state = "closed"
-                        if(state == "both"):
-                            print(port + ": \033[32;1m[OPEN]\033[0m")
-                        if(state == "in"):
-                            print(port + ": \033[33;1m[IN ONLY]\033[0m")
-                        if(state == "out"):
-                            print(port + ": \033[33;1m[OUT ONLY]\033[0m")
-                        if(state == "closed"):
-                            print(port + ": \033[31;1m[CLOSED]\033[0m")
-                    print("\n")
-                    if(len(ipList) == 0):
-                        print("No whitelisted IP Addresses.")
-                        print("\n")
-                    else:
-                        whiteListIP = "Whitelisted IP Addresses: "
-                        for ip in ipList:
-                            whiteListIP = whiteListIP + ip + ", "
-                        value = len(whiteListIP)-2
-                        whiteListIP = whiteListIP[:value]
-                        print(whiteListIP)
-                    if(len(bIpList) == 0):
-                        print("No blacklisted IP Addresses.")
-                        print("\n")
-                    else:
-                        bIpListIP = "Blacklisted IP Addresses: "
-                        for ip in bIpList:
-                            bIpListIP = bIpListIP + ip + ", "
-                        value = len(bIpListIP)-2
-                        bIpListIP = bIpListIP[:value]
-                        print(bIpListIP)
-                    print("\n")
-                    print(message)
-                    print("\n")
-                    option = input("Enter command: ")
-                    if(option.lower() == "whitelist"):
-                        y = True
-                        while(y):
-                            address = input("Enter IPv4 address to whitelist: ")
-                            length = len(address.split("."))
-                            if(address.lower() == "exit" or length == 4):
-                                y = False
-                            if(not y):
-                                print("Invalid address. Please re-enter the address or type 'exit' to exit.")
-                        if(length == 4):
-                            os.system("nft add rule firewall input ip saddr { "+address+" } accept")
-                            os.system("nft add rule firewall output ip daddr { "+address+" } accept")
-                            print(f"{address} added to whitelist")
-                    elif(option.lower() == "open"):
-                        y = True
-                        z = False
-                        while(y):
-                            type = input("Open port for input, output, or both?(Type 'exit' to cancel) ").lower()
-                            if(not (type == "input" or type == "output" or type == "both")):
-                                print("Invalid entry, enter 'input', 'output', or 'both' to determine what openings the port needs.")
-                            elif(type == "cancel"):
-                                z = True
-                            else:
-                                y = False
-                            if(z):
-                                y = False
-                            else:
-                                protocol = input("Enter port protocol(TCP/UDP): ").lower()
-                                service = input("Enter port number to open: ")
-                                if(protocol == "tcp"):
-                                    if(type == "input"):
-                                        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
-                                    elif(type == "output"):
-                                        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
-                                    elif(type == "both"):
-                                        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
-                                        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
-                                elif(protocol == "udp"):
-                                    if(type == "input"):
-                                        os.system("nft add rule firewall input udp dport { "+service+" } accept")
-                                    elif(type == "output"):
-                                        os.system("nft add rule firewall output udp dport { "+service+" } accept")
-                                    elif(type == "both"):
-                                        os.system("nft add rule firewall input udp dport { "+service+" } accept")
-                                        os.system("nft add rule firewall output udp dport { "+service+" } accept")
-                    elif(option.lower() == "quit"):
-                        return
-                    else:
-                        message = NormHelp()
+                    port = protocol + " " + portNum + " " + portDefault(protocol, portNum)
+                    outputPorts.append(port)
+            elif(itemArray[1] == "saddr" or itemArray[1] == "daddr"):
+                if(not itemArray[2] in ipList):
+                    ipList.append(itemArray[2])
+        for entry in blackListArray:
+            bIpList.append(entry[0])
+        print("Port Rules:")
+        print("\n")
+        for port in inputPorts:
+            if(not port in ports):
+                ports.append(port)
+        for port in outputPorts:
+            if(not port in ports):
+                ports.append(port)
+        ports = addOtherPorts(ports)
+        for port in ports:
+            if(port in inputPorts and port in outputPorts):
+                state = "both"
+            elif(port in inputPorts):
+                state = "in"
+            elif(port in outputPorts):
+                state = "out"
+            else:
+                state = "closed"
+            if(state == "both"):
+                print(port + ": \033[32;1m[OPEN]\033[0m")
+            if(state == "in"):
+                print(port + ": \033[33;1m[IN ONLY]\033[0m")
+            if(state == "out"):
+                print(port + ": \033[33;1m[OUT ONLY]\033[0m")
+            if(state == "closed"):
+                print(port + ": \033[31;1m[CLOSED]\033[0m")
+        print("\n")
+        if(len(ipList) == 0):
+            print("No whitelisted IP Addresses.")
+            print("\n")
+        else:
+            whiteListIP = "Whitelisted IP Addresses: "
+            for ip in ipList:
+                whiteListIP = whiteListIP + ip + ", "
+            value = len(whiteListIP)-2
+            whiteListIP = whiteListIP[:value]
+            print(whiteListIP)
+        if(len(bIpList) == 0):
+            print("No blacklisted IP Addresses.")
+            print("\n")
+        else:
+            bIpListIP = "Blacklisted IP Addresses: "
+            for ip in bIpList:
+                bIpListIP = bIpListIP + ip + ", "
+            value = len(bIpListIP)-2
+            bIpListIP = bIpListIP[:value]
+            print(bIpListIP)
+        print("\n")
+        print(message)
+        print("\n")
+        option = input("Enter command: ")
+        if(option.lower() == "whitelist"):
+            y = True
+            while(y):
+                address = input("Enter IPv4 address to whitelist: ")
+                length = len(address.split("."))
+                if(address.lower() == "exit" or length == 4):
+                    y = False
+                if(not y):
+                    print("Invalid address. Please re-enter the address or type 'exit' to exit.")
+            if(length == 4):
+                os.system("nft add rule firewall input ip saddr { "+address+" } accept")
+                os.system("nft add rule firewall output ip daddr { "+address+" } accept")
+                print(f"{address} added to whitelist")
+        elif(option.lower() == "open"):
+            y = True
+            z = False
+            while(y):
+                type = input("Open port for input, output, or both?(Type 'exit' to cancel) ").lower()
+                if(not (type == "input" or type == "output" or type == "both")):
+                    print("Invalid entry, enter 'input', 'output', or 'both' to determine what openings the port needs.")
+                elif(type == "cancel"):
+                    z = True
+                else:
+                    y = False
+                if(z):
+                    y = False
+                else:
+                    protocol = input("Enter port protocol(TCP/UDP): ").lower()
+                    service = input("Enter port number to open: ")
+                    if(protocol == "tcp"):
+                        if(type == "input"):
+                            os.system("nft add rule firewall input tcp dport { "+service+" } accept")
+                        elif(type == "output"):
+                            os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+                        elif(type == "both"):
+                            os.system("nft add rule firewall input tcp dport { "+service+" } accept")
+                            os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+                    elif(protocol == "udp"):
+                        if(type == "input"):
+                            os.system("nft add rule firewall input udp dport { "+service+" } accept")
+                        elif(type == "output"):
+                            os.system("nft add rule firewall output udp dport { "+service+" } accept")
+                        elif(type == "both"):
+                            os.system("nft add rule firewall input udp dport { "+service+" } accept")
+                            os.system("nft add rule firewall output udp dport { "+service+" } accept")
+        elif(option.lower() == "quit"):
+            return True
+        else:
+            message = NormHelp()
                             
-                else:
-                    print("Terminating to avoid crashes due to missing structure.")
-                    return
+    else:
+        print("Terminating to avoid crashes due to missing structure.")
+        return
 def tableCommand(table):
     x = True
     while(x):

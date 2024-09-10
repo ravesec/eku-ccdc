@@ -422,7 +422,7 @@ def chainCommand(table, chain):
                 if(x):
                     print("Invalid selection.")
             verification = input(f"Confirmation: Removing rule {ruleName} from chain {chain}? ")
-            if(verification.lower() == ('y', 'yes')):
+            if(verification.lower() == "y" or verification.lower() == "yes"):
                 command = f"nft delete rule {table} {chain} handle {handle}"
                 os.system(command)
         elif(option.lower() == 'list'):

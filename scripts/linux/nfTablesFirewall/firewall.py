@@ -412,14 +412,14 @@ def chainCommand(table, chain):
                     print(rule[0] + " ("+rule[1]+")  ["+rule[2]+"]") 
                 else:
                     print(rule[0] + " ("+rule[1]+")")
-            x = True
-            while(x):
+            y = True
+            while(y):
                 handle = input("Enter handle of rule you would like to remove: ")
                 for rule in ruleList:
                     if(rule[1] == handle):
                         ruleName = rule[0]
-                        x = False
-                if(x):
+                        y = False
+                if(y):
                     print("Invalid selection.")
             verification = input(f"Confirmation: Removing rule {ruleName} from chain {chain}? ")
             if(verification.lower() == "y" or verification.lower() == "yes"):

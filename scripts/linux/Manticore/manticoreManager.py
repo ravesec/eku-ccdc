@@ -3,26 +3,30 @@ import os
 import socket
 import sys
 import time
+import random
 possHosts = ["172.20.240.20", "172.20.242.10", "172.20.241.30", "172.20.241.40"]
-port = sys.argv[1]
+port = int(sys.argv[1])
 sock = socket.create_server(("0.0.0.0", port))
 def main():
     while(True):
         activeHosts = []
         for host in possHosts:
             message = encrypt("H10", "172.20.241.20")
-            sendSock = socket.create_connection((host, 1893), timeout=5)
-            sendSock.send(message.encode('utf-8'))
-            array = sock.accept()
-            conn = array[0]
-            address = array[1]
-            if(address == host):
-                recieved = conn.recv(4096)
-                dec = message.decode('utf-8')
-                trueMes = decrypt(dec)
-                messageArray = trueMes.split('-')
-                if(messageArray[1] == "H11" and messageArray[2] == "0.0.0.0"):
-                    activeHosts.append(host)
+            try:
+                sendSock = socket.create_connection((host, 1893), timeout=5)
+                sendSock.send(message.encode('utf-8'))
+                array = sock.accept()
+                conn = array[0]
+                address = array[1]
+                if(address == host):
+                    recieved = conn.recv(4096)
+                    dec = message.decode('utf-8')
+                    trueMes = decrypt(dec)
+                    messageArray = trueMes.split('-')
+                    if(messageArray[1] == "H11" and messageArray[2] == "0.0.0.0"):
+                        activeHosts.append(host)
+            except Exception as e:
+                print("An error occured with host " + host + ": " + str(e))
         fileContents = ""
         for host in activeHosts:
             fileContents = fileContents + host + "\n"

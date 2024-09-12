@@ -29,7 +29,7 @@ read password
 cat <<EOFA > /opt/splunk/etc/system/local/user-seed.conf
 [user_info]
 USERNAME = admin
-PASSOWRD = $password
+PASSWORD = $password
 EOFA
 stty echo
 /opt/splunk/bin/splunk start

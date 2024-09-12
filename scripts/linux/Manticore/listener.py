@@ -20,10 +20,10 @@ def main():
             messageArray = trueMes.split('-')
             if(messageArray[1] == "C17"):
                 address = messageArray[2]
-                firewall "-ba" f"{address}"
+                os.system(f'firewall -ba ' + address)
             if(messageArray[1] == "H10"):
                 address = messageArray[2]
-                if(address = "172.20.241.20"):
+                if(address == "172.20.241.20"):
                     heartSock = socket.create_connection(("172.20.241.20", 1894))
                     message = encrypt("H11", "0.0.0.0")
                     heartSock.send(message.encode('utf-8'))
@@ -32,7 +32,7 @@ def main():
             if(messageArray[1] == "S99"):
                 address = messageArray[2]
                 hostName = getHostName(address)
-                    os.system(f"bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh {hostName} &")
+                os.system("bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh "+ hostName + " &")
 def decrypt(message):
     decoded = []
     messArray = message.split('-')

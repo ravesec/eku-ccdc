@@ -22,6 +22,12 @@ def main():
             print("Entered machine name not found. Installing with default rules.")
             install("default")
 def install(machine):
+    os.system("mkdir /etc/firewall")
+    os.system("touch /etc/firewall/machinePreset.flag")
+    if(machine in ["centos", "splunk", "fedora", "ubuntu", "debian"]):
+        os.system('echo "' + machine + '" > /etc/firewall/machinePreset.flag')
+    else:
+        os.system('echo "default" > /etc/firewall/machinePreset.flag')
     if(machine == "splunk"):
         requiredServicesTCP = ["53", "http", "https", "8000"]
         inOnlyServicesTCP = ["1894"]

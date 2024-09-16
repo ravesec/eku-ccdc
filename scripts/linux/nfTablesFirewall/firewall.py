@@ -123,6 +123,66 @@ def main():
                 else:
                     print("No other tables detected. Exiting.")
                     return
+            elif(sys.argv[1].lower() == "-i"):
+                inPres = False
+                outPres = False
+                firewallPres = False
+                firewallInteg = False
+                blacklistPres = False
+                blacklistInteg = False
+                tableList = getTableList()
+                for table in tableList:
+                    if(table == "firewall"):
+                        firewallPres = True
+                        chainList = getChainList("firewall")
+                        for chain in chainList:
+                            if(chain == "input"):
+                                inPres = True
+                            if(chain == "output"):
+                                outPres = True
+                        if(inPres and outPres):
+                            firewallInteg = True
+                    elif(table == "blacklist"):
+                        blacklistPres = True
+                        chainList = getChainList("blacklist")
+                        for chain in chainList:
+                            if(chain == "input"):
+                                inPres = True
+                            if(chain == "output"):
+                                outPres = True
+                        if(inPres and outPres):
+                            blacklistInteg = True
+                if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
+                    print("Firewall integrity verified. Exiting.")
+                else:
+                    flag = subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True, check=True)
+                    if(not firewallInteg):
+                        if(not firewallPres):
+                            os.system("nft add table firewall")
+                        chainList = getChainList("firewall")
+                        for chain in chainList:
+                            if(chain == "input"):
+                                inPres = True
+                            if(chain == "output"):
+                                outPres = True
+                        if(not inPres):
+                            os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")
+                        if(not outPres)
+                            os.system("nft add chain firewall output \{ type filter hook output priority 0 \; policy drop\; \}")
+                        restoreRuleInteg(flag)
+                    if(not blacklistInteg):
+                        if(not blacklistPres):
+                            os.system("nft add table blacklist")
+                        chainList = getChainList("blacklist")
+                        for chain in chainList:
+                            if(chain == "input"):
+                                inPres = True
+                            if(chain == "output"):
+                                outPres = True
+                        if(not inPres):
+                            os.system("nft add chain blacklist blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
+                        if(not outPres)
+                            os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
         else:
             if(standMenu()):
                 return
@@ -647,6 +707,74 @@ def blackList():
             panic()
         else:
             printHelp()
+def restoreRuleInteg(machine):
+    if(machine == "splunk"):
+        requiredServicesTCP = ["53", "http", "https", "8000"]
+        inOnlyServicesTCP = ["1894"]
+        outOnlyServicesTCP = ["1893"]
+        requiredServicesUDP = ["53", "123"]
+        inOnlyServicesUDP = []
+        outOnlyServicesUDP = []
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
+        inOnlyIPs = []
+        outOnlyIPs = []
+    if(machine == "centos"):
+        requiredServicesTCP = ["53", "http", "https"]
+        inOnlyServicesTCP = ["1893"]
+        outOnlyServicesTCP = ["1894"]
+        requiredServicesUDP = ["53", "123"]
+        inOnlyServicesUDP = []
+        outOnlyServicesUDP = []
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
+        inOnlyIPs = []
+        outOnlyIPs = []
+    if(machine == "fedora"):
+        requiredServicesTCP = ["53", "http", "https", "25", "110"]
+        inOnlyServicesTCP = ["1893"]
+        outOnlyServicesTCP = ["1894"]
+        requiredServicesUDP = ["53", "123"]
+        inOnlyServicesUDP = []
+        outOnlyServicesUDP = []
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
+        inOnlyIPs = []
+        outOnlyIPs = []
+    else:
+        requiredServicesTCP = ["53", "http", "https"] 
+        inOnlyServicesTCP = [] 
+        outOnlyServicesTCP = [] 
+        requiredServicesUDP = ["53"] 
+        inOnlyServicesUDP = [] 
+        outOnlyServicesUDP = [] 
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"] 
+        inOnlyIPs = [] 
+        outOnlyIPs = [] 
+    for service in requiredServicesTCP:
+        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
+        os.system("nft add rule firewall input tcp sport { "+service+" } accept")
+        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+        os.system("nft add rule firewall output tcp sport { "+service+" } accept")
+        if(service == "1893" or service == "1894"):
+            os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+    for service in inOnlyServicesTCP:
+        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
+    for service in outOnlyServicesTCP:
+        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+    for service in requiredServicesUDP:
+        os.system("nft add rule firewall input udp dport { "+service+" } accept")
+        os.system("nft add rule firewall input udp sport { "+service+" } accept")
+        os.system("nft add rule firewall output udp dport { "+service+" } accept")
+        os.system("nft add rule firewall output udp sport { "+service+" } accept")
+    for service in inOnlyServicesUDP:
+        os.system("nft add rule firewall input udp dport { "+service+" } accept")
+    for service in outOnlyServicesUDP:
+        os.system("nft add rule firewall output udp dport { "+service+" } accept")
+    for ip in requiredIPs:
+        os.system("nft add rule firewall input ip saddr { "+ip+" } accept")
+        os.system("nft add rule firewall output ip daddr { "+ip+" } accept")
+    for ip in inOnlyIPs:
+        os.system("nft add rule firewall input ip saddr { "+ip+" } accept")
+    for ip in outOnlyIPs:
+        os.system("nft add rule firewall output ip daddr { "+ip+" } accept")
 def getBlackList():
     blackList = [[]]
     blackListOutput = subprocess.check_output(["nft -a list table blacklist"], shell=True)

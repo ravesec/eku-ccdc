@@ -181,9 +181,9 @@ def main():
                             os.system("nft add table blacklist")
                         chainList = getChainList("blacklist")
                         for chain in chainList:
-                            if(chain == "input"):
+                            if(chain == "blockIn"):
                                 inPres = True
-                            if(chain == "output"):
+                            if(chain == "blockOut"):
                                 outPres = True
                         if(not inPres):
                             os.system("nft add chain blacklist blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
@@ -222,9 +222,9 @@ def standMenu():
                 blacklistPres = True
                 chainList = getChainList("blacklist")
                 for chain in chainList:
-                    if(chain == "input"):
+                    if(chain == "blockIn"):
                         inPres = True
-                    if(chain == "output"):
+                    if(chain == "blockOut"):
                         outPres = True
                 if(inPres and outPres):
                     blacklistInteg = True

@@ -77,6 +77,52 @@ def main():
                         return
                     else:
                         printHelp()
+            elif(sys.argv[1].lower() == "-k"):
+                tableList = getTableList()
+                for table in tableList:
+                    if(table == "firewall"):
+                        firewallPres = True
+                    elif(table == "blacklist"):
+                        blacklistPres = True
+                    else:
+                        if(len(table) == 0):
+                            pass
+                        else:
+                            otherTablePres = True
+                if(otherTablePres):
+                    print("Other tables detected. Beginning kill process.")
+                    for table in tableList:
+                        if(table == "firewall" or table == "blacklist"):
+                            pass
+                        else:
+                            option = input("Table " + table + " found. Would you like to delete this table? ").lower()
+                            if(option == "y" or option == "yes"):
+                                os.system("nft delete table " + table)
+                else:
+                    print("No other tables detected. Exiting.")
+                    return
+            elif(sys.argv[1].lower() == "-kf"):
+                tableList = getTableList()
+                for table in tableList:
+                    if(table == "firewall"):
+                        firewallPres = True
+                    elif(table == "blacklist"):
+                        blacklistPres = True
+                    else:
+                        if(len(table) == 0):
+                            pass
+                        else:
+                            otherTablePres = True
+                if(otherTablePres):
+                    print("Other tables detected. Beginning kill process.")
+                    for table in tableList:
+                        if(table == "firewall" or table == "blacklist"):
+                            pass
+                        else:
+                            os.system("nft delete table " + table)
+                else:
+                    print("No other tables detected. Exiting.")
+                    return
         else:
             if(standMenu()):
                 return
@@ -133,7 +179,7 @@ def standMenu():
         else:
             print("Blacklist Status: "+"\033[31;1m[INACTIVE]\033[0m")
         if(otherTablePres):
-            print("\033[33;1m[Caution: Other tables detected present in nfTables. If this is unexpected, please investigate the issue.]\033[0m")
+            print('\033[33;1m[Caution: Other tables detected present in nfTables. Run the firewall with the "-k" flag to remove all excess tables.]\033[0m')
         if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
             print("\n")
             ports = []
@@ -718,9 +764,10 @@ Firewall interface for linux machines using nftables. Written for use by EKU's C
 Command line arguments:
 
     -h , --help    |     Displays this help menu and exits.
-    -ba (ip)       |     Adds given IP to blacklist.
-    -br (ip)       |     Removes given IP from blacklist.
+    -ba [ip]       |     Adds given IP to blacklist.
+    -br [ip]       |     Removes given IP from blacklist.
     -e             |     Enters expert mode, allows for more in-depth customization of nfTables.
+    -k(f)          |     Enters kill mode, allowing the user to kill all tables other than firewall and blacklist. (Running with -kf flag will kill all other tables without asking for user confirmation. Use with caution)
 
 In-Program Commands:
 

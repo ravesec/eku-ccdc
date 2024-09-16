@@ -125,6 +125,7 @@ def main():
                     print("No other tables detected. Exiting.")
                     return
             elif(sys.argv[1].lower() == "-i"):
+                print("Checking integrity of firewall tables.")
                 firewallPres = False
                 firewallInteg = False
                 blacklistPres = False
@@ -143,6 +144,7 @@ def main():
                                 outPres = True
                         if(inPres and outPres):
                             firewallInteg = True
+                            print("Firewall tables verified.")
                     elif(table == "blacklist"):
                         inPres = False
                         outPres = False
@@ -155,11 +157,13 @@ def main():
                                 outPres = True
                         if(inPres and outPres):
                             blacklistInteg = True
+                            print("Blacklist tables verified.")
                 if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
                     print("Firewall integrity verified. Exiting.")
                 else:
                     flag = subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True)
                     if(not firewallInteg):
+                        print("Core firewall tables failed verification. Repairing.")
                         inPres = False
                         outPres = False
                         if(not firewallPres):
@@ -175,7 +179,9 @@ def main():
                         if(not outPres):
                             os.system("nft add chain firewall output \{ type filter hook output priority 0 \; policy drop\; \}")
                         restoreRuleInteg(flag)
+                        print("Firewall tables repaired using preset: " + flag)
                     if(not blacklistInteg):
+                        print("Blacklist tables failed verification. Repairing.")
                         inPres = False
                         outPres = False
                         if(not blacklistPres):
@@ -190,6 +196,7 @@ def main():
                             os.system("nft add chain blacklist blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
                         if(not outPres):
                             os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
+                        print("Blacklist tables repaired.")
         else:
             if(standMenu()):
                 return

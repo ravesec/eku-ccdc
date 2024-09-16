@@ -70,8 +70,6 @@ def install(machine):
         inOnlyIPs = [] #IPs only allowed to send traffic to this machine.
         outOnlyIPs = [] #IPs only allowed to recieve traffic from this machine.
         
-    ruleInstall()
-def ruleInstall():
     os.system("nft add table firewall")
     os.system("nft add table blacklist")
     os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")

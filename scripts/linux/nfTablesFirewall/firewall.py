@@ -124,8 +124,6 @@ def main():
                     print("No other tables detected. Exiting.")
                     return
             elif(sys.argv[1].lower() == "-i"):
-                inPres = False
-                outPres = False
                 firewallPres = False
                 firewallInteg = False
                 blacklistPres = False
@@ -133,6 +131,8 @@ def main():
                 tableList = getTableList()
                 for table in tableList:
                     if(table == "firewall"):
+                        inPres = False
+                        outPres = False
                         firewallPres = True
                         chainList = getChainList("firewall")
                         for chain in chainList:
@@ -143,6 +143,8 @@ def main():
                         if(inPres and outPres):
                             firewallInteg = True
                     elif(table == "blacklist"):
+                        inPres = False
+                        outPres = False
                         blacklistPres = True
                         chainList = getChainList("blacklist")
                         for chain in chainList:
@@ -157,6 +159,8 @@ def main():
                 else:
                     flag = subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True, check=True)
                     if(not firewallInteg):
+                        inPres = False
+                        outPres = False
                         if(not firewallPres):
                             os.system("nft add table firewall")
                         chainList = getChainList("firewall")
@@ -192,8 +196,6 @@ def standMenu():
     x = True
     message = ""
     while(x):
-        inPres = False
-        outPres = False
         firewallPres = False
         firewallInteg = False
         blacklistPres = False
@@ -203,6 +205,8 @@ def standMenu():
         tableList = getTableList()
         for table in tableList:
             if(table == "firewall"):
+                inPres = False
+                outPres = False
                 firewallPres = True
                 chainList = getChainList("firewall")
                 for chain in chainList:
@@ -213,6 +217,8 @@ def standMenu():
                 if(inPres and outPres):
                     firewallInteg = True
             elif(table == "blacklist"):
+                inPres = False
+                outPres = False
                 blacklistPres = True
                 chainList = getChainList("blacklist")
                 for chain in chainList:

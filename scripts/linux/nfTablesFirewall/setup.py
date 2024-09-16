@@ -1,40 +1,57 @@
 import os
 import sys
 
-#TODO: Add all services/ports and all IPs that you want allowed by default
+requiredServicesTCP = []
+inOnlyServicesTCP = []
+outOnlyServicesTCP = []
+requiredServicesUDP = []
+inOnlyServicesUDP = []
+outOnlyServicesUDP = []
+inOnlyIPs = []
+outOnlyIPs = []
 
 def main():
     if(len(sys.argv) == 2):
-        if(sys.argv[1] == "splunk"):
-            requiredServicesTCP = ["53", "http", "https", "8000"]
-            inOnlyServicesTCP = ["1894"]
-            outOnlyServicesTCP = ["1893"]
-            requiredServicesUDP = ["53", "123"]
-            inOnlyServicesUDP = []
-            outOnlyServicesUDP = []
-            requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
-            inOnlyIPs = []
-            outOnlyIPs = []
-        if(sys.argv[1] == "centos"):
-            requiredServicesTCP = ["53", "http", "https"]
-            inOnlyServicesTCP = ["1893"]
-            outOnlyServicesTCP = ["1894"]
-            requiredServicesUDP = ["53", "123"]
-            inOnlyServicesUDP = []
-            outOnlyServicesUDP = []
-            requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
-            inOnlyIPs = []
-            outOnlyIPs = []
-        if(sys.argv[1] == "fedora"):
-            requiredServicesTCP = ["53", "http", "https", "25", "110"]
-            inOnlyServicesTCP = ["1893"]
-            outOnlyServicesTCP = ["1894"]
-            requiredServicesUDP = ["53", "123"]
-            inOnlyServicesUDP = []
-            outOnlyServicesUDP = []
-            requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
-            inOnlyIPs = []
-            outOnlyIPs = []
+        install(sys.argv[1])
+    else:
+        machine = input("Enter machine name to install as(centos, fedora, splunk, debian, ubuntu): ").lower()
+        if(machine in ["centos", "splunk", "fedora", "ubuntu", "debian"]):
+            print("Installing firewall as " + machine + ".")
+            install(machine)
+        else:
+            print("Entered machine name not found. Installing with default rules.")
+            install("default")
+def install(machine):
+    if(machine == "splunk"):
+        requiredServicesTCP = ["53", "http", "https", "8000"]
+        inOnlyServicesTCP = ["1894"]
+        outOnlyServicesTCP = ["1893"]
+        requiredServicesUDP = ["53", "123"]
+        inOnlyServicesUDP = []
+        outOnlyServicesUDP = []
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
+        inOnlyIPs = []
+        outOnlyIPs = []
+    if(machine == "centos"):
+        requiredServicesTCP = ["53", "http", "https"]
+        inOnlyServicesTCP = ["1893"]
+        outOnlyServicesTCP = ["1894"]
+        requiredServicesUDP = ["53", "123"]
+        inOnlyServicesUDP = []
+        outOnlyServicesUDP = []
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
+        inOnlyIPs = []
+        outOnlyIPs = []
+    if(machine == "fedora"):
+        requiredServicesTCP = ["53", "http", "https", "25", "110"]
+        inOnlyServicesTCP = ["1893"]
+        outOnlyServicesTCP = ["1894"]
+        requiredServicesUDP = ["53", "123"]
+        inOnlyServicesUDP = []
+        outOnlyServicesUDP = []
+        requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
+        inOnlyIPs = []
+        outOnlyIPs = []
     else:
         requiredServicesTCP = ["53", "http", "https"] #ports/services allowed to freely talk both ways
         inOnlyServicesTCP = [] #ports/services only allowed to recieve traffic, not send
@@ -45,6 +62,9 @@ def main():
         requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"] #IPs allowed to send traffic to and recieve trafic from this machine
         inOnlyIPs = [] #IPs only allowed to send traffic to this machine.
         outOnlyIPs = [] #IPs only allowed to recieve traffic from this machine.
+        
+    ruleInstall()
+def ruleInstall():
     os.system("nft add table firewall")
     os.system("nft add table blacklist")
     os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")

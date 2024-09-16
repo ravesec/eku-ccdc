@@ -7,6 +7,7 @@ outOnlyServicesTCP = []
 requiredServicesUDP = []
 inOnlyServicesUDP = []
 outOnlyServicesUDP = []
+requiredIPs = []
 inOnlyIPs = []
 outOnlyIPs = []
 

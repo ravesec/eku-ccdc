@@ -94,7 +94,7 @@ def main():
                     for table in tableList:
                         if(table == "firewall" or table == "blacklist"):
                             pass
-                        else:
+                        elif(len(table) != 0):
                             option = input("Table " + table + " found. Would you like to delete this table? ").lower()
                             if(option == "y" or option == "yes"):
                                 os.system("nft delete table " + table)
@@ -118,7 +118,7 @@ def main():
                     for table in tableList:
                         if(table == "firewall" or table == "blacklist"):
                             pass
-                        else:
+                        elif(len(table) != 0):
                             os.system("nft delete table " + table)
                 else:
                     print("No other tables detected. Exiting.")
@@ -167,10 +167,12 @@ def main():
                                 outPres = True
                         if(not inPres):
                             os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")
-                        if(not outPres)
+                        if(not outPres):
                             os.system("nft add chain firewall output \{ type filter hook output priority 0 \; policy drop\; \}")
                         restoreRuleInteg(flag)
                     if(not blacklistInteg):
+                        inPres = False
+                        outPres = False
                         if(not blacklistPres):
                             os.system("nft add table blacklist")
                         chainList = getChainList("blacklist")
@@ -181,7 +183,7 @@ def main():
                                 outPres = True
                         if(not inPres):
                             os.system("nft add chain blacklist blockIn \{ type filter hook input priority -99 \; policy accept\; \}")
-                        if(not outPres)
+                        if(not outPres):
                             os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
         else:
             if(standMenu()):

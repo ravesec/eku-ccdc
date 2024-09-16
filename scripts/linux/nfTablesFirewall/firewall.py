@@ -343,10 +343,13 @@ def tableCommand(table):
                     os.system("nft delete chain "+table+" "+chain)
                 print(f"{table} cleared.")
         elif(option.lower() == 'delete'):
+            chainList = getChainList(table)
+            for chain in chainList:
+                print(chain)
             option = input("What chain would you like to remove? ")
             os.system("nft flush chain "+table+" "+chain)
             os.system("nft delete chain "+table+" "+chain)
-            chainList = getChainList()
+            chainList = getChainList(table)
             z = False
             for chain in chainList:
                 if(chain == option):

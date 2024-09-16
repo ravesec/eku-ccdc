@@ -78,6 +78,7 @@ def main():
                     else:
                         printHelp()
             elif(sys.argv[1].lower() == "-k"):
+                otherTablePres = False
                 tableList = getTableList()
                 for table in tableList:
                     if(table == "firewall"):

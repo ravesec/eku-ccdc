@@ -393,7 +393,7 @@ def standMenu():
                 message = NormHelp()
                                 
         else:
-            print("Terminating to avoid crashes due to missing structure.")
+            print('Terminating to avoid crashes due to missing structure. Run firewall with the "-i" flag to verify integrity.')
             return
 def tableCommand(table):
     x = True
@@ -896,6 +896,7 @@ Command line arguments:
     -br [ip]       |     Removes given IP from blacklist.
     -e             |     Enters expert mode, allows for more in-depth customization of nfTables.
     -k(f)          |     Enters kill mode, allowing the user to kill all tables other than firewall and blacklist. (Running with -kf flag will kill all other tables without asking for user confirmation. Use with caution)
+    -i             |     Verifies integrity of firewall installation.
 
 In-Program Commands:
 

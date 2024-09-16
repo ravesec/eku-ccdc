@@ -17,22 +17,33 @@ def main():
             address = arguments[1]
             message = encrypt("C17", address)
             for host in hosts:
-                sock = socket.create_connection((host, 1893), timeout=5)
-                sock.send(message.encode('utf-8'))
+                try:
+                    sock = socket.create_connection((host, 1893), timeout=5)
+                    sock.send(message.encode('utf-8'))
+                except Exception as e:
+                    message = str(e)
+                    print("An error occured when trying to contact " + host + ": " + message)
             del(arguments[0])
             del(arguments[0])
         if (argument.lower() == "-i"):
             mainHosts = ["172.20.240.20", "172.20.242.10", "172.20.241.30", "172.20.241.40"]
             for host in mainHosts:
                 message = encrypt("S99", host)
-                sock = socket.create_connection((host, 1893), timeout=5)
-                sock.send(message.encode('utf-8'))
+                try:
+                    sock = socket.create_connection((host, 1893), timeout=5)
+                    sock.send(message.encode('utf-8'))
+                except Exception as e:
+                    message = str(e)
+                    print("An error occured when trying to install on " + host + ": " + message)
             del(arguments[0])
         if (argument.lower() == "-fi"):
             host = arguments[1]
             message = encrypt("S99", host)
-            sock = socket.create_connection((host, 1893), timeout=5)
-            sock.send(message.encode('utf-8'))
+            try:
+                sock = socket.create_connection((host, 1893), timeout=5)
+                sock.send(message.encode('utf-8'))
+            except Exception as e:
+                print("An error occured when trying to install on " + host + ": " + message)
             del(arguments[0])
             del(arguments[0])
 def encrypt(code, address):

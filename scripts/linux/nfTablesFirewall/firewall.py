@@ -148,16 +148,16 @@ def main():
                         blacklistPres = True
                         chainList = getChainList("blacklist")
                         for chain in chainList:
-                            if(chain == "input"):
+                            if(chain == "blockIn"):
                                 inPres = True
-                            if(chain == "output"):
+                            if(chain == "blockOut"):
                                 outPres = True
                         if(inPres and outPres):
                             blacklistInteg = True
                 if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
                     print("Firewall integrity verified. Exiting.")
                 else:
-                    flag = subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True, check=True)
+                    flag = subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True)
                     if(not firewallInteg):
                         inPres = False
                         outPres = False

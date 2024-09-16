@@ -39,7 +39,7 @@ def install(machine):
         requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
         inOnlyIPs = []
         outOnlyIPs = []
-    if(machine == "centos"):
+    elif(machine == "centos"):
         requiredServicesTCP = ["53", "http", "https"]
         inOnlyServicesTCP = ["1893"]
         outOnlyServicesTCP = ["1894"]
@@ -49,7 +49,7 @@ def install(machine):
         requiredIPs = ["127.0.0.1", "8.8.8.8", "8.8.4.4"]
         inOnlyIPs = []
         outOnlyIPs = []
-    if(machine == "fedora"):
+    elif(machine == "fedora"):
         requiredServicesTCP = ["53", "http", "https", "25", "110"]
         inOnlyServicesTCP = ["1893"]
         outOnlyServicesTCP = ["1894"]

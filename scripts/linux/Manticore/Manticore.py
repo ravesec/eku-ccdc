@@ -4,10 +4,8 @@ import sys
 import subprocess
 import random
 import socket
-import file
 hosts = []
-f = open("/etc/manticore/hosts.list", "r")
-hostList = f.read()
+hostList = subprocess.check_output("cat /etc/manticore/hosts.list", shell=True)
 hosts = hostList.split("\n")
 def main():
     arguments = []

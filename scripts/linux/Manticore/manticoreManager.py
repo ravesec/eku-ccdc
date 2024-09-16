@@ -30,7 +30,7 @@ def main():
         fileContents = ""
         for host in activeHosts:
             fileContents = fileContents + host + "\n"
-        os.system(f"{fileContents} >> /etc/manticore/hosts.list")
+        os.system('echo "' + fileContents + '" >> /etc/manticore/hosts.list')
         time.sleep(60)
 def encrypt(code, address):
     message = []

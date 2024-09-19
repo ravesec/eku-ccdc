@@ -983,6 +983,7 @@ Commands:
     whitelist      |     Adds an IP address to the whitelist.
     blacklist      |     Adds an IP address to the blacklist.
     open           |     Opens a port as defined by user input.
+    delete         |     Allows the user to delete a rule, delete an IP from the whitelist, or delete an IP from the blacklist.
     panic          |     Activates/Deactivates panic mode. Will only prompt confirmation when disabling panic mode.
 """)
 def printHelp():

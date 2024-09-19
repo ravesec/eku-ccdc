@@ -587,6 +587,7 @@ def getTableList():
     for line in tableListRaw:
         lineList = line.split(" ")
         tableList.append(lineList[-1])
+    del(tableList[-1])
     return tableList
 def getAdvTableList(): #Returns list of objects in this format: [TableName, TableFamily]
     tableList = [[]]

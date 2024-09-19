@@ -88,14 +88,14 @@ def main():
                     elif(table[0] == "blacklist"):
                         blacklistPres = True
                     else:
-                        if(len(table[0]) == 0):
+                        if(len(table[0]) == 0 or table[0] == "PANIC"):
                             pass
                         else:
                             otherTablePres = True
                 if(otherTablePres):
                     print("Other tables detected. Beginning kill process.")
                     for table in tableList:
-                        if(table[0] == "firewall" or table[0] == "blacklist"):
+                        if(table[0] == "firewall" or table[0] == "blacklist" or table[0] == "PANIC"):
                             pass
                         elif(len(table[0]) != 0):
                             option = input("Table " + table[0] + " found. Would you like to delete this table? ").lower()
@@ -112,14 +112,14 @@ def main():
                     elif(table[0] == "blacklist"):
                         blacklistPres = True
                     else:
-                        if(len(table[0]) == 0):
+                        if(len(table[0]) == 0 or table[0] == "PANIC"):
                             pass
                         else:
                             otherTablePres = True
                 if(otherTablePres):
                     print("Other tables detected. Beginning kill process.")
                     for table in tableList:
-                        if(table[0] == "firewall" or table[0] == "blacklist"):
+                        if(table[0] == "firewall" or table[0] == "blacklist" or table[0] == "PANIC"):
                             pass
                         elif(len(table[0]) != 0):
                             os.system("nft delete table " + table[1] + " " + table[0])
@@ -239,7 +239,7 @@ def standMenu():
                 if(inPres and outPres):
                     blacklistInteg = True
             else:
-                if(len(table) == 0):
+                if(len(table) == 0 or table == "PANIC"):
                     pass
                 else:
                     otherTablePres = True

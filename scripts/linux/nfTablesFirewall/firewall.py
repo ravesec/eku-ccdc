@@ -366,7 +366,7 @@ def standMenu():
                     os.system("nft add rule firewall input ip saddr { "+address+" } accept")
                     os.system("nft add rule firewall output ip daddr { "+address+" } accept")
                     message = (address + " successfully added to whitelist.")
-            if(option.lower() == "blacklist"):
+            elif(option.lower() == "blacklist"):
                 y = True
                 while(y):
                     address = input("Enter IPv4 address to blacklist: ")

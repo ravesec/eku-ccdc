@@ -349,7 +349,7 @@ def standMenu():
                     value = len(bIpListIP)-2
                     bIpListIP = bIpListIP[:value]
                     print(bIpListIP)
-                print("\n")
+            print("\n")
             print(message)
             print("\n")
             option = input("Enter command: ")
@@ -419,13 +419,13 @@ def standMenu():
                 dam()
                 tableList = getTableList()
                 for table in tableList:
-                    if(table == "PANIC" and currentPan = False):
+                    if(table == "PANIC" and currentPan == False):
                         message = "Panic mode successfully activated."
                     elif(table == "PANIC"):
                         p = True
-                if(currentPan = True):
+                if(currentPan == True):
                     message = "Panic mode successfully deactivated."
-                elif(currentPan = True and p):
+                elif(currentPan == True and p):
                     message = "Error deactivating panic mode."
             elif(option.lower() == "quit"):
                 return True

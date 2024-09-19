@@ -484,7 +484,7 @@ def tableCommand(table):
                 print(f"Error removing {option}.")
         elif(option.lower() == 'quit'):
             return "quit"
-        elif(option.lower() == 'view'):
+        elif(option.lower() == 'list'):
             chainList = getChainList(table)
             for chain in chainList:
                 print(chain)
@@ -952,7 +952,7 @@ In-Program Commands:
     add            |     Adds a new chain to the selected table.
     clear          |     Clears out the current table. This will remove all rules associated with the current table.
     delete         |     Removes a stated chain from the current table.
-    view           |     Displays all chains present within the current table.
+    list           |     Displays all chains present within the current table.
     
     Chain Commands:
 

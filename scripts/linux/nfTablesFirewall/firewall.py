@@ -12,8 +12,10 @@ def main():
         elif(sys.argv[1] == '-br'):
             print(removeFromBlackList(sys.argv[2]))
     elif ("SSH_CONNECTION" in os.environ) or ("SSH_CLIENT" in os.environ) or ("SSH_TTY" in os.environ):
-        os.system("echo -e "+"\033[0;32m[RED]\033[0m")
-        #print("Unable to be run remotely.")
+        print("\033[32;1m[RED]\033[0m")
+        print("Unable to be run remotely.")
+        print("Cheers RedTeam")
+        print("- Malfindor")
         return
     elif(os.getuid() != 0):
         print("Access Denied. Must be run as root.")
@@ -79,48 +81,48 @@ def main():
                         printHelp()
             elif(sys.argv[1].lower() == "-k"):
                 otherTablePres = False
-                tableList = getTableList()
+                tableList = getAdvTableList()
                 for table in tableList:
-                    if(table == "firewall"):
+                    if(table[0] == "firewall"):
                         firewallPres = True
-                    elif(table == "blacklist"):
+                    elif(table[0] == "blacklist"):
                         blacklistPres = True
                     else:
-                        if(len(table) == 0):
+                        if(len(table[0]) == 0):
                             pass
                         else:
                             otherTablePres = True
                 if(otherTablePres):
                     print("Other tables detected. Beginning kill process.")
                     for table in tableList:
-                        if(table == "firewall" or table == "blacklist"):
+                        if(table[0] == "firewall" or table[0] == "blacklist"):
                             pass
-                        elif(len(table) != 0):
-                            option = input("Table " + table + " found. Would you like to delete this table? ").lower()
+                        elif(len(table[0]) != 0):
+                            option = input("Table " + table[0] + " found. Would you like to delete this table? ").lower()
                             if(option == "y" or option == "yes"):
-                                os.system("nft delete table " + table)
+                                os.system("nft delete table " + table[1] + " " + table[0])
                 else:
                     print("No other tables detected. Exiting.")
                     return
             elif(sys.argv[1].lower() == "-kf"):
-                tableList = getTableList()
+                tableList = getAdvTableList()
                 for table in tableList:
-                    if(table == "firewall"):
+                    if(table[0] == "firewall"):
                         firewallPres = True
-                    elif(table == "blacklist"):
+                    elif(table[0] == "blacklist"):
                         blacklistPres = True
                     else:
-                        if(len(table) == 0):
+                        if(len(table[0]) == 0):
                             pass
                         else:
                             otherTablePres = True
                 if(otherTablePres):
                     print("Other tables detected. Beginning kill process.")
                     for table in tableList:
-                        if(table == "firewall" or table == "blacklist"):
+                        if(table[0] == "firewall" or table[0] == "blacklist"):
                             pass
-                        elif(len(table) != 0):
-                            os.system("nft delete table " + table)
+                        elif(len(table[0]) != 0):
+                            os.system("nft delete table " + table[1] + " " + table[0])
                 else:
                     print("No other tables detected. Exiting.")
                     return
@@ -585,6 +587,17 @@ def getTableList():
     for line in tableListRaw:
         lineList = line.split(" ")
         tableList.append(lineList[-1])
+    return tableList
+def getAdvTableList(): #Returns list of objects in this format: [TableName, TableFamily]
+    tableList = [[]]
+    tableOutput = subprocess.check_output(["nft", "list tables"])
+    tableListRaw = tableOutput.decode("utf-8").split("\n")
+    for line in tableListRaw:
+        lineTableList = []
+        lineList = line.split(" ")
+        lineTableList.append(lineList[-1])
+        lineTableList.append(lineList[1])
+        tableList.append(lineTableList)
     return tableList
 def getChainList(table):
     chainList = []

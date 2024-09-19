@@ -424,10 +424,8 @@ def standMenu():
                         message = "Panic mode successfully activated."
                     elif(table == "PANIC"):
                         p = True
-                if(currentPan == True):
+                if(currentPan == True and not p):
                     message = "Panic mode successfully deactivated."
-                elif(currentPan == True and p):
-                    message = "Error deactivating panic mode."
             elif(option.lower() == "quit"):
                 return True
             else:

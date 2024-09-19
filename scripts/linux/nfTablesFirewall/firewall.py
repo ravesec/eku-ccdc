@@ -593,11 +593,15 @@ def getAdvTableList(): #Returns list of objects in this format: [TableName, Tabl
     tableOutput = subprocess.check_output(["nft", "list tables"])
     tableListRaw = tableOutput.decode("utf-8").split("\n")
     for line in tableListRaw:
-        lineTableList = []
-        lineList = line.split(" ")
-        lineTableList.append(lineList[-1])
-        lineTableList.append(lineList[1])
-        tableList.append(lineTableList)
+        if(len(line) == 0):
+            pass
+        else:
+            lineTableList = []
+            lineList = line.split(" ")
+            lineTableList.append(lineList[-1])
+            lineTableList.append(lineList[1])
+            tableList.append(lineTableList)
+    del(tableList[0])
     return tableList
 def getChainList(table):
     chainList = []

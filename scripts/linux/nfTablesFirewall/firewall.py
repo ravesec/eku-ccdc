@@ -75,7 +75,7 @@ def main():
                     elif(option.lower() == 'blacklist'):
                         if(blackList() == "quit"):
                             return
-                    elif(option.lower() == 'exit'):
+                    elif(option.lower() == 'exit' or option.lower() == 'quit'):
                         return
                     else:
                         printHelp()

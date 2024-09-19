@@ -430,7 +430,7 @@ def standMenu():
                     elif(newOpt == "blacklist"):
                         blackList = getBlackList()
                         if(len(blackList) == 0):
-                            print("No IPs found in blacklist.")
+                            message = ("No IPs in blacklist to remove.")
                         else:
                             p = True
                             while(p):
@@ -448,7 +448,8 @@ def standMenu():
                                 if(not o):
                                     p = False
                             removeFromBlackList(address)
-                            message = address + " successfully removed from blacklist."
+                            if(address != "exit"):
+                                message = address + " successfully removed from blacklist."
             elif(option.lower() == "panic"):
                 currentPan = False
                 p = False
@@ -875,7 +876,7 @@ def restoreRuleInteg(machine):
         os.system("nft add rule firewall input ip saddr { "+ip+" } accept")
     for ip in outOnlyIPs:
         os.system("nft add rule firewall output ip daddr { "+ip+" } accept")
-def getBlackList():
+def getBlackList():     #Returns list of entities in following format: [ip, handle]
     blackList = [[]]
     blackListOutput = subprocess.check_output(["nft -a list table blacklist"], shell=True)
     blackListRaw = blackListOutput.decode("utf-8").split("saddr ")

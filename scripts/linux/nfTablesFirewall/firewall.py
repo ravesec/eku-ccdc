@@ -441,11 +441,11 @@ def standMenu():
                                 elif(len(address.split('.')) != 4):
                                     print("Invalid address entered. Enter exit to cancel.")
                                 for ip in blackList:
-                                    if(ip == address):
+                                    if(ip[0] == address):
                                         o = False
                                 if(o):
                                     print("Address not found in blacklist. Enter exit to cancel.")
-                                if(not o):
+                                else:
                                     p = False
                             removeFromBlackList(address)
                             if(address != "exit"):

@@ -410,6 +410,45 @@ def standMenu():
                             elif(type == "both"):
                                 os.system("nft add rule firewall input udp dport { "+service+" } accept")
                                 os.system("nft add rule firewall output udp dport { "+service+" } accept")
+            elif(option.lower() == "delete"):
+                e = True
+                p = True
+                while(p):
+                    newOpt = input("Would you like to delete a rule, a whitelisted IP, or blacklisted IP? (enter rule, whitelist, or blacklist) ").lower()
+                    if(newOpt == "rule" or newOpt == "whitelist" or newOpt == "blacklist" or newOpt == "exit"):
+                        p = False
+                    if(newOpt == "exit"):
+                        e = False
+                    else:
+                        if(p):
+                            print("Invalid selection. (enter exit to cancel)")
+                if(e):
+                    if(newOpt == "rule"):
+                        pass
+                    elif(newOpt == "whitelist"):
+                        pass
+                    elif(newOpt == "blacklist"):
+                        blackList = getBlackList()
+                        if(len(blackList) == 0):
+                            print("No IPs found in blacklist.")
+                        else:
+                            p = True
+                            while(p):
+                                o = True
+                                address = input("Enter IP to remove from blacklist: ").lower()
+                                if(address == "exit"):
+                                    p = False
+                                elif(len(address.split('.')) != 4):
+                                    print("Invalid address entered. Enter exit to cancel.")
+                                for ip in blackList:
+                                    if(ip == address):
+                                        o = False
+                                if(o):
+                                    print("Address not found in blacklist. Enter exit to cancel.")
+                                if(not o):
+                                    p = False
+                            removeFromBlackList(address)
+                            message = address + " successfully removed from blacklist."
             elif(option.lower() == "panic"):
                 currentPan = False
                 p = False

@@ -20,7 +20,7 @@ def main():
             messageArray = trueMes.split('-')
             if(messageArray[1] == "C17"):
                 address = messageArray[2]
-                os.system(f'firewall -ba ' + address)
+                os.system('firewall -ba ' + address)
             if(messageArray[1] == "H10"):
                 address = messageArray[2]
                 if(address == "172.20.241.20"):

@@ -43,10 +43,6 @@ pip install wheel
 pip install python-magic
 pip install libmagic
 pip install paramiko
-pip install socket
-pip install subprocess
-pip install random
-pip install time
 if ! [ -d /etc/eku-ccdc ]
 then
 git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc

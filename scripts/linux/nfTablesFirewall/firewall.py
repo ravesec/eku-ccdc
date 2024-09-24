@@ -427,7 +427,36 @@ def standMenu():
                     if(newOpt == "rule"):
                         pass
                     elif(newOpt == "whitelist"):
-                        pass
+                        if(len(ipList) == 0):
+                            print("No whitelisted IPs to remove.")
+                        else:
+                            p = True
+                            while(p):
+                                o = True
+                                address = input("Enter IP to remove from whitelist: ").lower()
+                                if(address == "exit"):
+                                    p = False
+                                elif(len(address.split('.')) != 4):
+                                    print("Invalid address entered. Enter exit to cancel.")
+                                for ip in ipList:
+                                    if(ip == address):
+                                        o = False
+                                if(o):
+                                    print("Address not found in whitelist. Enter exit to cancel.")
+                                else:
+                                    p = False
+                            if(address != "exit"):
+                                inputChain = getRuleList(firewall, input)
+                                outputChain = getRuleList(firewall, output)
+                                inTarget = "ip saddr " + address + " accept"
+                                outTarget = "ip daddr " + address + " accept"
+                                for rule in inputChain:
+                                    if(rule[0] == target):
+                                        os.system("nft delete rule firewall input handle " + rule[1])
+                                for rule in outputChain:
+                                    if(rule[0] == target):
+                                        os.system("nft delete rule firewall input handle " + rule[1])
+                                message = address + " successfully removed from whitelist."
                     elif(newOpt == "blacklist"):
                         blackList = getBlackList()
                         if(len(blackList) == 0):
@@ -642,7 +671,7 @@ def chainCommand(table, chain):
                 return "quit"
         else:
             printHelp()
-def getTableList():
+def getTableList(): #Returns list of table names as strings
     tableList = []
     tableOutput = subprocess.check_output(["nft", "list tables"])
     tableListRaw = tableOutput.decode("utf-8").split("\n")
@@ -651,7 +680,7 @@ def getTableList():
         tableList.append(lineList[-1])
     del(tableList[-1])
     return tableList
-def getAdvTableList(): #Returns list of objects in this format: [TableName, TableFamily]
+def getAdvTableList(): #Returns list of objects in this format: [TableName, TableFamily] with these types: [String, String]
     tableList = [[]]
     tableOutput = subprocess.check_output(["nft", "list tables"])
     tableListRaw = tableOutput.decode("utf-8").split("\n")
@@ -666,7 +695,7 @@ def getAdvTableList(): #Returns list of objects in this format: [TableName, Tabl
             tableList.append(lineTableList)
     del(tableList[0])
     return tableList
-def getChainList(table):
+def getChainList(table):    #Returns list of chains as strings
     chainList = []
     command = f"list table {table}"
     chainOutput = subprocess.check_output(["nft", command])
@@ -676,7 +705,7 @@ def getChainList(table):
         lineList = line.split(" ")
         chainList.append(lineList[1])
     return chainList
-def getRuleList(table, chain):
+def getRuleList(table, chain):  #Returns list of objects in this format: [ruleName, ruleHandle, portDefault]  with these types: [String, String, String(May be length 0 string if no default is listed]
     ruleList = [[]]
     command = f"nft -a list table {table}"
     ruleListOutput = subprocess.check_output([command], shell=True)

@@ -446,16 +446,16 @@ def standMenu():
                                 else:
                                     p = False
                             if(address != "exit"):
-                                inputChain = getRuleList(firewall, input)
-                                outputChain = getRuleList(firewall, output)
+                                inputChain = getRuleList("firewall", "input")
+                                outputChain = getRuleList("firewall", "output")
                                 inTarget = "ip saddr " + address + " accept"
                                 outTarget = "ip daddr " + address + " accept"
                                 for rule in inputChain:
-                                    if(rule[0] == target):
+                                    if(rule[0] == inTarget):
                                         os.system("nft delete rule firewall input handle " + rule[1])
                                 for rule in outputChain:
-                                    if(rule[0] == target):
-                                        os.system("nft delete rule firewall input handle " + rule[1])
+                                    if(rule[0] == outTarget):
+                                        os.system("nft delete rule firewall output handle " + rule[1])
                                 message = address + " successfully removed from whitelist."
                     elif(newOpt == "blacklist"):
                         blackList = getBlackList()

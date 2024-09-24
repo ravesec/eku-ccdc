@@ -1,4 +1,5 @@
 #!/bin/bash
+repo_root=$(git rev-parse --show-toplevel)
 echo "Enter new root password: "
 stty -echo
 read rPass
@@ -43,13 +44,9 @@ pip install wheel
 pip install python-magic
 pip install libmagic
 pip install paramiko
-if ! [ -d /etc/eku-ccdc ]
-then
-git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc
-fi
 echo "Setting up Manticore..."
 mkdir /etc/manticore
-mv /etc/eku-ccdc/scripts/linux/Manticore/* /etc/manticore
+mv $repo_root/scripts/linux/Manticore/* /etc/manticore
 mv /etc/manticore/Manticore.py /bin/manticore
 mv /etc/manticore/manticoreManager.py /bin/manticoreManager
 chmod +x /bin/manticore
@@ -109,10 +106,10 @@ python3 /etc/manticore/netListenerSetup.py "172.20.241.40"
 #echo "Setting up Debian listener..."
 #echo "Setting up Ubuntu listener..."
 echo "Setting up firewall..."
-mv /etc/eku-ccdc/scripts/linux/nfTablesFirewall/firewall.py /bin/firewall
+mv $repo_root/scripts/linux/nfTablesFirewall/firewall.py /bin/firewall
 chmod +x /bin/firewall
 echo "Defaults env_keep += \"SSH_CONNECTION SSH_CLIENT SSH_TTY\"" >> /etc/sudoers
-python3 /etc/eku-ccdc/scripts/linux/nfTablesFirewall/setup.py "splunk"
+python3 $repo_root/scripts/linux/nfTablesFirewall/setup.py "splunk"
 echo "Beginning remote setup..."
 manticore -i
 echo "Beginning GUI setup..."

@@ -30,7 +30,7 @@ def install(machine):
     else:
         os.system('echo "default" > /etc/firewall/machinePreset.flag')
     if(machine == "splunk"):
-        requiredServicesTCP = ["53", "http", "https", "8000"]
+        requiredServicesTCP = ["53", "http", "https", "8000", "8089"]
         inOnlyServicesTCP = ["1894"]
         outOnlyServicesTCP = ["1893"]
         requiredServicesUDP = ["53", "123"]
@@ -81,8 +81,6 @@ def install(machine):
         os.system("nft add rule firewall input tcp sport { "+service+" } accept")
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
-        if(service == "1893" or service == "1894"):
-            os.system("nft add rule firewall output tcp dport { "+service+" } accept")
     for service in inOnlyServicesTCP:
         os.system("nft add rule firewall input tcp dport { "+service+" } accept")
     for service in outOnlyServicesTCP:

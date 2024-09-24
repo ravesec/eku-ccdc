@@ -163,7 +163,7 @@ def main():
                 if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
                     print("Firewall integrity verified. Exiting.")
                 else:
-                    flag = str(subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True))
+                    flag = getFileCont("/etc/firewall/machinePreset.flag")
                     if(not firewallInteg):
                         print("Core firewall tables failed verification. Repairing.")
                         inPres = False
@@ -974,6 +974,10 @@ def addOtherPorts(inputArray):
         if(not value in portArray):
             portArray.append(value)
     return portArray
+def getFileCont(file):
+    command = "cat " + file
+    fileCont = str(subprocess.check_output(command, shell=True))
+    return fileCont[2:(len(fileCont)-1)]
 def NormHelp():
     return("""
 Firewall interface for linux machines using nftables. Written for use by EKU's CCDC team in practice and live environments.

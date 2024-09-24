@@ -163,7 +163,7 @@ def main():
                 if(firewallPres and firewallInteg and blacklistPres and blacklistInteg):
                     print("Firewall integrity verified. Exiting.")
                 else:
-                    flag = subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True)
+                    flag = str(subprocess.check_output("cat /etc/firewall/machinePreset.flag", shell=True))
                     if(not firewallInteg):
                         print("Core firewall tables failed verification. Repairing.")
                         inPres = False

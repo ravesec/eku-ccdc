@@ -425,7 +425,95 @@ def standMenu():
                             print("Invalid selection. (enter exit to cancel)")
                 if(e):
                     if(newOpt == "rule"):
-                        pass
+                        inList = getRuleList("firewall", "input")
+                        outList = getRuleList("firewall", "output")
+                        if(len(ports) == 0):
+                            print("No open ports to close.")
+                        else:
+                            p = True
+                            while(p):
+                                z = False
+                                c = False
+                                m = ""
+                                b = 0
+                                option = input("Enter port number to close: ").lower()
+                                if(option == "exit"):
+                                    p = False
+                                for port in ports:
+                                    portList = port.split(" ")
+                                    if(portList[1] == option):
+                                        b = b + 1
+                                        if(port in inputPorts):
+                                            m = "in"
+                                        if(port in outputPorts):
+                                            m = "out"
+                                if(b == 0):
+                                    print("Port " + option + " not open. Enter exit to cancel.")
+                                elif(b == 1):
+                                    z = True
+                                    if(m == "in"):
+                                        conf = input("Port " + option + " found open as 'In Only'. Would you like to close it? ").lower()
+                                        if(conf == 'y' or conf == 'yes'):
+                                            c = True
+                                    if(m == "out"):
+                                        conf = input("Port " + option + " found open as 'Out Only'. Would you like to close it? ").lower()
+                                        if(conf == 'y' or conf == 'yes'):
+                                            c = True
+                                elif(b == 2):
+                                    z = True
+                                    conf = input("Port " + option + " found open. Would you like to close it? ").lower()
+                                    if(conf == 'y' or conf == 'yes'):
+                                        c = True
+                                if(z):
+                                    p = False
+                            if(c):
+                                protocol = ""
+                                targetPort = option
+                                if(b == 1):
+                                    if(m == "in"):
+                                        rules = getRuleList("firewall", "input")
+                                        for port in inputPorts:
+                                            portList = port.split(" ")
+                                            if(portList[1] == targetPort):
+                                                protocol = portList[0]
+                                        queryOne = protocol + " sport " + targetPort + " accept"
+                                        queryTwo = protocol + " dport " + targetPort + " accept"
+                                        for rule in rules:
+                                            if(rule[0] == queryOne or rule[0] == queryTwo):
+                                                os.system("nft delete rule firewall input handle " + rule[1])
+                                    if(m == "out"):
+                                        rules = getRuleList("firewall", "output")
+                                        for port in outputPorts:
+                                            portList = port.split(" ")
+                                            if(portList[1] == targetPort):
+                                                protocol = portList[0]
+                                        queryOne = protocol + " sport " + targetPort + " accept"
+                                        queryTwo = protocol + " dport " + targetPort + " accept"
+                                        for rule in rules:
+                                            if(rule[0] == queryOne or rule[0] == queryTwo):
+                                                os.system("nft delete rule firewall output handle " + rule[1])
+                                elif(b == 2):
+                                    rules = getRuleList("firewall", "input")
+                                    for port in inputPorts:
+                                        portList = port.split(" ")
+                                        if(portList[1] == targetPort):
+                                            protocol = portList[0]
+                                    queryOne = protocol + " sport " + targetPort + " accept"
+                                    queryTwo = protocol + " dport " + targetPort + " accept"
+                                    for rule in rules:
+                                        if(rule[0] == queryOne or rule[0] == queryTwo):
+                                            os.system("nft delete rule firewall input handle " + rule[1])
+                                     
+                                    rules = getRuleList("firewall", "output")
+                                    for port in outputPorts:
+                                        portList = port.split(" ")
+                                        if(portList[1] == targetPort):
+                                            protocol = portList[0]
+                                    queryOne = protocol + " sport " + targetPort + " accept"
+                                    queryTwo = protocol + " dport " + targetPort + " accept"
+                                    for rule in rules:
+                                        if(rule[0] == queryOne or rule[0] == queryTwo):
+                                            os.system("nft delete rule firewall output handle " + rule[1])
                     elif(newOpt == "whitelist"):
                         if(len(ipList) == 0):
                             print("No whitelisted IPs to remove.")

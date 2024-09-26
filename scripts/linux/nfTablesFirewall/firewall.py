@@ -442,10 +442,11 @@ def standMenu():
                                 for port in ports:
                                     portList = port.split(" ")
                                     if(portList[1] == option):
-                                        b = b + 1
                                         if(port in inputPorts):
+                                            b = b + 1
                                             m = "in"
                                         if(port in outputPorts):
+                                            b = b + 1
                                             m = "out"
                                 if(b == 0):
                                     print("Port " + option + " not open. Enter exit to cancel.")

@@ -482,6 +482,7 @@ def standMenu():
                                         for rule in rules:
                                             if(rule[0] == queryOne or rule[0] == queryTwo):
                                                 os.system("nft delete rule firewall input handle " + rule[1])
+                                                message = "Port " + targetport + " successfully closed."
                                     if(m == "out"):
                                         rules = getRuleList("firewall", "output")
                                         for port in outputPorts:
@@ -493,6 +494,7 @@ def standMenu():
                                         for rule in rules:
                                             if(rule[0] == queryOne or rule[0] == queryTwo):
                                                 os.system("nft delete rule firewall output handle " + rule[1])
+                                                message = "Port " + targetport + " successfully closed."
                                 elif(b == 2):
                                     rules = getRuleList("firewall", "input")
                                     for port in inputPorts:
@@ -515,6 +517,8 @@ def standMenu():
                                     for rule in rules:
                                         if(rule[0] == queryOne or rule[0] == queryTwo):
                                             os.system("nft delete rule firewall output handle " + rule[1])
+                                    
+                                    message = "Port " + targetport + " successfully closed."
                     elif(newOpt == "whitelist"):
                         if(len(ipList) == 0):
                             print("No whitelisted IPs to remove.")

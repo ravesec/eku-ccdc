@@ -403,6 +403,7 @@ def standMenu():
                             elif(type == "both"):
                                 os.system("nft add rule firewall input tcp dport { "+service+" } accept")
                                 os.system("nft add rule firewall output tcp dport { "+service+" } accept")
+                                os.system("nft add rule firewall output tcp sport { "+service+" } accept")
                         elif(protocol == "udp"):
                             if(type == "input"):
                                 os.system("nft add rule firewall input udp dport { "+service+" } accept")
@@ -411,6 +412,7 @@ def standMenu():
                             elif(type == "both"):
                                 os.system("nft add rule firewall input udp dport { "+service+" } accept")
                                 os.system("nft add rule firewall output udp dport { "+service+" } accept")
+                                os.system("nft add rule firewall output udp sport { "+service+" } accept")
             elif(option.lower() == "delete"):
                 e = True
                 p = True

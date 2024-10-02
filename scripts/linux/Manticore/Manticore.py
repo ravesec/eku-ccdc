@@ -5,7 +5,7 @@ import subprocess
 import random
 import socket
 hosts = []
-hostList = subprocess.check_output("cat /etc/manticore/hosts.list", shell=True)
+hostList = getFileCont("/etc/manticore/hosts.list")
 hosts = hostList.split("\n")
 def main():
     arguments = []
@@ -98,4 +98,8 @@ def decrypt(message):
     decoded.append(address)
     y = '-'
     return y.join(decoded)
+def getFileCont(file):
+    command = "cat " + file
+    fileCont = str(subprocess.check_output(command, shell=True))
+    return fileCont[2:(len(fileCont)-1)]
 main ()

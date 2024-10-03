@@ -71,17 +71,17 @@ systemctl enable manager
 systemctl start manager
 cat <<EOFA > /etc/manticore/listenerSetup
 #!/bin/bash
+yum install -y python3 #Still installing/updating python3 as backup
 #Manual compile of Python 3.8 for OS versions too old for standard python3.8 install.
 yum install -y wget
 yum groupinstall -y "Development Tools"
 yum install -y openssl-devel bzip2-devel libffi-devel
 wget https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tgz -P /
-tar xzf /Python-3.8.0.tgz
-/Python-3.8.0/configure --enable-optimizations
+tar xzf Python-3.8.0.tgz
+Python-3.8.0/configure --enable-optimizations
 make altinstall
 
 yum install -y nftables 
-yum install -y python3 #Still installing/updating python3 as backup
 if ! [ -d /etc/eku-ccdc ]
 then
 git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc

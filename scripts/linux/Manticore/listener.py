@@ -2,6 +2,7 @@
 import os
 import socket
 import sys
+import random
 port = int(sys.argv[1])
 def main():
     sock = socket.create_server(("0.0.0.0", port))
@@ -15,24 +16,27 @@ def main():
             length = 0
         while(length > 0):
             message = conn.recv(4096)
-            dec = message.decode('utf-8')
-            trueMes = decrypt(dec)
-            messageArray = trueMes.split('-')
-            if(messageArray[1] == "C17"):
-                address = messageArray[2]
-                os.system('firewall -ba ' + address)
-            if(messageArray[1] == "H10"):
-                address = messageArray[2]
-                if(address == "172.20.241.20"):
-                    heartSock = socket.create_connection(("172.20.241.20", 1894))
-                    message = encrypt("H11", "0.0.0.0")
-                    heartSock.send(message.encode('utf-8'))
-                    heartSock.shutdown("SHUT_WR")
-                    heartSock.close()
-            if(messageArray[1] == "S99"):
-                address = messageArray[2]
-                hostName = getHostName(address)
-                os.system("bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh "+ hostName + " &")
+            if(len(message) == 0):
+                length = 0
+            else:
+                dec = message.decode('utf-8')
+                trueMes = decrypt(dec)
+                messageArray = trueMes.split('-')
+                if(messageArray[1] == "C17"):
+                    address = messageArray[2]
+                    os.system('firewall -ba ' + address)
+                if(messageArray[1] == "H10"):
+                    address = messageArray[2]
+                    if(address == "172.20.241.20"):
+                        heartSock = socket.create_connection(("172.20.241.20", 1894))
+                        message = encrypt("H11", "0.0.0.0")
+                        heartSock.send(message.encode('utf-8'))
+                        heartSock.shutdown(socket.SHUT_WR)
+                        heartSock.close()
+                if(messageArray[1] == "S99"):
+                    address = messageArray[2]
+                    hostName = getHostName(address)
+                    os.system("bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh "+ hostName + " &")
 def decrypt(message):
     decoded = []
     messArray = message.split('-')
@@ -91,5 +95,5 @@ def getHostName(host_addr):
             "172.20.242.10": "ubuntu",
             "172.20.241.30": "centos",
             "172.20.241.40": "ecomm"
-        }.get(host, "")
+        }.get(host_addr, "")
 main()

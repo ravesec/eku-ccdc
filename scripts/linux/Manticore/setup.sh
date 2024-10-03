@@ -96,7 +96,7 @@ Description=Manticore listener service
 Type=simple
 Restart=on-failure
 Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
-ExecStart=/bin/bash -c 'python3 manticoreListener "1893"'
+ExecStart=/bin/bash -c 'manticoreListener "1893"'
 StartLimitInterval=1s
 StartLimitBurst=999
 

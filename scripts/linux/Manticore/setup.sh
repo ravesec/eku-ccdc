@@ -81,7 +81,14 @@ tar xzf Python-3.8.0.tgz
 Python-3.8.0/configure --enable-optimizations
 make altinstall
 
-yum install -y nftables 
+yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
+yum install -y libmnl-devel libnetlink-devel
+wget https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz
+tar -xvf nftables-1.1.0.tar.xz
+nftables-1.1.0/configure
+make
+make install
+
 if ! [ -d /etc/eku-ccdc ]
 then
 git clone https://github.com/ravesec/eku-ccdc /etc/eku-ccdc

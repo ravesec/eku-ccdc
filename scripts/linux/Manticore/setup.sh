@@ -35,7 +35,6 @@ EOFA
 stty echo
 /opt/splunk/bin/splunk start
 echo "Splunk accounts reset."
-echo "Preventing password changes..."
 yum install -y nftables 
 yum install -y python3
 yum install -y pip
@@ -127,6 +126,7 @@ echo "Beginning GUI setup..."
 yum update -y
 yum groupinstall -y "Server with GUI"
 systemctl set-default graphical
+echo "Preventing password changes..."
 chattr +i /etc/passwd
 chattr +i /opt/splunk/etc/passwd
 reboot

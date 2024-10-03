@@ -20,6 +20,7 @@ def main():
             subprocess.run(scp_command, shell=True, check=True)
             print(f"Listener script copied over to {address}")
             
+            print("Installing listener on " + address)
             command = "bash /tmp/manticoreSetup"
             stdin, stdout, stderr = ssh_client.exec_command(f"echo {password} | sudo -S {command}")
             error = stderr.read().decode('utf-8')

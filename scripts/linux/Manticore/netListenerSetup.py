@@ -23,9 +23,6 @@ def main():
             print("Installing listener on " + address)
             command = "bash /tmp/manticoreSetup"
             stdin, stdout, stderr = ssh_client.exec_command(f"echo {password} | sudo -S {command}")
-            error = stderr.read().decode('utf-8')
-            if(len(error) > 0):
-                print(f"An error occured: {error}")
             time.sleep(1)
         except Exception as e:
             print(f"An error occurred: {str(e)}")

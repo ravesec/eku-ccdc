@@ -98,7 +98,7 @@ make
 make install
 
 yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
-yum install -y libmnl-devel libnetlink-devel
+yum install -y libmnl-devel libnetlink-devel gmp gmp-devel libedit libedit-devel
 wget --no-check-certificate https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz -P /
 tar -xvf nftables-1.1.0.tar.xz
 nftables-1.1.0/configure
@@ -126,6 +126,7 @@ StartLimitBurst=999
 [Install]
 WantedBy=multi-user.target
 EOFB
+ln -s /usr/local/bin/pip-3.8 /usr/bin/pip
 mv /usr/bin/python3 /usr/bin/python3OLD
 ln -s /usr/local/bin/python3.8 /usr/bin/python3
 mv /usr/bin/nft /usr/bin/nftOLD

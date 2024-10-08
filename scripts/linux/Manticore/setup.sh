@@ -81,6 +81,22 @@ tar xzf Python-3.8.0.tgz
 Python-3.8.0/configure --enable-optimizations
 make altinstall
 
+yum install -y libmnl libmnl-devel autoconf automake libtool pkgconfig bison flex
+wget --no-check-certificate https://netfilter.org/projects/libmnl/files/libmnl-1.0.5.tar.bz2 -P /
+tar -xjf libmnl-1.0.5.tar.bz2
+libmnl-1.0.5.tar.bz2/configure
+make
+make install
+cp libmnl.pc /usr/local/lib/pkgconfig/
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:\$PKG_CONFIG_PATH
+ldconfig
+
+wget --no-check-certificate https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.8.tar.xz -P /
+tar -xzf libnftnl-1.2.8.tar.xz
+libnftnl-1.2.8/configure
+make
+make install
+
 yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
 yum install -y libmnl-devel libnetlink-devel
 wget --no-check-certificate https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz -P /

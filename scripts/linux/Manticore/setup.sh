@@ -98,10 +98,13 @@ make
 make install
 
 yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
-yum install -y libmnl-devel libnetlink-devel gmp gmp-devel libedit libedit-devel
-wget --no-check-certificate https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz -P /
-tar -xvf nftables-1.1.0.tar.xz
-nftables-1.1.0/configure
+yum install -y libmnl-devel libnetlink-devel gmp gmp-devel libedit libedit-devel asciidoc
+git -c http.sslVerify=false clone https://git.netfilter.org/nftables /nftables
+#wget --no-check-certificate https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz -P /
+#tar -xvf nftables-1.1.0.tar.xz
+git checkout /nftables/v1.1.0
+/nftables/autogen.sh
+/nftables/configure
 make
 make install
 

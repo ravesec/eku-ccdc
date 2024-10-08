@@ -83,7 +83,7 @@ make altinstall
 
 yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
 yum install -y libmnl-devel libnetlink-devel
-wget https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz
+wget --no-check-certificate https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz -P /
 tar -xvf nftables-1.1.0.tar.xz
 nftables-1.1.0/configure
 make
@@ -112,6 +112,8 @@ WantedBy=multi-user.target
 EOFB
 mv /usr/bin/python3 /usr/bin/python3OLD
 ln -s /usr/local/bin/python3.8 /usr/bin/python3
+mv /usr/bin/nft /usr/bin/nftOLD
+ln -s /usr/local/bin/nft /usr/bin/nft
 systemctl enable manticore
 systemctl start manticore
 rm /tmp/manticoreSetup

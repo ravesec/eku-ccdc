@@ -5,7 +5,7 @@
 #
 # Description: A bash script that configures the firewall automatically using Palo Alto's XML API.
 #
-# Dependencies: $repo_root/config_files/ekurc, $repo_root/config_files/perms_set
+# Dependencies: ../../config_files/ekurc, ../../config_files/perms_set
 # Created: 02/12/2024
 # Usage: <./xml_api.sh>
 
@@ -29,11 +29,24 @@
 # Edit variables as required.
 host="172.20.242.150" # TODO: CHANGEME!!!
 management_subnet="172.20.242.0/24"
-team_number=0 #TODO: CHANGEME!!!
+team_number=2 #TODO: CHANGEME!!!
 user="admin"
-password="Changeme123" #TODO: CHANGEME!!!
+password="Changeme!" #TODO: CHANGEME!!!
 
-# Don't change these unless you know what you are doing
+if [ "$team_number" -eq 0 ]
+then
+#    error "Team number not set!"
+    exit 1
+fi
+
+if [ "$password" == "Changeme123" ]
+then
+#    error "Password cannot be default!"
+    exit 1
+fi
+
+
+# don't change these unless you know what you are doing
 third_octet=$((20+$team_number))
 pan_device="localhost.localdomain"
 pan_vsys="vsys1"
@@ -43,46 +56,15 @@ script_name="xml_api.sh"
 usage="./$script_name"
 
 api="https://$host/api/" # api baseurl
-job_status_poll_rate=3 # Rate (in seconds) that the script checks for the commit status
-
-# Get the path of the repository root
-repo_root=$(git rev-parse --show-toplevel)
+job_status_poll_speed=3 # Speed (in seconds) that the script checks for the commit status
 
 # Import environment variables
-. $repo_root/config_files/ekurc
+. ../../config_files/ekurc
 
-if [ "$team_number" -eq 0 ]
-then
-    error "Team number is set to 0!"
+if [ "$EUID" -ne 0 ] # Superuser requirement.
+then error "This script must be ran as root!"
     exit 1
 fi
-
-if [ "$password" == "Changeme123" ]
-then
-    error "Password cannot be default!"
-    exit 1
-fi
-
-#if [ "$EUID" -ne 0 ] # Superuser requirement.
-#then error "This script must be ran as root!"
-#    exit 1
-#fi
-
-# Safely source /etc/os-release
-read -r ID PRETTY_NAME < <(. /etc/os-release; echo $ID $PRETTY_NAME)
-
-# Throw a warning if the distribution is not Ubuntu Linux
-if [ "$ID" == "ubuntu" ]
-then
-    warn "You are running this script on $PRETTY_NAME, but it was designed to be ran on Ubuntu 20.04. This script may not work correctly!\n\nContinue anyway? (Y/n)\n"
-    read -n 1 -s yn
-
-    if [ "$yn" == "n" ]
-    then
-        exit 1
-    fi
-fi
-
 
 # Check for the correct number of arguments
 if [ "$#" -gt 0 ]
@@ -93,17 +75,8 @@ fi
 # Check repository security requirement
 check_security
 
-# If apt has not been updated in some time, update the apt cache
-current_time=$(date +%s)
-last_updated_time=$(date -r /var/cache/apt/pkgcache.bin +%s)
-time_difference=$(( ($current_time - $last_updated_time) / 60 ))
-
-if [ $time_difference -gt 240 ] # Four hours
-then
-    apt update
-fi
-
 # Install packages assuming apt is the package manager
+#apt update
 apt install -y libxml-xpath-perl libxml2-utils jq findutils curl
 
 action() { # action <action> <description> <xpath>/<cmd> <element>
@@ -111,13 +84,13 @@ action() { # action <action> <description> <xpath>/<cmd> <element>
     if [ "$1" == "set" ] || [ "$1" == "edit" ]
     then
         url_encoded_element="$(echo $4 | jq -sRr @uri)"
-        response=$(curl --location --globoff --insecure --silent --request POST --header "$header" "$api?type=config&action=$1&xpath=$3&element=$url_encoded_element")
+        response=$(curl --location --globoff --insecure --request POST --header "$header" "$api?type=config&action=$1&xpath=$3&element=$url_encoded_element")
     elif [ "$1" == "op" ]
     then
         url_encoded_cmd="$(echo $3 | jq -sRr @uri)"
-        response=$(curl --location --globoff --insecure --silent --request POST --header "$header" "https://$host/api/?type=op&cmd=$url_encoded_cmd")
+        response=$(curl --location --globoff --insecure --request POST --header "$header" "https://$host/api/?type=op&cmd=$url_encoded_cmd")
     else
-        response=$(curl --location --globoff --insecure --silent --request POST --header "$header" "$api?type=config&action=delete&xpath=$3")
+        response=$(curl --location --globoff --insecure --request POST --header "$header" "$api?type=config&action=delete&xpath=$3")
     fi
     
     response_code=$(echo $response | xmllint --xpath 'string(/response/@code)' -)
@@ -199,6 +172,9 @@ configure_interfaces() { # configure_interfaces
 }
 
 create_security_policies() { # create_security_policies
+
+#if [ -z $1 ]
+#then
     # Drop Blacklisted IPs Egress
     action "set" "Security Policy 'Block Outbound Blacklisted'" "$sec_policy_xpath[@name='deny-blacklist-egress']" "<to><member>External</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>any</member></source><destination><member>blacklist</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>any</member></application><service><member>any</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>drop</action><icmp-unreachable>yes</icmp-unreachable><description>Drop traffic with a blacklisted destination address from leaving the network perimeter.</description><log-setting>Splunk</log-setting>" &
 
@@ -222,10 +198,9 @@ create_security_policies() { # create_security_policies
 
     # External to Internal
     action "set" "Security Policy 'External to Internal'" "$sec_policy_xpath[@name='external-to-internal']" "<to><member>Internal</member></to><from><member>External</member></from><source><member>any</member></source><destination><member>internal-network-servers-nat</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>dns</member><member>icmp-ping</member><member>linux-updates</member><member>ntp</member><member>web-traffic</member><member>windows-updates</member></application><service><member>application-default</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Controls which traffic is permitted to access the internal network from the external network.</description><log-setting>Splunk</log-setting>" &
-    
+ 
     # Wait for external ingress rules to complete before moving on
     wait
-
     # Internal Servers to Splunk
     action "set" "Security Policy 'Internal Servers to Splunk'" "$sec_policy_xpath[@name='internal-servers-to-splunk']" "<to><member>Public</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member></source><destination><member>splunk</member><member>splunk-nat</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>any</member></application><service><member>splunk-indexing-service</member><member>splunk-syslog-service</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all company servers to communicate with Splunk.</description>" &
 
@@ -242,7 +217,9 @@ create_security_policies() { # create_security_policies
 
     # GUIs to Splunk
     action "set" "Security Policy 'GUIs to Splunk'" "$sec_policy_xpath[@name='guis-to-splunk']" "<to><member>Public</member></to><from><member>Internal</member><member>Public</member><member>User</member></from><source><member>all-company-servers</member></source><destination><member>splunk</member></destination><source-user><member>any</member></source-user><category><member>any</member></category><application><member>web-browsing</member></application><service><member>splunk-web-service</member></service><source-hip><member>any</member></source-hip><destination-hip><member>any</member></destination-hip><action>allow</action><description>Allow all company machines with a GUI to access the Splunk server's web UI.</description>" &
-
+#else 
+	#action "edit" 
+#fi
     wait # wait to finish the function until the actions are complete
 }
 
@@ -498,10 +475,59 @@ while [ -e "/proc/$log_forwarding_pid" ]; do sleep 0.1; done && action "edit" "I
 while [ -e "/proc/$address_groups_pid" ] || [ -e "/proc/$log_forwarding_pid" ]; do sleep 0.1; done && create_security_policies & security_policy_pid=$!
 
 # Commit Changes after security policies are made
-while [ -e "/proc/$security_policy_pid" ]; do sleep 0.1; done && commit "Finalize Stage One Changes"
+while [ -e "/proc/$security_policy_pid" ]; do sleep 0.1; done #&& commit "Finalize Stage One Changes"
+
+# DOS Protection
+# Make DoS protection profile object. 
+action "set" "DoS Protection" "$full_xpath/profiles/dos-protection/entry[@name='DoS-Protection']" "<flood><tcp-syn><red><block><duration>7200</duration></block><alarm-rate>10000</alarm-rate><activate-rate>10000</activate-rate><maximal-rate>40000</maximal-rate></red><enable>yes</enable></tcp-syn><udp><red><block><duration>7200</duration></block><maximal-rate>40000</maximal-rate><alarm-rate>10000</alarm-rate><activate-rate>10000</activate-rate></red><enable>yes</enable></udp><icmp><red><block><duration>7200</duration></block><maximal-rate>40000</maximal-rate><alarm-rate>10000</alarm-rate><activate-rate>10000</activate-rate></red><enable>yes</enable></icmp><icmpv6><red><block><duration>7200</duration></block><maximal-rate>40000</maximal-rate><alarm-rate>10000</alarm-rate><activate-rate>10000</activate-rate></red><enable>yes</enable></icmpv6><other-ip><red><block><duration>7200</duration></block><maximal-rate>40000</maximal-rate><alarm-rate>10000</alarm-rate><activate-rate>10000</activate-rate></red><enable>yes</enable></other-ip></flood><resource><sessions><enabled>yes</enabled></sessions></resource><type>classified</type>"
+
+# Create DOS Policy
+action "set" "dos" "$full_xpath/rulebase/dos/rules/entry[@name='dos']" "<from><zone><member>External</member></zone></from><to><zone><member>Internal</member><member>Public</member><member>User</member></zone></to><protection><classified><classification-criteria><address>destination-ip-only</address></classification-criteria><profile>DoS-Protection</profile></classified></protection><source><member>any</member></source><destination><member>any</member></destination><source-user><member>any</member></source-user><service><member>any</member></service><action><protect/></action>"
+
+# create anti spyware object
+action "set" "anti-spy" "$full_xpath/profiles/spyware/entry[@name='anti-spy']" '<botnet-domains><lists><entry name="default-paloalto-dns"><action><sinkhole/></action><packet-capture>disable</packet-capture></entry></lists><dns-security-categories><entry name="pan-dns-sec-adtracking"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-cc"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-ddns"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-grayware"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-malware"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-parked"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-phishing"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-proxy"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry><entry name="pan-dns-sec-recent"><log-level>default</log-level><action>default</action><packet-capture>disable</packet-capture></entry></dns-security-categories><sinkhole><ipv4-address>pan-sinkhole-default-ip</ipv4-address><ipv6-address>::1</ipv6-address></sinkhole></botnet-domains><rules><entry name="no-spy-alert"><action><alert/></action><severity><member>any</member></severity><threat-name>any</threat-name><category>any</category><packet-capture>extended-capture</packet-capture></entry><entry name="no-spy-drop"><action><drop/></action><severity><member>any</member></severity><threat-name>any</threat-name><category>any</category><packet-capture>extended-capture</packet-capture></entry></rules><threat-exception><entry name="14984"><action><default/></action></entry></threat-exception><mica-engine-spyware-enabled><entry name="HTTP Command and Control detector"><inline-policy-action>alert</inline-policy-action></entry><entry name="HTTP2 Command and Control detector"><inline-policy-action>alert</inline-policy-action></entry><entry name="SSL Command and Control detector"><inline-policy-action>alert</inline-policy-action></entry><entry name="Unknown-TCP Command and Control detector"><inline-policy-action>alert</inline-policy-action></entry><entry name="Unknown-UDP Command and Control detector"><inline-policy-action>alert</inline-policy-action></entry></mica-engine-spyware-enabled>'
+
+#DLP INJECT
+# object for DLP configuration inject
+action "set" "DLP-Object" "$full_xpath/profiles/data-objects/entry[@name='Confidential']" '<pattern-type><file-properties><pattern><entry name="Offical-Docs"><file-type>pdf</file-type><file-property>panav-rsp-pdf-dlp-keywords</file-property><property-value>Confidential</property-value></entry><entry name="Office-Docs"><file-type>docx</file-type><file-property>panav-rsp-office-dlp-keywords</file-property><property-value>office</property-value></entry></pattern></file-properties></pattern-type>'
+
+# Data filtering  profile for DLP inject 
+action "set" "DLP-Profile" "$full_xpath/profiles/data-filtering/entry[@name='outbound-dlp-for-offical-docs']" '<rules><entry name="rule0"><application><member>any</member></application><file-type><member>xlsx</member><member>xls</member><member>pptx</member><member>ppt</member><member>docx</member><member>doc</member><member>pdf</member></file-type><direction>both</direction><alert-threshold>1</alert-threshold><block-threshold>1</block-threshold><data-object>Confidential</data-object><log-severity>critical</log-severity></entry></rules><data-capture>yes</data-capture>'
+
+# BIG BOY IPS
+action "set" "Big-Boy IPS" "$full_xpath/profiles/vulnerability/entry[@name='IPS']" '<rules><entry name="alert"><action><alert/></action><vendor-id><member>any</member></vendor-id><severity><member>any</member></severity><cve><member>any</member></cve><threat-name>any</threat-name><host>any</host><category>any</category><packet-capture>extended-capture</packet-capture></entry><entry name="drop"><action><drop/></action><vendor-id><member>any</member></vendor-id><severity><member>any</member></severity><cve><member>any</member></cve><threat-name>any</threat-name><host>any</host><category>any</category><packet-capture>extended-capture</packet-capture></entry></rules><threat-exception><entry name="93031"><action><default/></action></entry></threat-exception><mica-engine-vulnerability-enabled><entry name="SQL Injection"><inline-policy-action>alert</inline-policy-action></entry><entry name="Command Injection"><inline-policy-action>alert</inline-policy-action></entry></mica-engine-vulnerability-enabled>'
+
+# url filtering base
+action "set" "Url filter" "$full_xpath/profiles/url-filtering/entry[@name='url-filter']" '<credential-enforcement><mode><disabled/></mode><log-severity>medium</log-severity><block><member>abortion</member><member>abused-drugs</member><member>adult</member><member>alcohol-and-tobacco</member><member>command-and-control</member><member>dating</member><member>extremism</member><member>games</member><member>grayware</member><member>hacking</member><member>high-risk</member><member>insufficient-content</member><member>nudity</member><member>phishing</member><member>sex-education</member><member>social-networking</member><member>swimsuits-and-intimate-apparel</member><member>weapons</member></block></credential-enforcement><log-http-hdr-xff>yes</log-http-hdr-xff><log-http-hdr-user-agent>yes</log-http-hdr-user-agent><log-http-hdr-referer>yes</log-http-hdr-referer><block><member>abortion</member><member>abused-drugs</member><member>adult</member><member>alcohol-and-tobacco</member><member>command-and-control</member><member>dating</member><member>extremism</member><member>games</member><member>grayware</member><member>hacking</member><member>high-risk</member><member>insufficient-content</member><member>nudity</member><member>phishing</member><member>sex-education</member><member>social-networking</member><member>swimsuits-and-intimate-apparel</member><member>weapons</member></block>'
+
 
 # Clear All Sessions
-action "op" "Clear All Sessions" "<clear><session><all/></session></clear>"
+action "op" "Clear All Sessions" "<clear><session><all/></session></<log-http-hdr-xff>yes</log-http-hdr-xff>
+  <log-http-hdr-user-agent>yes</log-http-hdr-user-agent>
+  <log-http-hdr-referer>yes</log-http-hdr-referer>
+  <block>
+    <member>abortion</member>
+    <member>abused-drugs</member>
+    <member>adult</member>
+    <member>alcohol-and-tobacco</member>
+    <member>command-and-control</member>
+    <member>dating</member>
+    <member>extremism</member>
+    <member>games</member>
+    <member>grayware</member>
+    <member>hacking</member>
+    <member>high-risk</member>
+    <member>insufficient-content</member>
+    <member>nudity</member>
+    <member>phishing</member>
+    <member>sex-education</member>
+    <member>social-networking</member>
+    <member>swimsuits-and-intimate-apparel</member>
+    <member>weapons</member>
+  </block>clear>"
+
+#Final commit
+commit "Final Commit"
 
 # Kill All Admin Sessions
 action "op" "Delete Admin Sessions" "<delete><admin-sessions></admin-sessions></delete>"
@@ -510,7 +536,7 @@ action "op" "Delete Admin Sessions" "<delete><admin-sessions></admin-sessions></
 
 # After content update download, install content updates
 
-# Firewall configured!
+# Firewall configured!cmd="set"
 success "Script complete!"
 
 exit 0 # Script ended successfully

@@ -65,13 +65,13 @@ if (!$currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Admin
 if($Force.IsPresent)
 {
     $env:updatedThisSession = $false
-    Set-ItemProperty -Path "HKCU\Environment" v updatedWithoutRestart /f 2>$null
+    reg delete HKCU\Environment /v updatedWithoutRestart /f | Out-Null
 } 
-elseif($env:updatedWithoutRestart -eq $true -or $env:updatedThisSession -eq $true)
+elseif($env:updatedWithoutRestart -or $env:updatedThisSession)
 {
     Write-Warning "You have updated without restart! Updates must take effect before rerunning script."
     Write-Host "If you have restarted and this is a false positive, rerun this script with -Force."
-    Exit 0
+    Exit 1
 }
 
 # Creating a log file to note changes made to the system
@@ -167,9 +167,9 @@ if(!$Force.IsPresent)
             }
         default
             {
-                Write-Warning "Could not detect compatible Windows Version, and therefore .NET version.`nThis script is intended for Windows Server 2012/Windows 10 and later, and .NET 4.8 and later."
-                Write-Host "To avoid this check, rerun this script with -Force."
-                Exit 0
+                Write-Warning "Could not detect compatible Windows Version, and therefore .NET version.`nThis script has only been tested on Windows Server 2012/Windows 10 and later, and .NET 4.8 and later."
+                Write-Host "If you would like to run this script anyway (not recommended), rerun with -Force."
+                Exit 1
             }
     }
 
@@ -179,11 +179,12 @@ if(!$Force.IsPresent)
         Write-Warning ".NET Framework is not 4.8 or above!"
         $updateNet = Read-Host "Would you like to update now? (Y/n)"
 
-        if($updateNet -ieq "n*")
+        if($updateNet -ilike "n*")
         {
             Write-Warning "Script requires .NET 4.8+, exiting..."
+            Write-Host "If you would like to run this script anyway (not recommended), rerun with -Force."
             Write-Log "Script requires .NET 4.8+, exiting..."
-            Exit 0
+            Exit 1
         }
 
         $update = $true
@@ -206,39 +207,38 @@ if(!$Force.IsPresent)
     ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
     ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
     ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-    <#
 
     if($PSVersionTable.PSVersion.Major -ge "7" -and $PSVersionTable.PSVersion.Minor -ge "4")
     {
         Write-Host "WMF is up-to-date, 7.4.x"
     }
-    elseif(Test-Path "$env:ProgramFiles\Powershell\7")
-    {
-        Write-Host "WMF is up-to-date, found pwsh.exe"
-    }
     elseif($PSVersionTable.PSVersion.Major -ge "5" -and $PSVersionTable.PSVersion.Minor -ge "1")
     {
-        Write-Host "WMF is up-to-date, 5.1.x."
-        $updateWmf = Read-Host "Would you like to optionally install 7.4.1? (Y/n)"
-        if($updateWmf -ieq "n*")
+        Write-Host "WMF is up-to-date, 5.1.x"
+        if(!(Test-Path "$env:ProgramFiles\Powershell\7"))
         {
-            Write-Host "No problemo"
-            $updateWmf = $false
-        }
-        else
-        {
-            $updateWmf = $true
-            $wmfLink = "https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/PowerShell-7.4.1-win-x64.msi"
+            $updateWmf = Read-Host "Would you like to optionally install 7.4.1? (Y/n)"
+            if($updateWmf -ilike "n*")
+            {
+                Write-Host "No problemo"
+                $updateWmf = $false
+            }
+            else
+            {
+                $updateWmf = $true
+                $wmfLink = "https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/PowerShell-7.4.1-win-x64.msi"
+            }
         }
     }
     else
     {
         Write-Warning "Powershell is not up-to-date!"
         $updateWmf = Read-Host "Would you like to update now to 5.1? (Y/n)"
-        if($updateWmf -ieq "n*")
+        if($updateWmf -ilike "n*")
         {
             Write-Warning "Powershell 5.1 and later is required for this script!"
-            Exit 0
+            Write-Host "If you would like to run this script anyway (not recommended), rerun with -Force."
+            Exit 1
         }
         else
         {
@@ -252,7 +252,6 @@ if(!$Force.IsPresent)
 
     }
     
-    #>
     ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
     ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
     ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
@@ -260,16 +259,16 @@ if(!$Force.IsPresent)
     if($update)
     {
         $restart = Read-Host "`nNecessary updates complete. Restart now? (y/N)"
-        if($restart -ieq "y")
+        if($restart -ilike "y*")
         {
-            Remove-Item delete HKCU\Environment /v updatedWithoutRestart /f
+            reg delete HKCU\Environment /v updatedWithoutRestart /f
             $env:updatedThisSession = $null
             Restart-Computer
         }
         else
         {
             Write-Warning "Restart is required for updates to take effect."
-            Exit 0
+            Exit 1
         }
     }
 }
@@ -309,7 +308,7 @@ try {
     DO
     {
         Write-Host "`n---Main Menu---"
-        Write-Host "1. First Run"
+        Write-Host "1. Scripted Changes"
         Write-Host "2. Firewall"
         if($activeDirectoryRunning)
         {
@@ -331,14 +330,48 @@ try {
             "1"
                 {
                     Write-Host "General Windows Hardening will now commence..."
+                    Write-Warning "This will make several modifications to your HKLM registry hive and default Windows settings`nIt is strongly recommended you review these before proceeding, and comment out those unnecessary or potentially harmful."
+                    Write-Host "A backup of your HKLM will be stored in $env:HOMEDRIVE\WindowsHardeningCLI\RegistryBackups."
                     Read-Host "(ENTER to start or CTRL+C to cancel)"
 
                     Write-Log "General Windows hardening begins!"
+                    
+                    Write-Log "Attempting to establish a registry backup..."
+                    mkdir -ErrorAction SilentlyContinue $env:HOMEDRIVE\WindowsHardeningCLI\RegistryBackups | Out-Null
+                    $curTime = Get-Date -Format "yyyyMMdd_HHmmss"
+                    $regFile = "$env:HOMEDRIVE\WindowsHardeningCLI\RegistryBackups\backup_$curTime.reg"
+                    $continueHardening = $false
+
+                    reg export HKLM $regFile /y | Out-Null
+                    
+                    if($LASTEXITCODE -eq "0")
+                    {
+                        Write-Host "HKLM registry sucessfully backed up at $regFile"
+                        Write-Log "HKLM registry successfully backed up at $regFile"
+                        $continueHardening = $true
+                    }
+                    else
+                    {
+                        Write-Warning "HKLM backup failed!"
+                        $confirmHardening = Read-Host "Continue without a backup? (Not recommended) (y/N):"
+                        if($confirmHardening -ilike "y*")
+                        {
+                            $continueHardening = $true
+                        }
+                    }
+
+                    if(!$continueHardening)
+                    {
+                        Break
+                    }
+
+                    #### MAKE CHANGES BELOW IF NECESSARY ####
+                    #### MAKE CHANGES BELOW IF NECESSARY ####
+                    #### MAKE CHANGES BELOW IF NECESSARY ####
 
                     # Disable RDP
                     Write-Log "Disabling RDP..." 
-                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 1 /f 
-                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp" /v UserAuthentication /t REG_DWORD /d 0 /f 
+                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server" /v fDenyTSConnections /t REG_DWORD /d 1 /f
 
                     # Disable DNS Multicast
                     Write-Log "Disabling DNS Multicast..."
@@ -353,7 +386,7 @@ try {
                     reg add "HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters" /v SMB1 /t REG_DWORD /d 0 /f
 
                     # Enables UAC and Virtualization
-                    Write-Log "Enabling UAC..."
+                    Write-Log "Enabling UAC and Virtualization..."
                     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableLUA /t REG_DWORD /d 1 /f
                     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v EnableVirtualization /t REG_DWORD /d 1 /f
                     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System" /v ConsentPromptBehaviorAdmin /t REG_DWORD /d 2 /f
@@ -439,6 +472,10 @@ try {
                     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SealSecureChannel /t REG_DWORD /d 1 /f
                     reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SignSecureChannel /t REG_DWORD /d 1 /f
 
+                    #### MAKE CHANGES ABOVE IF NECESSARY ####
+                    #### MAKE CHANGES ABOVE IF NECESSARY ####
+                    #### MAKE CHANGES ABOVE IF NECESSARY ####
+
                     Write-Log "General Windows Hardening ends!"
                 }
             "2" 
@@ -518,7 +555,7 @@ try {
                         }
 
                         Write-Host -ForegroundColor Blue "`n---Active Directory---"
-                        Write-Host "1. Change default password for all users"
+                        Write-Host "1. Scramble default password for all users"
                         Write-Host "2. Deprivilege all users besides current administrator"
                         Write-Host "3. Main menu"
                         $adchoice = Read-Host "`nYour selection"
@@ -640,7 +677,7 @@ try {
                                     $webClient.Dispose()
                                     [System.Console]::Clear()
                                     $restart = Read-Host "`nUpdates from CSV complete. Restart now? (y/N)"
-                                    if($restart -ieq "y")
+                                    if($restart -ilike "y*")
                                     {
                                         Restart-Computer
                                     }
@@ -747,7 +784,7 @@ try {
                                     Write-Host "Sysinternals"
                                     if(Test-Path $env:HOMEDRIVE\Windows\SysInternalsSuite)
                                     {
-                                        $switchdirSysinternals = Read-Host "Sysinternals installed at $env:HOMEDRIVE\Windows\Sysinternals. Switch directories now?"
+                                        $switchdirSysinternals = Read-Host "Sysinternals installed at $env:HOMEDRIVE\Windows\Sysinternals. Switch directories now? (y/N)"
                                         if($switchdirSysinternals -like "y*")
                                         {
                                             Set-Location "$env:HOMEDRIVE\Windows\Sysinternals"
@@ -859,14 +896,7 @@ try {
                     mkdir -ErrorAction SilentlyContinue $env:HOMEDRIVE\WindowsHardeningCLI\Inventory | Out-Null
 
                     $ipv6 = Read-Host "Are you all using IPv6? (y/N)" 
-                    if($ipv6 -inotlike "y*")
-                    {
-                        $ipv6 = $false
-                    }
-                    else
-                    {
-                        $ipv6 = $true
-                    }
+                    $ipv6 = $ipv6 -ilike "y*"
 
                     Write-Log "Inventory being stored in $env:HOMEDRIVE\WindowsHardeningCLI\Inventory\inventory.$i.txt" 
 
@@ -875,8 +905,9 @@ try {
                     Invoke-Command -ScriptBlock {
                         Write-Output "`n<!-- Inventory --!>"
                         Write-Output "`n--Operating System Information--`n"
-                        Write-Output "`tOS: $((Get-WmiObject Win32_OperatingSystem).Caption)`n"
-                        Write-Output "`tOS Version: $((Get-WmiObject Win32_OperatingSystem).Version)`n"
+                        $osInfo = Get-CimInstance Win32_OperatingSystem
+                        Write-Output "`tOS: $($osInfo.Caption)`n"
+                        Write-Output "`tOS Version: $($osInfo.Version)`n"
                         Write-Output "`tWMF Version: $($PSVersionTable.PSVersion)`n"
                     
                         $netframeworks = Get-ChildItem 'HKLM:\SOFTWARE\Microsoft\NET Framework Setup\NDP' -Recurse | Get-ItemProperty -Name Version -EA 0 | Where-Object { $_.PSChildName -Match '^(?!S)\p{L}'} | Select-Object PSChildName, Version
@@ -909,13 +940,13 @@ try {
                         {
                             $tcpconnections =  Get-NetTCPConnection | Where-Object { $_.State -eq 'Listen' } | Sort-Object LocalPort, LocalAddress
                             $udpconnections = Get-NetUDPEndpoint | Where-Object { $_.LocalPort -lt '49152' } | Sort-Object LocalPort, LocalAddress
-                            $udpephermeral = Get-NetUDPEndpoint | Where-Object { $_.LocalPort -ge '49152' } | Sort-Object LocalPort, LocalAddress
+                            $udpephemeral  = Get-NetUDPEndpoint | Where-Object { $_.LocalPort -ge '49152' } | Sort-Object LocalPort, LocalAddress
                         }
                         else
                         {
                             $tcpconnections =  Get-NetTCPConnection | Where-Object { $_.LocalAddress -notlike '*:*' -and $_.State -eq 'Listen' } | Sort-Object LocalPort, LocalAddress
                             $udpconnections = Get-NetUDPEndpoint | Where-Object { $_.LocalAddress -notlike '*:*' -and $_.LocalPort -lt '49152' } | Sort-Object LocalPort, LocalAddress
-                            $udpephermeral = Get-NetUDPEndpoint | Where-Object { $_.LocalAddress -notlike '*:*' -and $_.LocalPort -ge '49152' } | Sort-Object LocalPort, LocalAddress
+                            $udpephemeral  = Get-NetUDPEndpoint | Where-Object { $_.LocalAddress -notlike '*:*' -and $_.LocalPort -ge '49152' } | Sort-Object LocalPort, LocalAddress
                         }
                     
                         foreach($tcpconnection in $tcpconnections)
@@ -946,7 +977,7 @@ try {
                         $portsopen = ($connections | Select-Object -Unique LocalPort).Count
                     
                         Write-Output "`nTotal unique open ports: $($portsopen)"
-                        Write-Output "`nEphermeral UDP ports open: $($udpephermeral.Count)`n"
+                        Write-Output "`nEphemeral  UDP ports open: $($udpephemeral.Count)`n"
                     
                         Write-Output "For a list of potential vulnerabilities, visit https://www.cvedetails.com."
                         Write-Output "If searching via vendor, all Windows operating systems are under Microsoft."
@@ -958,7 +989,7 @@ try {
                 }
             "7"
                 {
-                    Write-Host "`nGoodbye"
+                    Write-Host "`nGoodbye`n"
                     $try = $true
                     Break
                 }

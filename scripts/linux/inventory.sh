@@ -58,8 +58,9 @@ done
 # Get list of services that are running on the system
 tservices=$(netstat -lntp4 | tail -n +3 | grep "LISTEN" | wc -l)
 uservices=$(netstat -lnup4 | tail -n +3 | wc -l)
+sservices=$(systemctl list-unit-files)
 echo "Service Info"
-echo "Services Running: $(expr $tservices + $uservices)"
+echo "Services Running: $(expr $tservices + $uservices + $sservices)"
 echo ""
 
 # Print the services table

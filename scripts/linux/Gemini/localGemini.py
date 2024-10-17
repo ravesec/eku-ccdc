@@ -15,10 +15,11 @@ suspiciousServices = ["system(x)"]
 #Note: variable entries can occur anywhere in the name
 def main():
     while True:
+        entryList = getServiceList()
         for service in suspiciousServices:
             entries = processEntry(service)
             for entry in entries:
-                if(serviceExists(entry)):
+                if(entry in entryList):
                     #ENTER REPORTING CODE HERE
                     
         if(len(getFileCont("/etc/crontab")) != 0):
@@ -71,14 +72,11 @@ def processEntry(service):
             y = False
         num = num + 1
     return returnList
-def serviceExists(service):
+def getServiceList():
     try:
         output = subprocess.run(["systemctl", "list-unit-files"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-        if(service in output.stdout):
-            return True
-        else:
-            return False
+        return output.stdout
     except subprocess.CalledProcessError as e:
         print("An error occured: " + e.stderr)
-        return False
+        return ""
 main()

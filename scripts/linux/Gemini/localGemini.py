@@ -31,17 +31,17 @@ def processEntry(service):
             if(x):
                 if(character == "x"):
                     serviceSplitFront = service[:num-1]
-                    serviceSplitEnd = service[num+1:]
+                    serviceSplitEnd = service[num+2:]
                     for letter in lowerLetter:
                         returnList.append(serviceSplitFront + letter + serviceSplitEnd)
                 if(character == "X"):
                     serviceSplitFront = service[:num-1]
-                    serviceSplitEnd = service[num+1:]
+                    serviceSplitEnd = service[num+2:]
                     for letter in upperLetter:
                         returnList.append(serviceSplitFront + letter + serviceSplitEnd)
                 if(character == "n"):
                     serviceSplitFront = service[:num-1]
-                    serviceSplitEnd = service[num+1:]
+                    serviceSplitEnd = service[num+2:]
                     for number in numbers:
                         returnList.append(serviceSplitFront + number + serviceSplitEnd)
                 y = True
@@ -50,3 +50,5 @@ def processEntry(service):
         else:   
             y = False
         num = num + 1
+    return returnList
+main()

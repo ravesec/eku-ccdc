@@ -28,12 +28,12 @@ def main():
         passwdContent = getFileCont("/etc/passwd")
         passwdLine = passwdContent.split("\n")
         for line in passwdLine:
-        userInfo = line.split(":")
-        username = userInfo[0]
-        uid = userInfo[2]
-        gid = userInfo[3]
-        if(uid > 1001 or gid > 1001 and username != "nobody"):
-            #ENTER REPORTING CODE HERE
+            userInfo = line.split(":")
+            username = userInfo[0]
+            uid = int(userInfo[2])
+            gid = int(userInfo[3])
+            if(uid > 1001 or gid > 1001 and username != "nobody"):
+                #ENTER REPORTING CODE HERE
             
             
         time.sleep(60)

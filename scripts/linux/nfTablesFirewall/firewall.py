@@ -6,7 +6,7 @@ import argparse
 from datetime import datetime
 
 def main():
-    if(len(sys.argv) == 3):
+    if(len(sys.argv) == 3 and (sys.argv[1] == '-ba' or sys.argv[1] == 'br')):
         if(sys.argv[1] == '-ba'):
             print(addToBlackList(sys.argv[2]))
         elif(sys.argv[1] == '-br'):
@@ -201,7 +201,7 @@ def main():
                             os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
                         print("Blacklist tables repaired.")
         elif(len(sys.argv) == 3 and sys.argv[1] == '-s'):
-            if(os.path.exists('/etc/firewall/configs/' + sys.argv[2] + '.config'):
+            if(os.path.exists('/etc/firewall/configs/' + sys.argv[2] + '.config')):
                 print("Config named " + sys.argv[2] + " already exists.")
             else:
                 saveConfig(sys.argv[2])
@@ -1105,17 +1105,18 @@ def addOtherPorts(inputArray):
             portArray.append(value)
     return portArray
 def saveConfig(saveName):
-    listofChains = []
     chainList = getChainList("firewall")
     blacklistAddresses = getBlackList()
     blacklistStr = '??'.join(blacklistAddresses) #Joins into format: "['(address)', '(handle)']??['(address)', '(handle)']??['(address)', '(handle)']?? ........"
     saveContent = blacklistStr
     saveContent = saveContent + "\nxxxxx\n" + "firewall"
     for chain in chainList:
+        listofChain = []
         listofChain.append(getRuleList("firewall", chain))
-        for rule in listofChain:
-            if(len(rule) == 3):
-                del(rule[2])
+        for ruleChain in listofChain:
+            for rule in ruleChain:
+                if(len(rule) == 3):
+                    del(rule[2])
         chainStr = chain + '??'.join(listofChain) #Joins into format: "['(rule)', '(handle)']??['(rule)', '(handle)']??['(rule)', '(handle)']?? ........"
         saveContent = saveContent + "\nxxxxx\n" + chainStr
     os.system('echo "' + saveContent + '" >> /etc/firewall/configs/' + saveName + '.config')

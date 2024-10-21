@@ -24,6 +24,7 @@ def main():
             install("default")
 def install(machine):
     os.system("mkdir /etc/firewall")
+    os.system("mkdir /etc/firewall/configs")
     os.system("touch /etc/firewall/machinePreset.flag")
     if(machine in ["centos", "splunk", "fedora", "ubuntu", "debian"]):
         os.system('echo "' + machine + '" > /etc/firewall/machinePreset.flag')

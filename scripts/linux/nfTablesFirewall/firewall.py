@@ -200,6 +200,11 @@ def main():
                         if(not outPres):
                             os.system("nft add chain blacklist blockOut \{ type filter hook output priority -99 \; policy accept\; \}")
                         print("Blacklist tables repaired.")
+        elif(len(sys.argv) == 3 and sys.argv[1] == '-s'):
+            if(os.path.exists('/etc/firewall/configs/' + sys.argv[2] + '.config'):
+                print("Config named " + sys.argv[2] + " already exists.")
+            else:
+                saveConfig(sys.argv[2])
         else:
             if(standMenu()):
                 return
@@ -1099,6 +1104,21 @@ def addOtherPorts(inputArray):
         if(not value in portArray):
             portArray.append(value)
     return portArray
+def saveConfig(saveName):
+    listofChains = []
+    chainList = getChainList("firewall")
+    blacklistAddresses = getBlackList()
+    blacklistStr = '??'.join(blacklistAddresses) #Joins into format: "['(address)', '(handle)']??['(address)', '(handle)']??['(address)', '(handle)']?? ........"
+    saveContent = blacklistStr
+    saveContent = saveContent + "\nxxxxx\n" + "firewall"
+    for chain in chainList:
+        listofChain.append(getRuleList("firewall", chain))
+        for rule in listofChain:
+            if(len(rule) == 3):
+                del(rule[2])
+        chainStr = chain + '??'.join(listofChain) #Joins into format: "['(rule)', '(handle)']??['(rule)', '(handle)']??['(rule)', '(handle)']?? ........"
+        saveContent = saveContent + "\nxxxxx\n" + chainStr
+    os.system('echo "' + saveContent + '" >> /etc/firewall/configs/' + saveName + '.config')
 def getFileCont(file):
     command = "cat " + file
     fileCont = str(subprocess.check_output(command, shell=True))

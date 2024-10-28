@@ -205,6 +205,11 @@ def main():
                 print("Config named " + sys.argv[2] + " already exists.")
             else:
                 saveConfig(sys.argv[2])
+        elif(len(sys.argv) == 3 and sys.argv[1] == '-l'):
+            if(os.path.exists('/etc/firewall/configs/' + sys.argv[2] + '.config')):
+                loadConfig(sys.argv[2])
+            else:
+                print("No config named " + sys.argv[2] + " found."
         else:
             if(standMenu()):
                 return

@@ -1131,6 +1131,25 @@ def saveConfig(saveName):
         saveContent = saveContent + "\nxxxxx\n" + chainStr
     os.system('echo "' + saveContent + '" >> /etc/firewall/configs/' + saveName + '.config')
 def loadConfig(saveName):
+    tableList = getTableList()
+    firewallPres = False
+    for table in tableList:
+        if(table == "firewall"):
+            firewallPres = True
+    if(not firewallPres):
+        os.system("nft add table firewall")
+    chainList = getChainList("firewall")
+    inPres = False
+    outPres = False
+    for chain in chainList:
+        if(chain == "input"):
+            inPres = True
+        if(chain == "output"):
+            outPres = True
+    if(not inPres):
+        os.system("nft add chain firewall input \{ type filter hook input priority 0 \; policy drop\; \}")
+    if(not outPres):
+        os.system("nft add chain firewall output \{ type filter hook output priority 0 \; policy drop\; \}")
     os.system("nft flush chain firewall input")
     os.system("nft flush chain firewall output")
     configContents = getFileCont("/etc/firewall/configs/" + saveName + ".config")

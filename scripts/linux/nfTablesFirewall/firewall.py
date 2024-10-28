@@ -1112,17 +1112,45 @@ def saveConfig(saveName):
         blacklistStr = blacklistStr + str(address) + "??" #Joins into format: "['(address)', '(handle)']??['(address)', '(handle)']??['(address)', '(handle)']?? ........"
     blacklistStr = blacklistStr[:len(blacklistStr)-2]
     saveContent = blacklistStr
-    saveContent = saveContent + "\nxxxxx\n" + "firewall"
     for chain in chainList:
+        chainStr = chain + "\n"
         listofChain = []
         listofChain.append(getRuleList("firewall", chain))
         for ruleChain in listofChain:
             for rule in ruleChain:
                 if(len(rule) == 3):
                     del(rule[2])
-        chainStr = chain + '??'.join(listofChain) #Joins into format: "['(rule)', '(handle)']??['(rule)', '(handle)']??['(rule)', '(handle)']?? ........"
+        for rule in listofChain:
+            chainStr = chainStr + str(rule) + "??" #Joins into format: "['(rule)', '(handle)']??['(rule)', '(handle)']??['(rule)', '(handle)']?? ........"
+        chainStr = chainStr[:len(chainStr)-2]
         saveContent = saveContent + "\nxxxxx\n" + chainStr
     os.system('echo "' + saveContent + '" >> /etc/firewall/configs/' + saveName + '.config')
+def loadConfig(saveName):
+    os.system("nft flush chain firewall input")
+    os.system("nft flush chain firewall output")
+    configContents = getFileCont("/etc/firewall/configs/" + saveName + ".config")
+    configList = configContents.split("\nxxxxx\n")
+    blacklist = configList[0]
+    blacklistList = blacklist.split("??")
+    for entry in blacklistList:
+        entry = entry[2:len(entry)-2]
+        entryList = entry.split("', '")
+        blacklistIP = entryList[0]
+        blacklistHandle = entryList[1]
+        os.system("nft insert rule blacklist blockIn [position " + blacklistHandle + "] ip saddr " + blacklistIP + " drop")
+        os.system("nft insert rule blacklist blockOut [position " + blacklistHandle + "] ip daddr " + blacklistIP + " drop")
+    del(configList[0])
+    for chain in configList:
+        chainSplit = chain.split("\n")
+        chainName = chainSplit[0]
+        chainRules = chainSplit[1]
+        chainRules = chainRules[3:len(chainRules)-3]
+        chainRuleList = chainRules.split("'], ['")
+        for rule in chainRuleList:
+            ruleSplit = rule.split("', '")
+            ruleName = ruleSplit[0]
+            ruleHandle = ruleSplit[1]
+            os.system("nft insert rule firewall " + chain + "[position " + ruleHandle + "] " + ruleName)
 def getFileCont(file):
     command = "cat " + file
     fileCont = str(subprocess.check_output(command, shell=True))

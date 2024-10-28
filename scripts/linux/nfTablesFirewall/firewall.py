@@ -1160,9 +1160,9 @@ def loadConfig(saveName):
         entry = entry[2:len(entry)-2]
         entryList = entry.split("', '")
         blacklistIP = entryList[0]
-        blacklistHandle = entryList[1]
-        os.system("nft insert rule blacklist blockIn [position " + blacklistHandle + "] ip saddr " + blacklistIP + " drop")
-        os.system("nft insert rule blacklist blockOut [position " + blacklistHandle + "] ip daddr " + blacklistIP + " drop")
+        blacklistHandle = entryList[1] + 1
+        os.system("nft insert rule blacklist blockIn \[position " + blacklistHandle + "\] ip saddr " + blacklistIP + " drop")
+        os.system("nft insert rule blacklist blockOut \[position " + blacklistHandle + "\] ip daddr " + blacklistIP + " drop")
     del(configList[0])
     for chain in configList:
         chainSplit = chain.split("\n")
@@ -1173,8 +1173,8 @@ def loadConfig(saveName):
         for rule in chainRuleList:
             ruleSplit = rule.split("', '")
             ruleName = ruleSplit[0]
-            ruleHandle = ruleSplit[1]
-            os.system("nft insert rule firewall " + chain + "[position " + ruleHandle + "] " + ruleName)
+            ruleHandle = ruleSplit[1] + 1
+            os.system("nft insert rule firewall " + chain + "\[position " + ruleHandle + "\] " + ruleName)
 def getFileCont(file):
     command = "cat " + file
     fileCont = str(subprocess.check_output(command, shell=True))

@@ -209,7 +209,7 @@ def main():
             if(os.path.exists('/etc/firewall/configs/' + sys.argv[2] + '.config')):
                 loadConfig(sys.argv[2])
             else:
-                print("No config named " + sys.argv[2] + " found."
+                print("No config named " + sys.argv[2] + " found.")
         else:
             if(standMenu()):
                 return
@@ -530,7 +530,7 @@ def standMenu():
                                         if(rule[0] == queryOne or rule[0] == queryTwo):
                                             os.system("nft delete rule firewall output handle " + rule[1])
                                     
-                                    message = "Port " + targetport + " successfully closed."
+                                    message = "Port " + targetPort + " successfully closed."
                     elif(newOpt == "whitelist"):
                         if(len(ipList) == 0):
                             print("No whitelisted IPs to remove.")

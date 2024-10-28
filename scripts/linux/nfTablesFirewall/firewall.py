@@ -1107,7 +1107,10 @@ def addOtherPorts(inputArray):
 def saveConfig(saveName):
     chainList = getChainList("firewall")
     blacklistAddresses = getBlackList()
-    blacklistStr = '??'.join(blacklistAddresses) #Joins into format: "['(address)', '(handle)']??['(address)', '(handle)']??['(address)', '(handle)']?? ........"
+    blacklistStr = ""
+    for address in blacklistAddresses:
+        blacklistStr = blacklistStr + str(address) + "??" #Joins into format: "['(address)', '(handle)']??['(address)', '(handle)']??['(address)', '(handle)']?? ........"
+    blacklistStr = blacklistStr[:len(blacklistStr)-2]
     saveContent = blacklistStr
     saveContent = saveContent + "\nxxxxx\n" + "firewall"
     for chain in chainList:

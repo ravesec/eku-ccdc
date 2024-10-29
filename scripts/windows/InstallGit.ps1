@@ -8,11 +8,31 @@ $webClient = (New-Object System.Net.WebClient)
 $installerHyperlink = "https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.2/Git-2.47.0.2-64-bit.exe"
 
 # Downloading the installer into the user's temp directory
-$webClient.DownloadFile($installerHyperlink,"$env:temp\Git-2.47.0.2-64-bit.exe")
+try
+{
+    Write-Host "Downloading installer..."
+    $webClient.DownloadFile($installerHyperlink, "$env:temp\Git-installer.exe")
+}
+catch
+{
+    Write-Error "Failed to download installer: $_"
+    Exit 1
+}
 
 # Installing git with no user interaction and no restarts, then removing the installer
-Start-Process -FilePath "$env:temp\Git-2.47.0.2-64-bit.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
-Remove-Item "$env:temp\Git-2.47.0.2-64-bit.exe"
+Write-Host "Installing git..."
+try
+{
+    Start-Process -FilePath "$env:temp\Git-installer.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
+}
+catch
+{
+    Write-Error "Installation failed: $_"
+    Remove-Item -ErrorAction SilentlyContinue "$env:temp\Git-installer.exe" -Force
+    Exit 1
+}
+
+Remove-Item -ErrorAction SilentlyContinue "$env:temp\Git-installer.exe" -Force
 
 # Initializing variables to check the git installation
 $userSpecific = $false
@@ -21,17 +41,18 @@ $systemWidex86 = $false
 $noPathNoLocation = $false
 
 # Check where the install has placed itself
-if(Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
+if
+(Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
 {
     $userSpecific = $true
     Write-Host "Git has been installed as user-specific"
-}
-elseif(Test-Path "C:\Program Files\Git")
+} 
+elseif (Test-Path "C:\Program Files\Git")
 {
     $systemWide = $true
     Write-Host "Git has been installed system-wide"
 }
-elseif(Test-Path "C:\Program Files (x86)\Git")
+elseif (Test-Path "C:\Program Files (x86)\Git")
 {
     $systemWidex86 = $true
     Write-Host "Git has been installed system-wide (x86)"
@@ -42,28 +63,29 @@ else
 }
 
 # Test if git is in the path
+$ErrorActionPreference = "SilentlyContinue"
 git --version
 
-if($?)
+if ($?)
 {
     Write-Host "Git is in the `$PATH"
 }
 else
 {
-    if($userSpecific)
+    if ($userSpecific)
     {
         Write-Host "Adding Git to `$PATH..."
-        [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";$env:USERPROFILE\AppData\Local\Programs\Git\cmd", [System.EnvironmentVariableTarget]::User)
+        [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$env:USERPROFILE\AppData\Local\Programs\Git\cmd", [System.EnvironmentVariableTarget]::User)
     }
-    elseif($systemWide)
+    elseif ($systemWide)
     {
         Write-Host "Adding Git to `$PATH..."
-        [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
+        [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$env:ProgramFiles\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
     }
-    elseif($systemWidex86)
+    elseif ($systemWidex86)
     {
         Write-Host "Adding Git to `$PATH..."
-        [System.Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files (x86)\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
+        [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$(${env:ProgramFiles(x86)})\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
     }
     else
     {
@@ -72,24 +94,27 @@ else
     }
 }
 
-if($noPathNoLocation)
+# Either git installed somewhere unnatural or it failed and it didn't catch
+if ($noPathNoLocation)
 {
-    Write-Host "I have no idea what happened"
+    Write-Host "Achievement Get: `"How Did We Get Here?`""
+    Exit 1
 }
-else
+
+# Configure name and email
+$configConfirm = Read-Host "Would you like to configure your global username and email? (Y/N)"
+if ($configConfirm -ilike "Y*")
 {
-    $configConfirm = "Would you like to configure your global username and email? (Y/N)"
-    if($configConfirm -ilike "Y*")
+    $name = Read-Host "Enter your username"
+    if ($null -ne $name)
     {
-        $name = Read-Host "Enter your username"
-        if($null -ne $name)
-        {
-            git config --global user.name $name
-        }
-        $email = Read-Host "Enter your email"
-        if($null -ne $email)
-        {
-            git config --global user.email $email
-        }
+        git config --global user.name $name
+        Write-Host "Git username configured to: $name"
+    }
+    $email = Read-Host "Enter your email"
+    if ($null -ne $email)
+    {
+        git config --global user.email $email
+        Write-Host "Git email configured to: $email"
     }
 }

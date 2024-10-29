@@ -2,8 +2,6 @@ import os
 import sys
 
 requiredServicesTCP = []
-inOnlyServicesTCP = []
-outOnlyServicesTCP = []
 requiredServicesUDP = []
 inOnlyServicesUDP = []
 outOnlyServicesUDP = []
@@ -31,9 +29,7 @@ def install(machine):
     else:
         os.system('echo "default" > /etc/firewall/machinePreset.flag')
     if(machine == "splunk"):
-        requiredServicesTCP = ["53", "http", "https", "8000", "8089"]
-        inOnlyServicesTCP = ["1894"]
-        outOnlyServicesTCP = ["1893"]
+        requiredServicesTCP = ["53", "http", "https", "8000", "8089", "1893", "1894", "1973"]
         requiredServicesUDP = ["53", "123"]
         inOnlyServicesUDP = []
         outOnlyServicesUDP = []
@@ -41,9 +37,7 @@ def install(machine):
         inOnlyIPs = []
         outOnlyIPs = []
     elif(machine == "centos"):
-        requiredServicesTCP = ["53", "http", "https"]
-        inOnlyServicesTCP = ["1893"]
-        outOnlyServicesTCP = ["1894"]
+        requiredServicesTCP = ["53", "http", "https", "1893", "1894", "1973"]
         requiredServicesUDP = ["53", "123"]
         inOnlyServicesUDP = []
         outOnlyServicesUDP = []
@@ -51,9 +45,7 @@ def install(machine):
         inOnlyIPs = []
         outOnlyIPs = []
     elif(machine == "fedora"):
-        requiredServicesTCP = ["53", "http", "https", "25", "110"]
-        inOnlyServicesTCP = ["1893"]
-        outOnlyServicesTCP = ["1894"]
+        requiredServicesTCP = ["53", "http", "https", "25", "110", "1893", "1894", "1973"]
         requiredServicesUDP = ["53", "123"]
         inOnlyServicesUDP = []
         outOnlyServicesUDP = []
@@ -62,8 +54,6 @@ def install(machine):
         outOnlyIPs = []
     else:
         requiredServicesTCP = ["53", "http", "https"] #ports/services allowed to freely talk both ways
-        inOnlyServicesTCP = [] #ports/services only allowed to recieve traffic, not send
-        outOnlyServicesTCP = [] #ports/services only allowed to send traffic, not recieve
         requiredServicesUDP = ["53"] #ports/services allowed to freely talk both ways
         inOnlyServicesUDP = [] #ports/services only allowed to recieve traffic, not send
         outOnlyServicesUDP = [] #ports/services only allowed to send traffic, not recieve
@@ -82,10 +72,6 @@ def install(machine):
         os.system("nft add rule firewall input tcp sport { "+service+" } accept")
         os.system("nft add rule firewall output tcp dport { "+service+" } accept")
         os.system("nft add rule firewall output tcp sport { "+service+" } accept")
-    for service in inOnlyServicesTCP:
-        os.system("nft add rule firewall input tcp dport { "+service+" } accept")
-    for service in outOnlyServicesTCP:
-        os.system("nft add rule firewall output tcp dport { "+service+" } accept")
     for service in requiredServicesUDP:
         os.system("nft add rule firewall input udp dport { "+service+" } accept")
         os.system("nft add rule firewall input udp sport { "+service+" } accept")

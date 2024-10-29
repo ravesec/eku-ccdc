@@ -7,6 +7,7 @@ lowerLetter = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", 
 upperLetter = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
+whiteListUsers = ["root", "sysadmin", "sshd", "sync", "_apt", "nobody"]
 revShellFlags = ["/bin/nc", "import pty", "pty.spawn"]
 suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe"]
 serviceOverride = ["systemd"]
@@ -37,12 +38,13 @@ def main():
             
         passwdContent = getFileCont("/etc/passwd")
         passwdLine = passwdContent.split("\n")
+        del(passwdLine[len(passwdLine)-1])
         for line in passwdLine:
             userInfo = line.split(":")
             username = userInfo[0]
             uid = int(userInfo[2])
             gid = int(userInfo[3])
-            if(uid > 1001 or gid > 1001 and username != "nobody"):
+            if((uid > 999 or gid > 999) and username not in whiteListUsers):
                 #ENTER REPORTING CODE HERE
 
         for flag in revShellFlags:
@@ -76,8 +78,9 @@ def main():
         time.sleep(60)
 def getFileCont(file):
     command = "cat " + file
-    fileCont = str(subprocess.check_output(command, shell=True))
-    return fileCont[2:(len(fileCont)-1)]
+    fileCont = subprocess.check_output(command, shell=True)
+    fileDecode = fileCont.decode("utf-8")
+    return fileDecode
 def processEntry(service):
     returnList = [service]
     num = 0

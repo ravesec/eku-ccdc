@@ -8,7 +8,8 @@ upperLetter = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", 
 numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 revShellFlags = ["/bin/nc", "import pty", "pty.spawn"]
-suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe"] 
+suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe"]
+serviceOverride = ["systemd"]
 suspiciousFileNames = ["shell.php", "template.php"]
 #Possible entry formats:
 #"[service name]" - Searches directly for the service name entered
@@ -26,7 +27,7 @@ def main():
         for service in suspiciousServices:
             entries = processEntry(service)
             for entry in entries:
-                if(entry in entryList):
+                if(entry in entryList and entry not in serviceOverride):
                     #ENTER REPORTING CODE HERE
         
         crontabFileCont = getFileCont("/etc/crontab")

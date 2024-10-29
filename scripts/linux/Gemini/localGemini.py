@@ -10,7 +10,7 @@ lowerLetter = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", 
 upperLetter = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
-suspiciousServices = ["system(x)"] 
+suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe"] 
 #Possible entry formats:
 #"[service name]" - Searches directly for the service name entered
 #"[serviceName(x)]" - Searches for the listed name, along with any variation of the service name where 'x' is a lowercase letter

@@ -25,8 +25,9 @@ def main():
             for entry in entries:
                 if(entry in entryList):
                     #ENTER REPORTING CODE HERE
-                    
-        if(len(getFileCont("/etc/crontab")) != 0):
+        
+        crontabFileCont = getFileCont("/etc/crontab")
+        if(len(crontabFileCont) != 0):
             os.system('echo "" >> /etc/crontab')
             #ENTER REPORTING CODE HERE
             

@@ -9,6 +9,7 @@ numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
 revShellFlags = ["/bin/nc", "import pty", "pty.spawn"]
 suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe"] 
+suspiciousFileNames = ["shell.php", "template.php"]
 #Possible entry formats:
 #"[service name]" - Searches directly for the service name entered
 #"[serviceName(x)]" - Searches for the listed name, along with any variation of the service name where 'x' is a lowercase letter
@@ -20,6 +21,8 @@ def main():
         entryList = getServiceList()
         processList = getProcessList()
         loginList = getLoginList()
+        prestashopDirectory = findFiles("/var/www/")
+        
         for service in suspiciousServices:
             entries = processEntry(service)
             for entry in entries:
@@ -64,7 +67,11 @@ def main():
             if(remoteLogin):
                 #ENTER REPORTING CODE HERE
             
-        
+        for targetFile in suspiciousFileNames:
+            for file in prestashopDirectory:
+                if(targetFile in file):
+                    #ENTER REPORTING CODE HERE
+                
         time.sleep(60)
 def getFileCont(file):
     command = "cat " + file
@@ -116,4 +123,11 @@ def getLoginList():
     loginDecode = loginOutput.decode("utf-8").split("\n")
     del(loginDecode[len(loginDecode)-1])
     return loginDecode
+def findFiles(origin):
+    fileList = []
+    for root, dirs, files in os.walk(origin):
+        for file in files:
+            path = os.path.join(root, file)
+            fileList.append(path)
+    return fileList
 main()

@@ -78,9 +78,12 @@ def main():
         time.sleep(60)
 def getFileCont(file):
     command = "cat " + file
-    fileCont = subprocess.check_output(command, shell=True)
-    fileDecode = fileCont.decode("utf-8")
-    return fileDecode
+    try:
+        fileCont = subprocess.check_output(command, shell=True)
+        fileDecode = fileCont.decode("utf-8")
+        return fileDecode
+    except subprocess.CalledProcessError as e:
+        return ""
 def processEntry(service):
     returnList = [service]
     num = 0
@@ -119,14 +122,20 @@ def getServiceList():
         print("An error occured: " + e.stderr)
         return ""
 def getProcessList():
-    processOutput = subprocess.check_output(["ps", "-ef"])
-    processLines = processOutput.decode("utf-8").split("\n")
-    return processLines
+    try:
+        processOutput = subprocess.check_output(["ps", "-ef"])
+        processLines = processOutput.decode("utf-8").split("\n")
+        return processLines
+    except subprocess.CalledProcessError as e:
+        return []
 def getLoginList():
-    loginOutput = subprocess.check_output(["who"])
-    loginDecode = loginOutput.decode("utf-8").split("\n")
-    del(loginDecode[len(loginDecode)-1])
-    return loginDecode
+    try:
+        loginOutput = subprocess.check_output(["who"])
+        loginDecode = loginOutput.decode("utf-8").split("\n")
+        del(loginDecode[len(loginDecode)-1])
+        return loginDecode
+    except subprocess.CalledProcessError as e:
+        return []
 def findFiles(origin):
     fileList = []
     for root, dirs, files in os.walk(origin):

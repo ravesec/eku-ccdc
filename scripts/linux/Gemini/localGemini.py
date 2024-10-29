@@ -16,7 +16,7 @@ suspiciousFileNames = ["shell.php", "template.php"]
 #"[serviceName(x)]" - Searches for the listed name, along with any variation of the service name where 'x' is a lowercase letter
 #"[serviceName(X)]" - Searches for the listed name, along with any variation of the service name where 'x' is an uppercase letter
 #"[serviceName(n)]" - Searches for the listed name, along with any variation of the service name where 'n' is a number 0-9
-#Note: variable entries can occur anywhere in the name, but only in one 
+#Note: variable entries can occur anywhere in the name, but only in one place
 def main():
     while True:
         entryList = getServiceList()

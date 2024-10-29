@@ -6,10 +6,12 @@
 import os
 import subprocess
 import time
+import socket
 lowerLetter = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
 upperLetter = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
 numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
+revShellFlags = ["/bin/nc", "import pty", "pty.spawn"]
 suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe"] 
 #Possible entry formats:
 #"[service name]" - Searches directly for the service name entered
@@ -20,6 +22,8 @@ suspiciousServices = ["system(x)", "discord.exe", "snapchat.exe", "minecraft.exe
 def main():
     while True:
         entryList = getServiceList()
+        processList = getProcessList()
+        loginList = getLoginList()
         for service in suspiciousServices:
             entries = processEntry(service)
             for entry in entries:
@@ -39,8 +43,28 @@ def main():
             gid = int(userInfo[3])
             if(uid > 1001 or gid > 1001 and username != "nobody"):
                 #ENTER REPORTING CODE HERE
+
+        for flag in revShellFlags:
+            for process in processList:
+                if(flag in process):
+                    #ENTER REPORTING CODE HERE
+                    
+        for line in loginList:
+            remoteLogin = False
+            loginSplit = line.split(" ")
+            for item in loginSplit:
+                if(item == ''):
+                    loginSplit.remove('')
+            user = loginSplit[0]
+            interface = loginSplit[1]
+            dateTime = loginSplit[2] + loginSplit[3]
+            if(len(loginSplit) == 5):
+                remoteLogin = True
+                remoteAddress = loginSplit[4]
+            if(remoteLogin):
+                #ENTER REPORTING CODE HERE
             
-            
+        
         time.sleep(60)
 def getFileCont(file):
     command = "cat " + file
@@ -83,4 +107,13 @@ def getServiceList():
     except subprocess.CalledProcessError as e:
         print("An error occured: " + e.stderr)
         return ""
+def getProcessList():
+    processOutput = subprocess.check_output(["ps", "-ef"])
+    processLines = ps_output.decode("utf-8").split("\n")
+    return processLines
+def getLoginList():
+    loginOutput = subprocess.check_output(["who"])
+    loginDecode = loginOutput.decode("utf-8").split("\n")
+    del(loginDecode[len(loginDecode)-1])
+    return loginDecode
 main()

@@ -1,5 +1,25 @@
 #Requires -Version 3.0
 
+<#
+
+.SYNOPSIS
+This is a PowerShell script to install Git for Windows with installer-selected defaults and minimal user interaction
+Git will install system-wide if:
+    You are in a PowerShell instance that is running as Administrator
+    You are running as a non-Administator but allow the installer access to the system via UAC
+Git will install only for the current user if:
+    You do not or cannot (due to permissions) allow the installer access to the system via UAC
+RUN AT OWN RISK
+
+.NOTES
+Author: Logan Jackson
+Date: 10/29/2024
+
+.LINK
+Github: https://github.com/c-u-r-s-e
+
+#>
+
 # Setting up the web client and TLS version
 $webClient = (New-Object System.Net.WebClient)
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
@@ -41,18 +61,17 @@ $systemWidex86 = $false
 $noPathNoLocation = $false
 
 # Check where the install has placed itself
-if
-(Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
+if (Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
 {
     $userSpecific = $true
     Write-Host "Git has been installed as user-specific"
 } 
-elseif (Test-Path "C:\Program Files\Git")
+elseif (Test-Path "$env:ProgramFiles\Git")
 {
     $systemWide = $true
     Write-Host "Git has been installed system-wide"
 }
-elseif (Test-Path "C:\Program Files (x86)\Git")
+elseif (Test-Path "$(${env:ProgramFiles(x86)})\Git")
 {
     $systemWidex86 = $true
     Write-Host "Git has been installed system-wide (x86)"
@@ -64,7 +83,7 @@ else
 
 # Test if git is in the path
 $ErrorActionPreference = "SilentlyContinue"
-git --version
+git --version > $null
 
 if ($?)
 {
@@ -72,6 +91,7 @@ if ($?)
 }
 else
 {
+    Write-Warning "Git is not in the `$PATH"
     if ($userSpecific)
     {
         Write-Host "Adding Git to `$PATH..."
@@ -90,16 +110,27 @@ else
     else
     {
         $noPathNoLocation = $true
-        Write-Warning "Git could not be located and is not in the `$PATH"
+    }
+    if ($PATH -ilike "*git*")
+    {
+        Write-Host "Sucessfully added Git to path"
+        Write-Warning "Note: must restart PowerShell instance due to manual add"
+    }
+    else
+    {
+        Write-Host "Git was not successfully added to path"
     }
 }
 
-# Either git installed somewhere unnatural or it failed and it didn't catch
+# Achievement Get: "How Did We Get Here?"
 if ($noPathNoLocation)
 {
-    Write-Host "Achievement Get: `"How Did We Get Here?`""
+    Write-Warning "Either git installed in an unnatural location, or the installation failed and was not caught"
     Exit 1
 }
+
+# At this point, git has been fully installed
+Write-Host "Successfully installed $(git --version)"
 
 # Configure name and email
 $configConfirm = Read-Host "Would you like to configure your global username and email? (Y/N)"

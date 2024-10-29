@@ -1,3 +1,7 @@
+# Flags to add:
+# If "who" command has IP present or pts/* - Remote Login Detected
+# If "ps-ef" command returns a process involving /bin/nc(or any derivatives) - Poss remote shell detected
+#   - If a python3 process is running with a pty import, throw "Reverse shell detected", instead of poss shell
 #!/usr/bin/env python3
 import os
 import subprocess
@@ -12,7 +16,7 @@ suspiciousServices = ["system(x)"]
 #"[serviceName(x)]" - Searches for the listed name, along with any variation of the service name where 'x' is a lowercase letter
 #"[serviceName(X)]" - Searches for the listed name, along with any variation of the service name where 'x' is an uppercase letter
 #"[serviceName(n)]" - Searches for the listed name, along with any variation of the service name where 'n' is a number 0-9
-#Note: variable entries can occur anywhere in the name
+#Note: variable entries can occur anywhere in the name, but only in one 
 def main():
     while True:
         entryList = getServiceList()

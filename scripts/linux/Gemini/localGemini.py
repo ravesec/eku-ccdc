@@ -48,12 +48,15 @@ def main():
         for line in loginList:
             remoteLogin = False
             loginSplit = line.split(" ")
-            for item in loginSplit:
-                if(item == ''):
-                    loginSplit.remove('')
+            x = 0
+            while(x < len(loginSplit)):
+                if(loginSplit[x] == ''):
+                    del(loginSplit[x])
+                else:
+                    x = x + 1
             user = loginSplit[0]
             interface = loginSplit[1]
-            dateTime = loginSplit[2] + loginSplit[3]
+            dateTime = loginSplit[2] + " " + loginSplit[3]
             if(len(loginSplit) == 5):
                 remoteLogin = True
                 remoteAddress = loginSplit[4]
@@ -105,7 +108,7 @@ def getServiceList():
         return ""
 def getProcessList():
     processOutput = subprocess.check_output(["ps", "-ef"])
-    processLines = ps_output.decode("utf-8").split("\n")
+    processLines = processOutput.decode("utf-8").split("\n")
     return processLines
 def getLoginList():
     loginOutput = subprocess.check_output(["who"])

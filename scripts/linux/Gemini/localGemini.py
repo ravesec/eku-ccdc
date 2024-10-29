@@ -1,7 +1,3 @@
-# Flags to add:
-# If "who" command has IP present or pts/* - Remote Login Detected
-# If "ps-ef" command returns a process involving /bin/nc(or any derivatives) - Poss remote shell detected
-#   - If a python3 process is running with a pty import, throw "Reverse shell detected", instead of poss shell
 #!/usr/bin/env python3
 import os
 import subprocess

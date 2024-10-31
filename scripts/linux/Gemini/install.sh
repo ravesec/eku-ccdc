@@ -22,6 +22,8 @@ StartLimitBurst=999
 WantedBy=multi-user.target
 EOFA
 systemctl daemon-reload
-systemctl enable gemini
-systemctl start gemini
+echo "Gemini installed, but has not started. Please edit the file located at /etc/gemini/monitor.py and make changes to the settings as needed before starting."
+echo "Once settings have been changed, start Gemini by running these two commands:"
+echo "systemctl enable gemini.service"
+echo "systemctl start gemini.service"
 rm $0

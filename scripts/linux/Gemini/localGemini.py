@@ -43,7 +43,7 @@ def main():
         crontabFileCont = getFileCont("/etc/crontab")
         if(len(crontabFileCont) != 0 and crontabFileCont != "\n"):
             os.system('echo "" > /etc/crontab')
-            log = '[' + time.ctime() + '] - Changes were detected in /etc/crontab and removed: ' + crontabFileCont
+            log = '[' + time.ctime() + '] - Changes were detected in /etc/crontab and removed: ' + crontabFileCont[:len(crontabFileCont)-1]
             os.system('echo "' + log + '" >> /var/log/gemini.log')
             
         passwdContent = getFileCont("/etc/passwd")

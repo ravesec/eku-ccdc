@@ -5,7 +5,7 @@ Description=Gemini system integrity service
 Type=simple
 Restart=on-failure
 Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
-ExecStart=/bin/bash -c ''
+ExecStart=/bin/bash -c '/etc/gemini/monitor.py'
 StartLimitInterval=1s
 StartLimitBurst=999
 

@@ -19,6 +19,8 @@ suspiciousFileNames = ["shell.php", "template.php"]
 #"[serviceName(n)]" - Searches for the listed name, along with any variation of the service name where 'n' is a number 0-9
 #Note: variable entries can occur anywhere in the name, but only in one place
 def main():
+    if(not os.path.exists("/var/log/gemini.log")
+    os.system("touch /var/log/gemini.log")
     while True:
         entryList = getServiceList()
         processList = getProcessList()
@@ -29,12 +31,20 @@ def main():
             entries = processEntry(service)
             for entry in entries:
                 if(entry in entryList and entry not in serviceOverride):
-                    #ENTER REPORTING CODE HERE
+                    os.system("systemctl stop " + entry)
+                    os.system("systemctl disable " + entry)
+                    os.system("rm /etc/systemd/system/" + entry)
+                    os.system("rm /usr/lib/systemd/system/" + entry)
+                    os.system("systemctl daemon-reload")
+                    os.system("systemctl reset-failed")
+                    log = '[' + time.ctime() + '] - A suspicious service was found and removed: ' + entry
+                    os.system('echo "' + log + '" >> /var/log/gemini.log')
         
         crontabFileCont = getFileCont("/etc/crontab")
         if(len(crontabFileCont) != 0):
             os.system('echo "" >> /etc/crontab')
-            #ENTER REPORTING CODE HERE
+            log = '[' + time.ctime() + '] - Changes were detected in /etc/crontab and removed: ' + crontabFileCont
+            os.system('echo "' + log + '" >> /var/log/gemini.log')
             
         passwdContent = getFileCont("/etc/passwd")
         passwdLine = passwdContent.split("\n")
@@ -45,7 +55,9 @@ def main():
             uid = int(userInfo[2])
             gid = int(userInfo[3])
             if((uid > 999 or gid > 999) and username not in whiteListUsers):
-                #ENTER REPORTING CODE HERE
+                os.system("userdel -f " + username)
+                log = '[' + time.ctime() + '] - An unknown user with UID/GID above 999 was found and removed: ' + username
+                os.system('echo "' + log + '" >> /var/log/gemini.log')
 
         for flag in revShellFlags:
             for process in processList:
@@ -73,7 +85,9 @@ def main():
         for targetFile in suspiciousFileNames:
             for file in prestashopDirectory:
                 if(targetFile in file):
-                    #ENTER REPORTING CODE HERE
+                    os.system("rm " + file)
+                    log = '[' + time.ctime() + '] - A suspicious file was found in /var/www/ and was removed: ' + file
+                    os.system('echo "' + log + '" >> /var/log/gemini.log')
                 
         time.sleep(60)
 def getFileCont(file):

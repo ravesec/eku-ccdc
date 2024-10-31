@@ -19,8 +19,8 @@ suspiciousFileNames = ["shell.php", "template.php"]
 #"[serviceName(n)]" - Searches for the listed name, along with any variation of the service name where 'n' is a number 0-9
 #Note: variable entries can occur anywhere in the name, but only in one place
 def main():
-    if(not os.path.exists("/var/log/gemini.log")
-    os.system("touch /var/log/gemini.log")
+    if(not os.path.exists("/var/log/gemini.log")):
+        os.system("touch /var/log/gemini.log")
     while True:
         entryList = getServiceList()
         processList = getProcessList()

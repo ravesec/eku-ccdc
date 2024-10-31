@@ -11,10 +11,9 @@ Git will install system-wide if:
     You are running as a non-Administator but allow the installer access to the system via UAC
 Git will install only for the current user if:
     You cannot (due to permissions) allow the installer access to the system via UAC
+    You run this script with the `-UserInstall` parameter (it will still prompt UAC if you have permission to elevate)
 Git will cancel the installation if:
-    You have permission to allow the installer access to the system via UAC and you choose not to
-
-To avoid cancelling in this last instance, run this script with the parameter '-UserInstall'
+    You have permission to allow the installer access to the system via UAC yet choose not to
 
 RUN AT OWN RISK
 
@@ -25,7 +24,8 @@ iex "(& {$(irm https://raw.githubusercontent.com/ravesec/eku-ccdc/main/scripts/w
 iex "(& {$(irm https://raw.githubusercontent.com/ravesec/eku-ccdc/main/scripts/windows/Install-Git.ps1)} arg -UserInstall)"
 
 .PARAMETER UserInstall
-Forces git to install user-specifically instead of system wide when you have permission to allow it to
+This changes the directory of the installation to the AppData\Local\Programs of the current user.
+This in turn forces git to install user-specifically instead of system wide when the user has permission to allow it to.
 
 .NOTES
 Author: Logan Jackson
@@ -43,7 +43,7 @@ param(
 # Function to exit script without closing the entire PowerShell instance before user even has a chance to read what went wrong
 function Exit-Script
 {
-    Read-Host "`nScript has terminated. Press (Enter) to exit."
+    Read-Host "`nScript has terminated. Press (Enter) to exit"
     Exit 1
 }
 
@@ -62,6 +62,8 @@ try
 }
 catch
 {
+    Start-Sleep 2
+    Clear-Host
     Write-Error "Failed to download installer: $($_)"
     Exit-Script
 }
@@ -79,6 +81,8 @@ try
 }
 catch
 {
+    Start-Sleep 2
+    Clear-Host
     Write-Error "Installation failed: $($_)"
     Remove-Item -ErrorAction SilentlyContinue "$env:TEMP\Git-installer.exe" -Force
     Exit-Script
@@ -93,12 +97,7 @@ $systemWidex86 = $false
 $noPathNoLocation = $false
 
 # Check where the install has placed itself
-if (Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
-{
-    $userSpecific = $true
-    Write-Host "Git has been installed as user-specific"
-} 
-elseif (Test-Path "$env:ProgramFiles\Git")
+if (Test-Path "$env:ProgramFiles\Git")
 {
     $systemWide = $true
     Write-Host "Git has been installed system-wide"
@@ -108,6 +107,11 @@ elseif (Test-Path "$(${env:ProgramFiles(x86)})\Git")
     $systemWidex86 = $true
     Write-Host "Git has been installed system-wide (x86)"
 }
+elseif (Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
+{
+    $userSpecific = $true
+    Write-Host "Git has been installed as user-specific"
+} 
 else
 {
     Write-Warning "Could not locate where Git was installed"
@@ -157,7 +161,9 @@ else
 # Achievement Get: "How Did We Get Here?"
 if ($noPathNoLocation)
 {
-    Write-Warning "Either git installed in an unnatural location without adding itself to `$PATH or the installation failed and was not caught"
+    Start-Sleep 2
+    Clear-Host
+    Write-Warning "Either git installed in an unnatural location without adding itself to `$PATH or the installation failed due to lack of UAC access and was not caught"
     Exit-Script
 }
 
@@ -166,10 +172,10 @@ if ($noPathNoLocation)
 Write-Host "`nSuccessfully installed $(git --version)"
 
 # Configure name and email
-$configConfirm = Read-Host "`nWould you like to configure your global user.name and user.email? This overwrites your current .gitconfig if present (Y/N)"
+$configConfirm = Read-Host "`nWould you like to configure your global user.name and user.email?`nWARNING: This overwrites your current .gitconfig if present (Y/N)"
 if ($configConfirm -ilike "Y*")
 {
     $name = Read-Host "Enter your user.name"
     $email = Read-Host "Enter your user.email"
-    "[user]`n`tname = $name`n`temail = $email`n" > $env:USERPROFILE\.gitconfig
+    Set-Content -Path "$env:USERPROFILE\.gitconfig" -Value "[user]`n    name = $name`n    email = $email" -Force
 }

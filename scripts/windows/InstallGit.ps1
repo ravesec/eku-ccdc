@@ -3,13 +3,23 @@
 <#
 
 .SYNOPSIS
-This is a PowerShell script to install Git for Windows with installer-selected defaults and minimal user interaction
+This is a PowerShell script to install the latest 64-bit Git for Windows with installer-selected defaults and minimal user interaction.
+
+.DESCRIPTION
 Git will install system-wide if:
     You are in a PowerShell instance that is running as Administrator
     You are running as a non-Administator but allow the installer access to the system via UAC
 Git will install only for the current user if:
-    You do not or cannot (due to permissions) allow the installer access to the system via UAC
+    You cannot (due to permissions) allow the installer access to the system via UAC
+Git will cancel the installation if:
+    You have permission to allow the installer access to the system via UAC and you choose not to
+
+To avoid cancelling in this last instance, run this script with the parameter 'User'
+
 RUN AT OWN RISK
+
+.PARAMETER User
+Forces git to install user-specifically instead of system wide when you have permission to allow it to
 
 .NOTES
 Author: Logan Jackson
@@ -20,22 +30,26 @@ Github: https://github.com/c-u-r-s-e
 
 #>
 
+param(
+    [switch]User
+)
+
+# Fetching the latest git for windows 64-bit installer
+$installerHyperLink = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" | % assets | Where-Object browser_download_url -like "*64-bit.exe" | Select-Object -ExpandProperty browser_download_url
+
 # Setting up the web client and TLS version
 $webClient = (New-Object System.Net.WebClient)
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
-
-# CHANGE ME TO NEWEST VERSION IF AVALIABLE (or don't, its up to you)
-$installerHyperlink = "https://github.com/git-for-windows/git/releases/download/v2.47.0.windows.2/Git-2.47.0.2-64-bit.exe"
 
 # Downloading the installer into the user's temp directory
 try
 {
     Write-Host "Downloading installer..."
-    $webClient.DownloadFile($installerHyperlink, "$env:temp\Git-installer.exe")
+    $webClient.DownloadFile($installerHyperlink, "$env:TEMP\Git-installer.exe")
 }
 catch
 {
-    Write-Error "Failed to download installer: $_"
+    Write-Error "Failed to download installer: $($_)"
     Exit 1
 }
 
@@ -43,16 +57,21 @@ catch
 Write-Host "Installing git..."
 try
 {
-    Start-Process -FilePath "$env:temp\Git-installer.exe" -ArgumentList "/VERYSILENT", "/NORESTART" -Wait
+    $installArgs = "/VERYSILENT", "/NORESTART"
+    if ($User)
+    {
+        $installArgs += "/DIR=$env:USERPROFILE\AppData\Local\Programs\Git"
+    }
+    Start-Process -FilePath "$env:TEMP\Git-installer.exe" -ArgumentList $installArgs -Wait
 }
 catch
 {
-    Write-Error "Installation failed: $_"
-    Remove-Item -ErrorAction SilentlyContinue "$env:temp\Git-installer.exe" -Force
+    Write-Error "Installation failed: $($_)"
+    Remove-Item -ErrorAction SilentlyContinue "$env:TEMP\Git-installer.exe" -Force
     Exit 1
 }
 
-Remove-Item -ErrorAction SilentlyContinue "$env:temp\Git-installer.exe" -Force
+Remove-Item -ErrorAction SilentlyContinue "$env:TEMP\Git-installer.exe" -Force
 
 # Initializing variables to check the git installation
 $userSpecific = $false
@@ -78,7 +97,7 @@ elseif (Test-Path "$(${env:ProgramFiles(x86)})\Git")
 }
 else
 {
-    Write-Host "Could not locate where Git was installed"
+    Write-Warning "Could not locate where Git was installed"
 }
 
 # Test if git is in the path
@@ -118,7 +137,7 @@ else
     }
     else
     {
-        Write-Host "Git was not successfully added to path"
+        Write-Warning "Git was not successfully added to path"
     }
 }
 

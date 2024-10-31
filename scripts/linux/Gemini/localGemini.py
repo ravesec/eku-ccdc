@@ -33,19 +33,22 @@ def main():
                 if(entry in entryList and entry not in serviceOverride):
                     os.system("systemctl stop " + entry)
                     os.system("systemctl disable " + entry)
-                    os.system("rm /etc/systemd/system/" + entry)
-                    os.system("rm /usr/lib/systemd/system/" + entry)
+                    os.system("mkdir /.quarantine/Q-S-" + entry)
+                    os.system("mv /etc/systemd/system/" + entry + " /.quarantine/Q-S-" + entry)
+                    os.system("rm /usr/lib/systemd/system/" + entry + " /.quarantine/Q-S-" + entry)
                     os.system("systemctl daemon-reload")
                     os.system("systemctl reset-failed")
-                    log = '[' + time.ctime() + '] - A suspicious service was found and removed: ' + entry
+                    log = '[' + time.ctime() + '] - A suspicious service was found and quarintined: ' + entry
                     os.system('echo "' + log + '" >> /var/log/gemini.log')
         
+        #POSS QUARANTINE CHANGE
         crontabFileCont = getFileCont("/etc/crontab")
         if(len(crontabFileCont) != 0 and crontabFileCont != "\n"):
             os.system('echo "" > /etc/crontab')
             log = '[' + time.ctime() + '] - Changes were detected in /etc/crontab and removed: ' + crontabFileCont[:len(crontabFileCont)-1]
             os.system('echo "' + log + '" >> /var/log/gemini.log')
             
+        #POSS QUARANTINE CHANGE
         passwdContent = getFileCont("/etc/passwd")
         passwdLine = passwdContent.split("\n")
         del(passwdLine[len(passwdLine)-1])
@@ -85,8 +88,8 @@ def main():
         for targetFile in suspiciousFileNames:
             for file in prestashopDirectory:
                 if(targetFile in file):
-                    os.system("rm " + file)
-                    log = '[' + time.ctime() + '] - A suspicious file was found in /var/www/ and was removed: ' + file
+                    os.system("mv " + file + " /.quarantine/Q-F-" + targetFile)
+                    log = '[' + time.ctime() + '] - A suspicious file was found in /var/www/ and was quarantined: ' + file
                     os.system('echo "' + log + '" >> /var/log/gemini.log')
                 
         time.sleep(60)

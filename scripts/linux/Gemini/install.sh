@@ -1,6 +1,8 @@
 #!/bin/bash
 repo_root=$(git rev-parse --show-toplevel)
 mkdir /etc/gemini
+mkdir /.quarantine
+chmod 400 /.quarantine/
 touch /var/log/gemini.log
 mv $repo_root/scripts/linux/Gemini/localGemini.py /etc/gemini/monitor.py
 chmod +x /etc/gemini/monitor.py

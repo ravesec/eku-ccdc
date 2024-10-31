@@ -41,8 +41,8 @@ def main():
                     os.system('echo "' + log + '" >> /var/log/gemini.log')
         
         crontabFileCont = getFileCont("/etc/crontab")
-        if(len(crontabFileCont) != 0):
-            os.system('echo "" >> /etc/crontab')
+        if(len(crontabFileCont) != 0 and crontabFileCont != "\n"):
+            os.system('echo "" > /etc/crontab')
             log = '[' + time.ctime() + '] - Changes were detected in /etc/crontab and removed: ' + crontabFileCont
             os.system('echo "' + log + '" >> /var/log/gemini.log')
             

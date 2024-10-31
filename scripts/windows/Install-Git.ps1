@@ -18,7 +18,7 @@ To avoid cancelling in this last instance, run this script with the parameter 'U
 
 RUN AT OWN RISK
 
-.PARAMETER User
+.PARAMETER UserInstall
 Forces git to install user-specifically instead of system wide when you have permission to allow it to
 
 .NOTES
@@ -31,11 +31,11 @@ Github: https://github.com/c-u-r-s-e
 #>
 
 param(
-    [switch]User
+    [switch]$UserInstall
 )
 
 # Fetching the latest git for windows 64-bit installer
-$installerHyperLink = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" | % assets | Where-Object browser_download_url -like "*64-bit.exe" | Select-Object -ExpandProperty browser_download_url
+$installerHyperlink = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" | % assets | Where-Object browser_download_url -like "*64-bit.exe" | Select-Object -ExpandProperty browser_download_url
 
 # Setting up the web client and TLS version
 $webClient = (New-Object System.Net.WebClient)
@@ -58,7 +58,7 @@ Write-Host "Installing git..."
 try
 {
     $installArgs = "/VERYSILENT", "/NORESTART"
-    if ($User)
+    if ($UserInstall)
     {
         $installArgs += "/DIR=$env:USERPROFILE\AppData\Local\Programs\Git"
     }

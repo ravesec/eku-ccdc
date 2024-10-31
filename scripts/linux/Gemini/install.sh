@@ -2,7 +2,7 @@
 repo_root=$(git rev-parse --show-toplevel)
 mkdir /etc/gemini
 touch /var/log/gemini.log
-mv $repo_root/scripts/linux/Gemini/localGemini /etc/gemini/monitor.py
+mv $repo_root/scripts/linux/Gemini/localGemini.py /etc/gemini/monitor.py
 chmod +x /etc/gemini/monitor.py
 cat <<EOFA > /etc/systemd/system/gemini.service
 [Unit]

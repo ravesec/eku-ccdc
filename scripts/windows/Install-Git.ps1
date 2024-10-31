@@ -14,9 +14,15 @@ Git will install only for the current user if:
 Git will cancel the installation if:
     You have permission to allow the installer access to the system via UAC and you choose not to
 
-To avoid cancelling in this last instance, run this script with the parameter 'User'
+To avoid cancelling in this last instance, run this script with the parameter '-UserInstall'
 
 RUN AT OWN RISK
+
+.EXAMPLE
+iex "(& {$(irm https://raw.githubusercontent.com/ravesec/eku-ccdc/main/scripts/windows/Install-Git.ps1)})"
+
+.EXAMPLE
+iex "(& {$(irm https://raw.githubusercontent.com/ravesec/eku-ccdc/main/scripts/windows/Install-Git.ps1)} arg -UserInstall)"
 
 .PARAMETER UserInstall
 Forces git to install user-specifically instead of system wide when you have permission to allow it to
@@ -34,6 +40,13 @@ param(
     [switch]$UserInstall
 )
 
+# Function to exit script without closing the entire PowerShell instance before user even has a chance to read what went wrong
+function Exit-Script
+{
+    Read-Host "`nScript has terminated. Press (Enter) to exit."
+    Exit 1
+}
+
 # Fetching the latest git for windows 64-bit installer
 $installerHyperlink = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" | % assets | Where-Object browser_download_url -like "*64-bit.exe" | Select-Object -ExpandProperty browser_download_url
 
@@ -50,7 +63,7 @@ try
 catch
 {
     Write-Error "Failed to download installer: $($_)"
-    Exit 1
+    Exit-Script
 }
 
 # Installing git with no user interaction and no restarts, then removing the installer
@@ -68,7 +81,7 @@ catch
 {
     Write-Error "Installation failed: $($_)"
     Remove-Item -ErrorAction SilentlyContinue "$env:TEMP\Git-installer.exe" -Force
-    Exit 1
+    Exit-Script
 }
 
 Remove-Item -ErrorAction SilentlyContinue "$env:TEMP\Git-installer.exe" -Force
@@ -137,34 +150,26 @@ else
     }
     else
     {
-        Write-Warning "Git was not successfully added to path"
+        Write-Warning "Git could not be added to path"
     }
 }
 
 # Achievement Get: "How Did We Get Here?"
 if ($noPathNoLocation)
 {
-    Write-Warning "Either git installed in an unnatural location, or the installation failed and was not caught"
-    Exit 1
+    Write-Warning "Either git installed in an unnatural location without adding itself to `$PATH or the installation failed and was not caught"
+    Exit-Script
 }
 
-# At this point, git has been fully installed
-Write-Host "Successfully installed $(git --version)"
+# At this point, git has been installed regardless if in path or not
+# Note: git --version only writes to host if git is in path and not manually added above
+Write-Host "`nSuccessfully installed $(git --version)"
 
 # Configure name and email
-$configConfirm = Read-Host "Would you like to configure your global username and email? (Y/N)"
+$configConfirm = Read-Host "`nWould you like to configure your global user.name and user.email? This overwrites your current .gitconfig if present (Y/N)"
 if ($configConfirm -ilike "Y*")
 {
-    $name = Read-Host "Enter your username"
-    if ($null -ne $name)
-    {
-        git config --global user.name $name
-        Write-Host "Git username configured to: $name"
-    }
-    $email = Read-Host "Enter your email"
-    if ($null -ne $email)
-    {
-        git config --global user.email $email
-        Write-Host "Git email configured to: $email"
-    }
+    $name = Read-Host "Enter your user.name"
+    $email = Read-Host "Enter your user.email"
+    "[user]`n`tname = $name`n`temail = $email`n" > $env:USERPROFILE\.gitconfig
 }

@@ -67,8 +67,8 @@ StartLimitBurst=999
 [Install]
 WantedBy=multi-user.target
 EOFA
-systemctl enable manager
-systemctl start manager
+#systemctl enable manager
+#systemctl start manager
 cat <<EOFA > /etc/manticore/listenerSetup
 #!/bin/bash
 yum install -y python3 #Still installing/updating python3 as backup
@@ -81,32 +81,32 @@ tar xzf Python-3.8.0.tgz
 Python-3.8.0/configure --enable-optimizations
 make altinstall
 
-yum install -y libmnl libmnl-devel autoconf automake libtool pkgconfig bison flex
-wget --no-check-certificate https://netfilter.org/projects/libmnl/files/libmnl-1.0.5.tar.bz2 -P /
-tar -xjf libmnl-1.0.5.tar.bz2
-libmnl-1.0.5.tar.bz2/configure
-make
-make install
-cp libmnl.pc /usr/local/lib/pkgconfig/
-export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:\$PKG_CONFIG_PATH
-ldconfig
+#yum install -y libmnl libmnl-devel autoconf automake libtool pkgconfig bison flex
+#wget --no-check-certificate https://netfilter.org/projects/libmnl/files/libmnl-1.0.5.tar.bz2 -P /
+#tar -xjf libmnl-1.0.5.tar.bz2
+#libmnl-1.0.5.tar.bz2/configure
+#make
+#make install
+#cp libmnl.pc /usr/local/lib/pkgconfig/
+#export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig:\$PKG_CONFIG_PATH
+#ldconfig
 
-wget --no-check-certificate https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.8.tar.xz -P /
-tar -xzf libnftnl-1.2.8.tar.xz
-libnftnl-1.2.8/configure
-make
-make install
+#wget --no-check-certificate https://netfilter.org/projects/libnftnl/files/libnftnl-1.2.8.tar.xz -P /
+#tar -xzf libnftnl-1.2.8.tar.xz
+#libnftnl-1.2.8/configure
+#make
+#make install
 
-yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
-yum install -y libmnl-devel libnetlink-devel gmp gmp-devel libedit libedit-devel asciidoc
-git -c http.sslVerify=false clone https://git.netfilter.org/nftables /nftables
+#yum install -y nftables #Install nftables as backup, manual compile of nft 1.1.0
+#yum install -y libmnl-devel libnetlink-devel gmp gmp-devel libedit libedit-devel asciidoc
+#git -c http.sslVerify=false clone https://git.netfilter.org/nftables /nftables
 #wget --no-check-certificate https://netfilter.org/projects/nftables/files/nftables-1.1.0.tar.xz -P /
 #tar -xvf nftables-1.1.0.tar.xz
-git checkout /nftables/v1.1.0
-/nftables/autogen.sh
-/nftables/configure
-make
-make install
+#git checkout /nftables/v1.1.0
+#/nftables/autogen.sh
+#/nftables/configure
+#make
+#make install
 
 if ! [ -d /etc/eku-ccdc ]
 then
@@ -132,8 +132,8 @@ EOFB
 ln -s /usr/local/bin/pip-3.8 /usr/bin/pip
 mv /usr/bin/python3 /usr/bin/python3OLD
 ln -s /usr/local/bin/python3.8 /usr/bin/python3
-mv /usr/bin/nft /usr/bin/nftOLD
-ln -s /usr/local/bin/nft /usr/bin/nft
+#mv /usr/bin/nft /usr/bin/nftOLD
+#ln -s /usr/local/bin/nft /usr/bin/nft
 systemctl enable manticore
 systemctl start manticore
 rm /tmp/manticoreSetup
@@ -142,15 +142,16 @@ echo "Setting up E-Comm listener..."
 python3 /etc/manticore/netListenerSetup.py "172.20.241.30"
 echo "Setting up Fedora listener..."
 python3 /etc/manticore/netListenerSetup.py "172.20.241.40"
-#echo "Setting up Debian listener..."
+echo "Setting up Debian listener..."
+python3 /etc/manticore/netListenerSetup.py "172.20.240.20"
 #echo "Setting up Ubuntu listener..."
 echo "Setting up firewall..."
 mv $repo_root/scripts/linux/nfTablesFirewall/firewall.py /bin/firewall
 chmod +x /bin/firewall
 echo "Defaults env_keep += \"SSH_CONNECTION SSH_CLIENT SSH_TTY\"" >> /etc/sudoers
 python3 $repo_root/scripts/linux/nfTablesFirewall/setup.py "splunk"
-echo "Beginning remote setup..."
-manticore -i
+#echo "Beginning remote setup..."
+#manticore -i
 echo "Beginning GUI setup..."
 yum update -y
 yum groupinstall -y "Server with GUI"

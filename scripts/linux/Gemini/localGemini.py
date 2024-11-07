@@ -160,4 +160,34 @@ def findFiles(origin):
             path = os.path.join(root, file)
             fileList.append(path)
     return fileList
+def processService(serviceFileName): #Returns in the following format: [description:String, type:String, [execStart_command:String, is_file_used:Bool]]
+    executedCommand = []
+    serviceType = ""
+    desc = ""
+    serviceCont = getFileCont(serviceFileName)
+    contSplit = serviceCont.split('\n')
+    for line in contSplit:
+        line = line.lower()
+        if(len(line) == 0):
+            pass
+        elif("execstart" in line):
+            command = line[10:]
+            if('/bin/bash -c ' in line):
+                remainingCommand = command[13:]
+            elif('/bin/python3 -c ' in line):
+                remainingCommand = command[16:]
+            else:
+                remainingCommand = ""
+                
+            if('/' in remainingCommand):
+                isFile = True
+            else:
+                isFile = False
+            
+            executedCommand = [command, isFile]
+        elif("description" in line):
+            desc = line[12:]
+        elif("type" in line):
+            serviceType = line[5:]
+    return [desc, serviceType, executedCommand]
 main()

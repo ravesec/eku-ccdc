@@ -138,8 +138,13 @@ systemctl enable manticore
 systemctl start manticore
 rm /tmp/manticoreSetup
 EOFA
-echo "Setting up listeners..."
-bash $repo_root/scripts/linux/Manticore/listenerSetupManager.sh
+echo "Setting up E-Comm listener..."
+python3 /etc/manticore/netListenerSetup.py "172.20.241.30"
+echo "Setting up Fedora listener..."
+python3 /etc/manticore/netListenerSetup.py "172.20.241.40"
+echo "Setting up Debian listener..."
+python3 /etc/manticore/netListenerSetup.py "172.20.240.20"
+#echo "Setting up Ubuntu listener..."
 echo "Setting up firewall..."
 mv $repo_root/scripts/linux/nfTablesFirewall/firewall.py /bin/firewall
 chmod +x /bin/firewall
@@ -147,6 +152,7 @@ echo "Defaults env_keep += \"SSH_CONNECTION SSH_CLIENT SSH_TTY\"" >> /etc/sudoer
 python3 $repo_root/scripts/linux/nfTablesFirewall/setup.py "splunk"
 #echo "Beginning remote setup..."
 #manticore -i
+manticore -gi
 echo "Beginning GUI setup..."
 yum update -y
 yum groupinstall -y "Server with GUI"

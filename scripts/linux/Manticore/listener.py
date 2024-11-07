@@ -37,6 +37,8 @@ def main():
                     address = messageArray[2]
                     hostName = getHostName(address)
                     os.system("bash /etc/eku-ccdc/scripts/linux/Manticore/remoteSetup.sh "+ hostName + " &")
+                if(messageArray[1] == "G99"):
+                    os.system("bash /etc/eku-ccdc/scripts/linux/Gemini/install.sh")
 def decrypt(message):
     decoded = []
     messArray = message.split('-')

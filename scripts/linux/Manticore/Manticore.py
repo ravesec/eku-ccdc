@@ -47,6 +47,7 @@ def main():
                 sock = socket.create_connection((host, 1893), timeout=5)
                 sock.send(message.encode('utf-8'))
             except Exception as e:
+                message = str(e)
                 print("An error occured when trying to install on " + host + ": " + message)
             del(arguments[0])
             del(arguments[0])
@@ -58,6 +59,7 @@ def main():
                     sock = socket.create_connection((host, 1893), timeout=5)
                     sock.send(message.encode('utf-8'))
                 except Exception as e:
+                    message = str(e)
                     print("An error occured when trying to install Gemini on " + host + ": " + message)
 def encrypt(code, address):
     message = []

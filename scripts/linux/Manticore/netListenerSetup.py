@@ -4,13 +4,13 @@ import sys
 import subprocess
 import time
 def main():
-    if(len(sys.argv) != 2):
+    if(len(sys.argv) != 3):
         print("Invalid usage")
     else:
         address = sys.argv[1]
         try:
             os.system("stty -echo")
-            password = input("Enter root password: ")
+            password = sys.argv[2]
             os.system("stty echo")
             ssh_client = paramiko.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -21,7 +21,7 @@ def main():
             print(f"Listener script copied over to {address}")
             
             print("Installing listener on " + address)
-            command = "bash /tmp/manticoreSetup &"
+            command = "bash /tmp/manticoreSetup"
             stdin, stdout, stderr = ssh_client.exec_command(f"echo {password} | sudo -S {command}")
             time.sleep(1)
         except Exception as e:

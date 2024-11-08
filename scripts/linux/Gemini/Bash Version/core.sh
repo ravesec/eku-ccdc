@@ -19,7 +19,7 @@ userInWhitelist()
             result="2"
         fi
     done
-    if [[ ! $result == "2" ]]; then
+    if [[ ! $result -eq "2" ]]; then
 		result="3"
 	fi
 }
@@ -31,7 +31,7 @@ for line in "${passwdConts[@]}"; do
     declare -i uid=${userInfo[2]}
     declare -i gid=${userInfo[3]}
 	userInWhitelist $username isInWhitelist
-	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist -eq "1" ]]; then
+	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist -eq "3" ]]; then
 		userdel -f $username
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"

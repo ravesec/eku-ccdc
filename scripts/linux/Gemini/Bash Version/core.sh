@@ -13,14 +13,15 @@ userInWhitelist()
 {
     local user="$1"
 	local -n result="$2"
+	result="4"
     for entry in "${whitelistUsers[@]}"; do
         if [[ "$entry" == "$user" ]]; then
-            $result="0"
-			return 0
+            result="2"
         fi
     done
-    $result="1"
-	return 0
+    if [[ ! $result == "2" ]]; then
+		result="3"
+	fi
 }
 while true; do
 getFileCont "/etc/passwd" passwdConts
@@ -36,7 +37,7 @@ for line in "${passwdConts[@]}"; do
 		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"
 		echo $log >> /var/log/gemini.log
 	fi
-
+isInWhitelist=""
 done
 sleep 60
 done

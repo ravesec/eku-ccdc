@@ -14,10 +14,12 @@ userInWhitelist()
     local user="$1"
     for entry in "${whitelistUsers[@]}"; do
         if [[ "$entry" == "$user" ]]; then
-            return 0
+            echo "0"
+			return 0
         fi
     done
-    return 1
+    echo "1"
+	return 0
 }
 while true; do
 getFileCont "/etc/passwd" passwdConts
@@ -26,7 +28,8 @@ for line in "${passwdConts[@]}"; do
 	username=${userInfo[0]}
     declare -i uid=${userInfo[2]}
     declare -i gid=${userInfo[3]}
-	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ ! userInWhitelist $username ]]; then
+	isInWhitelist=userInWhitelist $username
+	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist -eq "1" ]]; then
 		userdel -f $username
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"

@@ -12,13 +12,14 @@ getFileCont() #usage: "getFileCont {file name} {array variable name}"
 userInWhitelist() 
 {
     local user="$1"
+	local -n result="$2"
     for entry in "${whitelistUsers[@]}"; do
         if [[ "$entry" == "$user" ]]; then
-            echo "0"
+            $result="0"
 			return 0
         fi
     done
-    echo "1"
+    $result="1"
 	return 0
 }
 while true; do
@@ -28,7 +29,7 @@ for line in "${passwdConts[@]}"; do
 	username=${userInfo[0]}
     declare -i uid=${userInfo[2]}
     declare -i gid=${userInfo[3]}
-	isInWhitelist=userInWhitelist $username
+	userInWhitelist $username isInWhitelist
 	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist -eq "1" ]]; then
 		userdel -f $username
 		current_time=$(date +"%H:%M:%S")

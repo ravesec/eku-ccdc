@@ -77,7 +77,7 @@ yum install -y wget
 yum groupinstall -y "Development Tools"
 yum install -y openssl-devel bzip2-devel libffi-devel
 wget https://www.python.org/ftp/python/3.8.0/Python-3.8.0.tgz -P /
-tar xzf Python-3.8.0.tgz
+tar -xzf Python-3.8.0.tgz
 Python-3.8.0/configure --enable-optimizations
 make altinstall
 
@@ -134,6 +134,7 @@ mv /usr/bin/python3 /usr/bin/python3OLD
 ln -s /usr/local/bin/python3.8 /usr/bin/python3
 #mv /usr/bin/nft /usr/bin/nftOLD
 #ln -s /usr/local/bin/nft /usr/bin/nft
+systemctl daemon-deload
 systemctl enable manticore
 systemctl start manticore
 rm /tmp/manticoreSetup

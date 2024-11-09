@@ -1,5 +1,5 @@
 #!/bin/bash
-whitelistUsers=("root","sysadmin","sshd","sync","_apt","nobody")
+whitelistUsers=("root" "sysadmin" "sshd" "sync" "_apt" "nobody")
 getFileCont() #usage: "getFileCont {file name} {array variable name}"
 {
 	local fileName="$1"
@@ -19,11 +19,12 @@ userInWhitelist()
             result="2"
         fi
     done
-    if [[ ! $result -eq "2" ]]; then
+    if [[ ! $result == "2" ]]; then
 		result="3"
 	fi
 }
 while true; do
+#Checking for unknown users
 getFileCont "/etc/passwd" passwdConts
 for line in "${passwdConts[@]}"; do
 	IFS=":" read -ra userInfo <<< "$line"
@@ -31,7 +32,7 @@ for line in "${passwdConts[@]}"; do
     declare -i uid=${userInfo[2]}
     declare -i gid=${userInfo[3]}
 	userInWhitelist $username isInWhitelist
-	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist -eq "3" ]]; then
+	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist == "3" ]]; then
 		userdel -f $username
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"

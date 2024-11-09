@@ -1,6 +1,7 @@
 #!/bin/bash
 whitelistUsers=("root" "sysadmin" "sshd" "sync" "_apt" "nobody")
-getFileCont() #usage: "getFileCont {file name} {array variable name}"
+suspiciousFileNames=("shell.php" "template.php")
+getFileContAsArray() #usage: "getFileCont {file name} {array variable name}"
 {
 	local fileName="$1"
 	local -n arr="$2"
@@ -8,6 +9,17 @@ getFileCont() #usage: "getFileCont {file name} {array variable name}"
 		return 1
 	fi
 	mapfile -t arr < "$fileName"
+}
+getFileContAsStr()
+{
+	local fileName="$1"
+	local -n fileCont="$2"
+	if [[ ! -f "$fileName" ]]; then
+        fileCont=""
+	else
+		fileCont=$(<"$fileName")
+    fi
+    echo "$fileCont"
 }
 userInWhitelist() 
 {
@@ -25,7 +37,7 @@ userInWhitelist()
 }
 while true; do
 #Checking for unknown users
-getFileCont "/etc/passwd" passwdConts
+getFileContAsArray "/etc/passwd" passwdConts
 for line in "${passwdConts[@]}"; do
 	IFS=":" read -ra userInfo <<< "$line"
 	username=${userInfo[0]}
@@ -40,5 +52,21 @@ for line in "${passwdConts[@]}"; do
 	fi
 isInWhitelist=""
 done
+#Checking for malicious services
+
+#Checking for crontab changes
+getFileContAsStr "/etc/crontab" crontabCont
+if [[ ! $crontabCont == "\n" ]]; then
+	echo "" > /etc/crontab
+	current_time=$(date +"%H:%M:%S")
+	log="[ $current_time ] - Changes were detected in /etc/crontab and removed: $crontabCont"
+	echo $log >> /var/log/gemini.log
+fi
+#Checking for common reverse shell practices
+
+#Checking for remote logins
+
+#Checking for suspicious files in a webserver
+
 sleep 60
 done

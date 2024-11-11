@@ -1,6 +1,11 @@
 #!/bin/bash
+lowerLetters=("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")
+upperLetters=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z")
+numbers = ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
+
 whitelistUsers=("root" "sysadmin" "sshd" "sync" "_apt" "nobody")
 suspiciousFileNames=("shell.php" "template.php")
+suspiciousServices=("minecraft" "discord" "snapchat" "systemb"
 getFileContAsArray() #usage: "getFileCont {file name} {array variable name}"
 {
 	local fileName="$1"
@@ -20,6 +25,16 @@ getFileContAsStr()
 		fileCont=$(<"$fileName")
     fi
     echo "$fileCont"
+}
+getCommandOutputAsStr()
+{
+	local -n output="$2"
+	output="$($1)"
+}
+getCommandOutputAsArray()
+{
+	local -n output="$2"
+    mapfile -t output < <("$1")
 }
 userInWhitelist() 
 {
@@ -53,7 +68,23 @@ for line in "${passwdConts[@]}"; do
 isInWhitelist=""
 done
 #Checking for malicious services
-
+getCommandOutputAsArray "systemctl list-unit-files" serviceList
+for line in "${serviceList[@]}"; do
+	for maliciousService in "${suspiciousServices[@]}"; do
+		if [[ "$line" == *"$maliciousService"* ]]; then
+			systemctl stop "$maliciousService"
+            systemctl disable "$maliciousService"
+            mkdir /.quarantine/Q-S-"$maliciousService"
+            mv /etc/systemd/system/"$maliciousService".service /.quarantine/Q-S-"$maliciousService"
+            mv /usr/lib/systemd/system/"$maliciousService".service /.quarantine/Q-S-"$maliciousService"
+            systemctl daemon-reload
+            systemctl reset-failed
+			current_time=$(date +"%H:%M:%S")
+            log = "[ $current_time ] - A suspicious service was found and quarintined: $maliciousService"
+            echo "$log" >> /var/log/gemini.log
+		fi
+	done
+done
 #Checking for crontab changes
 getFileContAsStr "/etc/crontab" crontabCont
 if [[ ! $crontabCont == "\n" ]]; then

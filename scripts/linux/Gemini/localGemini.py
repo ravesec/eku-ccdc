@@ -35,7 +35,7 @@ def main():
                     os.system("systemctl disable " + entry)
                     os.system("mkdir /.quarantine/Q-S-" + entry)
                     os.system("mv /etc/systemd/system/" + entry + " /.quarantine/Q-S-" + entry)
-                    os.system("rm /usr/lib/systemd/system/" + entry + " /.quarantine/Q-S-" + entry)
+                    os.system("mv /usr/lib/systemd/system/" + entry + " /.quarantine/Q-S-" + entry)
                     os.system("systemctl daemon-reload")
                     os.system("systemctl reset-failed")
                     log = '[' + time.ctime() + '] - A suspicious service was found and quarintined: ' + entry

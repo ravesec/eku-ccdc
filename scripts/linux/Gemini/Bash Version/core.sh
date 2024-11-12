@@ -15,15 +15,6 @@ getFileContAsArray() #usage: "getFileCont {file name} {array variable name}"
 	fi
 	mapfile -t arr < "$fileName"
 }
-getLoginList() {
-    login_output=$(who 2>/dev/null)
-    if [ $? -ne 0 ]; then
-        echo ""
-        return
-    fi
-    IFS=$'\n' read -r -d '' -a login_array <<< "$login_output"$'\n'
-    echo "${login_array[@]}"
-}
 getFileContAsStr()
 {
 	local fileName="$1"
@@ -96,7 +87,7 @@ fi
 #Checking for common reverse shell practices
 
 #Checking for remote logins
-loginList=($(getLoginList))
+mapfile -t loginList < <(who)
 
 #Checking for suspicious files in a webserver
 

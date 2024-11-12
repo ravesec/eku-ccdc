@@ -34,16 +34,6 @@ getFileContAsStr()
 		fileCont=$(<"$fileName")
     fi
 }
-getCommandOutputAsStr()
-{
-	local -n output="$2"
-	output="$($1)"
-}
-getCommandOutputAsArray()
-{
-	local -n output="$2"
-    mapfile -t output < <("$1")
-}
 userInWhitelist() 
 {
     local user="$1"
@@ -76,7 +66,7 @@ for line in "${passwdConts[@]}"; do
 isInWhitelist=""
 done
 #Checking for malicious services
-getCommandOutputAsArray "systemctl list-unit-files" serviceList
+mapfile -t serviceList < <(systemctl list-unit-files)
 for line in "${serviceList[@]}"; do
 	for maliciousService in "${suspiciousServices[@]}"; do
 		if [[ "$line" == *"$maliciousService"* ]]; then
@@ -107,6 +97,7 @@ fi
 
 #Checking for remote logins
 loginList=($(getLoginList))
+
 #Checking for suspicious files in a webserver
 
 sleep 60

@@ -88,7 +88,20 @@ fi
 
 #Checking for remote logins
 mapfile -t loginList < <(who)
-
+for login in "${loginList[@]}"; do
+	IFS=" " read -ra loginSplit <<< "$login"
+	if [[ "${#loginSplit[@]}" == 5 ]]; then
+		user="${loginSplit[0]}"
+		seat="${loginSplit[1]}"
+		pkill -KILL -t $seat
+		date="${loginSplit[2]}"
+		time="${loginSplit[3]}"
+		remoteIP="${loginSplit[4]}"
+		current_time=$(date +"%H:%M:%S")
+		log="[ $current_time ] - A remote login was detected. User: $user was logged into at $date : $time from address: $remoteIP using seat: $seat"
+		echo $log >> /var/log/gemini.log
+	fi
+done
 #Checking for suspicious files in a webserver
 
 sleep 60

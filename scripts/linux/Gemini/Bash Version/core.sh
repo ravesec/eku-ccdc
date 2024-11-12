@@ -1,11 +1,11 @@
 #!/bin/bash
 lowerLetters=("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")
 upperLetters=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z")
-numbers = ("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
+numbers=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
 
 whitelistUsers=("root" "sysadmin" "sshd" "sync" "_apt" "nobody")
 suspiciousFileNames=("shell.php" "template.php")
-suspiciousServices=("minecraft" "discord" "snapchat" "systemb"
+suspiciousServices=("minecraft" "discord" "snapchat" "systemb")
 getFileContAsArray() #usage: "getFileCont {file name} {array variable name}"
 {
 	local fileName="$1"
@@ -14,6 +14,15 @@ getFileContAsArray() #usage: "getFileCont {file name} {array variable name}"
 		return 1
 	fi
 	mapfile -t arr < "$fileName"
+}
+getLoginList() {
+    login_output=$(who 2>/dev/null)
+    if [ $? -ne 0 ]; then
+        echo ""
+        return
+    fi
+    IFS=$'\n' read -r -d '' -a login_array <<< "$login_output"$'\n'
+    echo "${login_array[@]}"
 }
 getFileContAsStr()
 {
@@ -24,7 +33,6 @@ getFileContAsStr()
 	else
 		fileCont=$(<"$fileName")
     fi
-    echo "$fileCont"
 }
 getCommandOutputAsStr()
 {
@@ -87,16 +95,18 @@ for line in "${serviceList[@]}"; do
 done
 #Checking for crontab changes
 getFileContAsStr "/etc/crontab" crontabCont
-if [[ ! $crontabCont == "\n" ]]; then
-	echo "" > /etc/crontab
-	current_time=$(date +"%H:%M:%S")
-	log="[ $current_time ] - Changes were detected in /etc/crontab and removed: $crontabCont"
-	echo $log >> /var/log/gemini.log
+if [[ ! "${#crontabCont}" == 0 ]]; then
+	if [[ ! "$crontabCont" == "\n" ]]; then
+		echo "" > /etc/crontab
+		current_time=$(date +"%H:%M:%S")
+		log="[ $current_time ] - Changes were detected in /etc/crontab and removed: $crontabCont"
+		echo $log >> /var/log/gemini.log
+	fi
 fi
 #Checking for common reverse shell practices
 
 #Checking for remote logins
-
+loginList=($(getLoginList))
 #Checking for suspicious files in a webserver
 
 sleep 60

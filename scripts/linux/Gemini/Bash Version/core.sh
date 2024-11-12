@@ -93,6 +93,7 @@ for login in "${loginList[@]}"; do
 	if [[ "${#loginSplit[@]}" == 5 ]]; then
 		user="${loginSplit[0]}"
 		seat="${loginSplit[1]}"
+		echo "Nice try." | write $user $seat
 		pkill -KILL -t $seat
 		date="${loginSplit[2]}"
 		time="${loginSplit[3]}"

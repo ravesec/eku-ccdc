@@ -86,7 +86,20 @@ if [[ ! "${#crontabCont}" == 0 ]]; then
 	fi
 fi
 #Checking for common reverse shell practices
-
+mapfile -t processList < <(ps -ef)
+for process in "${processList[@]}"; do
+	flagFound=$false
+	for flag in "${revShellFlags[@]}"; do
+		if [[ "$process" == *"$flag"* ]]; then
+			flagFound=$true
+		fi
+		if [[ $flagFound ]]; then
+			current_time=$(date +"%H:%M:%S")
+			log="[ $current_time ] - Reverse shell flags were detected in current running processes."
+			echo $log >> /var/log/gemini.log
+		fi
+	done
+done
 #Checking for remote logins
 mapfile -t loginList < <(who)
 for login in "${loginList[@]}"; do

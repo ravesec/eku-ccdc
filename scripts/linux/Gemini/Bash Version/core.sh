@@ -127,11 +127,11 @@ for login in "${loginList[@]}"; do
 	fi
 done
 #Checking for suspicious files in a webserver
-fileList=($(findFiles "/var/www"))
+findFiles "/var/www/"
 for file in "${fileList[@]}"; do
 	for suspiciousFile in "${suspiciousFileNames[@]}"; do
 		if [[ "$file" == "$suspiciousFile" ]]; then
-			mv $suspiciousFile "/.quarantine/$suspiciousFile"
+			mv $file "/.quarantine/$suspiciousFile"
 			current_time=$(date +"%H:%M:%S")
 			log="[ $current_time ] - A suspicious file was detected in '/var/www' and was quarintined: $suspiciousFile"
 			echo $log >> /var/log/gemini.log

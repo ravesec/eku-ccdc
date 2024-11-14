@@ -6,7 +6,7 @@ mv "$repo_root/scripts/linux/Gemini/Bash Version/core.sh" /etc/gemini/core
 chmod +x /etc/gemini/core
 mv "$repo_root/scripts/linux/Gemini/Bash Version/gemini.service" /etc/systemd/system/gemini.service
 systemctl daemon-reload
-if [[ ! -z "$1" ]] && [[ ! "$1" == "-s" ]]; then
+if [[ -z "$1" ]]; then
 	declare -i x=3
 	machineList=("centos" "ecom" "fedora" "debian" "ubuntu")
 	while [[ x -eq 3 ]]; do
@@ -27,7 +27,7 @@ if [[ ! -z "$1" ]] && [[ ! "$1" == "-s" ]]; then
 	echo "Once settings have been changed, start Gemini by running these two commands:"
 	echo "systemctl enable gemini.service"
 	echo "systemctl start gemini.service"
-else
+elif [[ "$1" == "-s" ]]; then
     mv "$repo_root/scripts/linux/Gemini/Bash Version/splCore.sh" /etc/gemini/core
 	touch /etc/gemini/buffer.log
 	touch /etc/gemini/read.log

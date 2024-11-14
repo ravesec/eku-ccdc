@@ -9,6 +9,10 @@ echo "Enter new sysadmin password: "
 stty -echo
 read sPass
 stty echo
+echo "Enter new splunk admin password: "
+stty -echo
+read password
+stty echo
 echo "sysadmin:$sPass" | chpasswd
 echo "Clearing crontab..."
 echo "" > /etc/crontab
@@ -24,15 +28,11 @@ fi
 echo "Clearing splunk and installing new admin user..."
 /opt/splunk/bin/splunk stop
 /opt/splunk/bin/splunk clean all -f
-stty -echo
-echo "Enter new splunk admin password: "
-read password
 cat <<EOFA > /opt/splunk/etc/system/local/user-seed.conf
 [user_info]
 USERNAME = admin
 PASSWORD = $password
 EOFA
-stty echo
 /opt/splunk/bin/splunk start
 echo "Splunk accounts reset."
 yum install -y nftables 

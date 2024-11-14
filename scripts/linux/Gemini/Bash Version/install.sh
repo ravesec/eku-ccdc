@@ -13,8 +13,8 @@ if [[ -z "$1" ]]; then
 		echo "Enter your machine name(centos/fedora/debian/ubuntu): "
 		read machine
 		for item in "${machineList[@]}"; do
-			if [[ machine == item ]]; then
-				$x=4
+			if [[ $machine == $item ]]; then
+				x=4
 			fi
 		done
 		if [[ x -eq 3 ]]; then
@@ -22,7 +22,7 @@ if [[ -z "$1" ]]; then
 		fi
 	done
 	touch /etc/gemini/machine.name
-	echo $machine >> machine.name
+	echo "$machine" >> machine.name
 	echo "Gemini installed, but has not started. Please edit the file located at /etc/gemini/core.sh and make changes to the settings as needed before starting."
 	echo "Once settings have been changed, start Gemini by running these two commands:"
 	echo "systemctl enable gemini.service"

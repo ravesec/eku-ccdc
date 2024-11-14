@@ -49,12 +49,6 @@ findFiles()
         fileList+=("$file")
     done < <(find "$origin" -type f)
 }
-sendLog()
-{
-	newLog="[ $machineName ] - $log"
-	echo $newLog | nc 172.20.241.20 1973
-}
-getFileContAsStr /etc/gemini/machine.name machineName
 while true; do
 #Checking for unknown users
 getFileContAsArray "/etc/passwd" passwdConts
@@ -69,7 +63,6 @@ for line in "${passwdConts[@]}"; do
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"
 		echo $log >> /var/log/gemini.log
-		sendLog
 	fi
 isInWhitelist=""
 done
@@ -88,7 +81,6 @@ for line in "${serviceList[@]}"; do
 			current_time=$(date +"%H:%M:%S")
             log = "[ $current_time ] - A suspicious service was found and quarintined: $maliciousService"
             echo "$log" >> /var/log/gemini.log
-			sendLog
 		fi
 	done
 done
@@ -100,7 +92,6 @@ if [[ ! "${#crontabCont}" == 0 ]]; then
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - Changes were detected in /etc/crontab and removed: $crontabCont"
 		echo $log >> /var/log/gemini.log
-		sendLog
 	fi
 fi
 #Checking for common reverse shell practices
@@ -115,7 +106,6 @@ for process in "${processList[@]}"; do
 			current_time=$(date +"%H:%M:%S")
 			log="[ $current_time ] - Reverse shell flags were detected in current running processes."
 			echo $log >> /var/log/gemini.log
-			sendLog
 		fi
 	done
 done
@@ -134,7 +124,6 @@ for login in "${loginList[@]}"; do
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - A remote login was detected. User: $user was logged into at $date : $time from address: $remoteIP using seat: $seat"
 		echo $log >> /var/log/gemini.log
-		sendLog
 	fi
 done
 #Checking for suspicious files in a webserver
@@ -146,7 +135,6 @@ for file in "${fileList[@]}"; do
 			current_time=$(date +"%H:%M:%S")
 			log="[ $current_time ] - A suspicious file was detected in '/var/www' and was quarintined: $suspiciousFile"
 			echo $log >> /var/log/gemini.log
-			sendLog
 		fi
 	done
 done

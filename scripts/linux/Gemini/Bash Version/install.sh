@@ -29,6 +29,7 @@ if [[ -z "$1" ]]; then
 	echo "systemctl start gemini.service"
 elif [[ "$1" == "-s" ]]; then
     mv "$repo_root/scripts/linux/Gemini/Bash Version/splCore.sh" /etc/gemini/core
+	chmod +x /etc/gemini/core
 	touch /etc/gemini/buffer.log
 	touch /etc/gemini/read.log
 	touch /etc/gemini/active.log

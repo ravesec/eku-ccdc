@@ -17,8 +17,10 @@ def main():
         logs = getFileCont("/etc/gemini/active.log")
         logList = logs.split('\n')
         print("Last refresh: " + str(lastRefresh))
+        x = 0
         for log in logList:
-            print(log)
+            print(str(x+1) + ": " + log)
+            x = x + 1
     
         x = True
         while(x):
@@ -37,6 +39,17 @@ def main():
                 pass
             else:
                 pass
+        elif((option.split(" "))[0] == "ack"):
+            if(len(option.split(" ")) == 1):
+                print("Missing log number to acknowledge.")
+            else:
+                acked = (option.split(" "))[1]
+                if(acked > len(logList)):
+                    print("Invalid log identifier.")
+                else:
+                    del(logList[acked-1])
+                    newLogList = "\n".join(logList)
+                    os.system('echo "' + newLogList + '" > /etc/gemini/active.log')
         else:
             printHelp()
     
@@ -63,6 +76,7 @@ Controler for Gemini EDR System:
         
         Refresh - Refreshes the current log list
         Filter - Adds a filter to the current search
+        Ack # - Acknowledges a given alert and removes it from the list
     
     Filter Format:
         

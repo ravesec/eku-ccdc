@@ -53,6 +53,7 @@ sendLog()
 {
 	newLog="[ $machineName ] - $log"
 	echo $newLog | nc 172.20.241.20 1973
+	sleep 0.1
 }
 getFileContAsStr /etc/gemini/machine.name machineName
 while true; do
@@ -150,5 +151,5 @@ for file in "${fileList[@]}"; do
 		fi
 	done
 done
-sleep 60
+sleep 30
 done

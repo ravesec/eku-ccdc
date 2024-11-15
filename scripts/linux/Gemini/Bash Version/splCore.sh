@@ -138,5 +138,5 @@ for file in "${fileList[@]}"; do
 		fi
 	done
 done
-sleep 60
+sleep 30
 done

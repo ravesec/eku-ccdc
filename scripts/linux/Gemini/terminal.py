@@ -7,14 +7,16 @@ def main():
     while True:
         os.system("clear")
         readCont = getFileCont("/etc/gemini/read.log")
-        os.system('echo "' + readCont + '" >> /etc/gemini/active.log')
-        os.system("mv /etc/gemini/buffer.log /etc/gemini/read.log")
-        os.system("touch /etc/gemini/buffer.log")
-        os.system('echo "' + readCont + '" + >> /var/log/masterGemini.log')
+        if(len(readCont) != 0):
+            if(readCont != "\n"):
+                os.system('echo "' + readCont + '" >> /etc/gemini/active.log')
+                os.system("mv /etc/gemini/buffer.log /etc/gemini/read.log")
+                os.system("touch /etc/gemini/buffer.log")
+                os.system('echo "' + readCont + '" + >> /var/log/masterGemini.log')
         lastRefresh = datetime.datetime.today()
         logs = getFileCont("/etc/gemini/active.log")
         logList = logs.split('\n')
-        
+        print("Last refresh: " + str(lastRefresh))
         for log in logList:
             print(log)
     

@@ -93,7 +93,7 @@ if($Force.IsPresent)
     Write-Host "Cleared false positive! You may now rerun this script."
     Exit 1
 } 
-elseif([System.Environment]::GetEnvironmentVariable("updatedWithoutRestart","Machine" -eq $true))
+elseif([System.Environment]::GetEnvironmentVariable("updatedWithoutRestart","Machine") -eq $true)
 {
     Write-Warning "You have updated without restart! Updates must take effect before rerunning script."
     Write-Host "If you have restarted and this is a false positive (which happens), rerun this script with -Force."

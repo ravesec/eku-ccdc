@@ -40,15 +40,22 @@ param(
     [switch]$UserInstall
 )
 
-# Function to exit script without closing the entire PowerShell instance before user even has a chance to read what went wrong
+# Function to exit script without closing the entire PowerShell instance before user has a chance to read what went wrong
 function Exit-Script
 {
     Read-Host "`nScript has terminated. Press (Enter) to exit"
     Exit 1
 }
 
+# Ensure the user wants to continue
+$installConfirm = Read-Host "`nThis is a script to install the latest version of Git. Please read the description before continuing.`nDo you wish to continue? (Y/N)"
+if ($installConfirm -inotlike "Y*")
+{
+    Exit-Script
+}
+
 # Fetching the latest git for windows 64-bit installer
-$installerHyperlink = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" | % assets | Where-Object browser_download_url -like "*64-bit.exe" | Select-Object -ExpandProperty browser_download_url
+$installerHyperlink = Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest" | ForEach-Object assets | Where-Object browser_download_url -like "*64-bit.exe" | Select-Object -ExpandProperty browser_download_url
 
 # Setting up the web client and TLS version
 $webClient = (New-Object System.Net.WebClient)
@@ -73,7 +80,8 @@ Write-Host "Installing git..."
 try
 {
     $installArgs = "/VERYSILENT", "/NORESTART"
-    if ($UserInstall)
+    # Checking for user install script to modify install directory
+    if ($UserInstall.IsPresent)
     {
         $installArgs += "/DIR=$env:USERPROFILE\AppData\Local\Programs\Git"
     }
@@ -88,28 +96,31 @@ catch
     Exit-Script
 }
 
+# Cleaning up after successful install
 Remove-Item -ErrorAction SilentlyContinue "$env:TEMP\Git-installer.exe" -Force
 
 # Initializing variables to check the git installation
-$userSpecific = $false
-$systemWide = $false
-$systemWidex86 = $false
+$gitPath = ""
+$envVarTarget = ""
 $noPathNoLocation = $false
 
-# Check where the install has placed itself
+# Check the default locations to find where the install has placed itself
 if (Test-Path "$env:ProgramFiles\Git")
 {
-    $systemWide = $true
+    $gitPath = "$env:ProgramFiles\Git"
+    $envVarTarget = [System.EnvironmentVariableTarget]::User
     Write-Host "Git has been installed system-wide"
 }
 elseif (Test-Path "$(${env:ProgramFiles(x86)})\Git")
 {
-    $systemWidex86 = $true
+    $gitPath = "$(${env:ProgramFiles(x86)})\Git"
+    $envVarTarget = [System.EnvironmentVariableTarget]::Machine
     Write-Host "Git has been installed system-wide (x86)"
 }
 elseif (Test-Path "$env:USERPROFILE\AppData\Local\Programs\Git")
 {
-    $userSpecific = $true
+    $gitPath = "$env:USERPROFILE\AppData\Local\Programs\Git"
+    $envVarTarget = [System.EnvironmentVariableTarget]::Machine
     Write-Host "Git has been installed as user-specific"
 } 
 else
@@ -118,43 +129,35 @@ else
 }
 
 # Test if git is in the path
-$ErrorActionPreference = "SilentlyContinue"
-git --version > $null
-
-if ($?)
+if ($env:PATH -ilike "*\Git\cmd*")
 {
+    # No further action needed
     Write-Host "Git is in the `$PATH"
 }
 else
 {
+    # Attempt to add git to the system path if installed in Program Files or user path if in AppData
     Write-Warning "Git is not in the `$PATH"
-    if ($userSpecific)
+    if ($gitPath -ne "")
     {
-        Write-Host "Adding Git to `$PATH..."
-        [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$env:USERPROFILE\AppData\Local\Programs\Git\cmd", [System.EnvironmentVariableTarget]::User)
-    }
-    elseif ($systemWide)
-    {
-        Write-Host "Adding Git to `$PATH..."
-        [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$env:ProgramFiles\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
-    }
-    elseif ($systemWidex86)
-    {
-        Write-Host "Adding Git to `$PATH..."
-        [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$(${env:ProgramFiles(x86)})\Git\cmd", [System.EnvironmentVariableTarget]::Machine)
+        $ErrorActionPreference = Stop
+        Write-Host "Attempting to add Git to `$PATH..."
+        try
+        {
+            [System.Environment]::SetEnvironmentVariable("Path", $env:PATH + ";$gitPath\cmd", $envVarTarget)
+            Write-Host "Sucessfully added Git to path"
+            Write-Warning "Note: must restart PowerShell instance due to manual add"
+        }
+        catch
+        {
+            Write-Warning "Git could not be added to path"
+        }
+        $ErrorActionPreference = SilentlyContinue
     }
     else
     {
+        # Git did not install in a normal location and did not add itself to the path
         $noPathNoLocation = $true
-    }
-    if ($PATH -ilike "*git*")
-    {
-        Write-Host "Sucessfully added Git to path"
-        Write-Warning "Note: must restart PowerShell instance due to manual add"
-    }
-    else
-    {
-        Write-Warning "Git could not be added to path"
     }
 }
 
@@ -163,19 +166,34 @@ if ($noPathNoLocation)
 {
     Start-Sleep 2
     Clear-Host
-    Write-Warning "Either git installed in an unnatural location without adding itself to `$PATH or the installation failed due to lack of UAC access and was not caught"
+    Write-Warning "Either git installed in an unnatural location without adding itself to `$PATH or the installation failed due to lack of UAC access and was not caught prior to here"
     Exit-Script
 }
 
 # At this point, git has been installed regardless if in path or not
-# Note: git --version only writes to host if git is in path and not manually added above
-Write-Host "`nSuccessfully installed $(git --version)"
+Write-Host "`nSuccessfully installed $(& $gitPath\cmd\git.exe --version)"
 
 # Configure name and email
-$configConfirm = Read-Host "`nWould you like to configure your global user.name and user.email?`nWARNING: This overwrites your current .gitconfig if present (Y/N)"
+$configConfirm = Read-Host "`nWould you like to configure your global user.name and user.email? This backs up and replaces your current .gitconfig if present (Y/N)"
 if ($configConfirm -ilike "Y*")
 {
+    $gitConfigPath = "$env:USERPROFILE\.gitconfig"
+    if(Test-Path $gitConfigPath)
+    {
+        try
+        {
+            Copy-Item -Path $gitConfigPath -Destination "$gitConfigPath.bak" -Force
+            Write-Host "Backup of .gitconfig saved at $gitConfigPath.bak"            
+        }
+        catch
+        {
+            Start-Sleep 2
+            Clear-Host
+            Write-Warning "Failed to backup .gitconfig, exiting instead"
+            Exit-Script
+        }
+    }
     $name = Read-Host "Enter your user.name"
     $email = Read-Host "Enter your user.email"
-    Set-Content -Path "$env:USERPROFILE\.gitconfig" -Value "[user]`n    name = $name`n    email = $email" -Force
+    Set-Content -Path $gitConfigPath -Value "[user]`n    name = $name`n    email = $email" -Force
 }

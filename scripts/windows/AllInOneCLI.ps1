@@ -3,34 +3,57 @@
 <#
 .SYNOPSIS
 This is a general Windows Hardening tool created for EKUCCDC purposes.
-Requires PS 3.0 and Administrator rights.
+Requires PS 5.1, .NET 4.8, and Administrator rights.
+Will update systems from PS 3.0+ to PS 5.1 and .NET to 4.8 or 4.5.2.
 
 .DESCRIPTION
 The features of this tool include:
-    -.NET version checking / updating
-        -Checks for 4.8.x+
-    -WMF/Powershell version checking / updating
-        -Checks for 5.1+, optionally can install 7
-    -OS hardening
-    -Firewall management
-        -Firewall toggle
-        -MWCCDC firewall setup
-    -Active Directory management
-        -Generate random users
-        -Generate random passwords for all users
-        -Remove all groups from users besides current administrator
-    -Windows update management
-        -Ability to install updates from .csv list
-        -Turn on automatic updating
-    -General security management
-        -Installation of sysinternals
-        -Installation of Bluespawn
-        -Setting logon banner
-        -Setting logoff timer
-    -Taking inventory of current services / versions
+        -.NET version checking / updating
+[ X ]     -Checks for 4.8.x+
+[ X ]     -Forcefully installs 4.8 (2012+)
+[   ]     -Forcefully installs 4.5.2 (Win7+)
+        -WMF/Powershell version checking / updating
+[ X ]     -Checks for 5.1+
+[ X ]     -Forcefully installs 5.1 (2012/2012 R2)
+[   ]     -Forcefully installs 5.1 (Win7+)
+[   ]     -Check for compatibility with PS 7
+[ X ]     -Optionally can install 7
+        -OS hardening
+[ X ]     -Backup HKLM hive
+[ X ]     -Disabling and modifying a multitude of potentially vulnerable services
+[ X ]     -Flushing DNS cache
+[ X ]     -Enabling and enlarging Windows Event logs
+[ X ]     -Setting suspicious filetypes to default to notepad
+[   ]     -Much more coming for this section!
+        -Firewall management
+[ X ]     -Firewall toggle
+[   ]     -MWCCDC firewall setup (requires recieving the Teampack for 2025)
+        -Active Directory management
+[   ]     -Scramble default password for all users and save in a .csv
+[ X ]     -Deprivilege all users besides current administrator
+[   ]     -Generate new AD users
+[   ]     -Begin auditing user permissions
+[   ]     -Organizational Unit Management
+[   ]     -Group Policy Management
+        -Windows update management
+[ X ]     -Ability to install updates from .csv list
+[ X ]     -Turn on automatic updating
+[ X ]     -Modifying/restarting auto updater services to attempt to fix not finding updates
+        -General security management
+[ X ]     -Installation of sysinternals
+[ X ]     -Installation of Bluespawn
+[ X ]     -Setting logon banner
+[ X ]     -Setting logoff timer
+[ X ]   -Taking inventory of current services / versions
+
+.PARAMETER NoNet
+Disables .NET version checking
+
+.PARAMETER NoWmf
+Disables WMF version checking
 
 .PARAMETER Force
-Disables .NET and WMF version checking.
+Overrides updating without restarting
 
 .INPUTS
 None.
@@ -44,14 +67,16 @@ Author: Logan Jackson
 Date: 2024
 
 .LINK
-https://gist.github.com/mackwage
+Resource: https://gist.github.com/mackwage
 
 .LINK
-Github: https://github.com/c-u-r-s-e
+Website: https://lj-sec.github.io/
 #>
 
 param (
-    [switch]$Force
+    [switch]$Force,
+    [switch]$NoNet,
+    [switch]$NoWmf
 )
 
 # Powershell 3.0 compatible way of checking for admin, requires admin was introduced later
@@ -64,13 +89,14 @@ if (!$currentUser.IsInRole([System.Security.Principal.WindowsBuiltInRole]::Admin
 
 if($Force.IsPresent)
 {
-    $env:updatedThisSession = $false
-    reg delete HKCU\Environment /v updatedWithoutRestart /f | Out-Null
+    [System.Environment]::SetEnvironmentVariable("updatedWithoutRestart",$false,"Machine")
+    Write-Host "Cleared false positive! You may now rerun this script."
+    Exit 1
 } 
-elseif($env:updatedWithoutRestart -or $env:updatedThisSession)
+elseif([System.Environment]::GetEnvironmentVariable("updatedWithoutRestart","Machine" -eq $true))
 {
     Write-Warning "You have updated without restart! Updates must take effect before rerunning script."
-    Write-Host "If you have restarted and this is a false positive, rerun this script with -Force."
+    Write-Host "If you have restarted and this is a false positive (which happens), rerun this script with -Force."
     Exit 1
 }
 
@@ -89,12 +115,19 @@ $logFile = "$env:HOMEDRIVE\WindowsHardeningCLI\Logs\log.$i.txt"
 # Write-Log Function to write logs to $logFile
 function Write-Log {
     param (
-        [string]$message
+        [string]$message,
+        [switch]$NoDate
     )
 
-    $currentTime = Get-Date -Format "MM/dd/yyyy HH:mm:ss K"
-
-    Write-Output "$currentTime - $message" | Out-File $logFile -Append
+    if($NoDate.IsPresent)
+    {
+        Write-Output "// $message" | Out-File $logFile -Append
+    }
+    else
+    {
+        $currentTime = Get-Date -Format "MM/dd/yyyy HH:mm:ss K"
+        Write-Output "$currentTime - $message" | Out-File $logFile -Append   
+    }
 }
 
 # For downloads and such
@@ -103,11 +136,13 @@ $webClient = New-Object System.Net.WebClient
 
 Write-Log "Script started!"
 
-if(!$Force.IsPresent)
+$update=$false
+
+if(!$NoNet.IsPresent)
 {
     # Checking for .NET Frameworks older than 4.8, latest .NET compatible for Windows 2012 and up
     $outdatedNet = $false
-    switch -Wildcard ((Get-WmiObject Win32_OperatingSystem).Caption)
+    switch -Wildcard ((Get-CimInstance Win32_OperatingSystem).Caption)
     {
         "*2012 R2*"
             {
@@ -167,8 +202,8 @@ if(!$Force.IsPresent)
             }
         default
             {
-                Write-Warning "Could not detect compatible Windows Version, and therefore .NET version.`nThis script has only been tested on Windows Server 2012/Windows 10 and later, and .NET 4.8 and later."
-                Write-Host "If you would like to run this script anyway (not recommended), rerun with -Force."
+                Write-Warning "Could not detect compatible Windows Version, and therefore .NET version.`nThis script has only been tested on Windows Server 2012/Windows 10 and later, with .NET 4.8 and later."
+                Write-Host "If you would like to run this script anyway (not recommended), rerun with -NoNet."
                 Exit 1
             }
     }
@@ -194,20 +229,21 @@ if(!$Force.IsPresent)
         Write-Host "Running .NET updater..."
         Start-Process -FilePath "$env:HOMEDRIVE\WindowsHardeningCLI\net-updater.exe" -ArgumentList "/quiet","/norestart" -Wait
         Write-Host "Done!"
-        $env:updatedThisSession = $true
-        Invoke-Expression "Setx updatedWithoutRestart $true | Out-Null"
         Write-Log ".NET was updated"
     }
     else
     {
         Write-Host ".NET is up-to-date, 4.8+"
     }
+}
+else
+{
+    Write-Host "-NoNet is present, skipping .NET version checking..."
+    Write-Log -NoDate "-NoNet is present, skipping .NET version checking"
+}
 
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-
+if (!$NoWmf.IsPresent)
+{
     if($PSVersionTable.PSVersion.Major -ge "7" -and $PSVersionTable.PSVersion.Minor -ge "4")
     {
         Write-Host "WMF is up-to-date, 7.4.x"
@@ -217,10 +253,10 @@ if(!$Force.IsPresent)
         Write-Host "WMF is up-to-date, 5.1.x"
         if(!(Test-Path "$env:ProgramFiles\Powershell\7"))
         {
-            $updateWmf = Read-Host "Would you like to optionally install 7.4.1? (Y/n)"
-            if($updateWmf -ilike "n*")
+            $updateWmf = Read-Host "Would you like to optionally install 7.4.1? (y/N)"
+            if($updateWmf -ilike "y*")
             {
-                Write-Host "No problemo"
+                Write-Host "No problem"
                 $updateWmf = $false
             }
             else
@@ -233,43 +269,68 @@ if(!$Force.IsPresent)
     else
     {
         Write-Warning "Powershell is not up-to-date!"
-        $updateWmf = Read-Host "Would you like to update now to 5.1? (Y/n)"
+        $updateWmf = Read-Host "WMF 5.1 or later is required. Would you like to update now to 5.1? (Y/n)"
         if($updateWmf -ilike "n*")
         {
             Write-Warning "Powershell 5.1 and later is required for this script!"
-            Write-Host "If you would like to run this script anyway (not recommended), rerun with -Force."
+            Write-Host "If you would like to run this script anyway (not recommended), rerun with -NoWmf."
             Exit 1
         }
         else
         {
             $updateWmf = $true
-            $wmfLink = ""
+            switch -Wildcard ((Get-CimInstance Win32_OperatingSystem).Caption)
+            {
+                "*2012 R2*"
+                    {
+                        $wmfLink = "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu"
+                    }
+                "*2012*"
+                    {
+                        $wmfLink = "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win8.1AndW2K12R2-KB3191564-x64.msu"
+                    }
+                default
+                    {
+                        Write-Warning "Could not fetch link to download WMF 5.1. This script has only been tested on Windows Server 2012/Windows 10 (1607) and later, with WMF 5.1+."
+                        Write-Host "It is highly recommended to install this version yourself.`nIf you would like to run this script anyway (not recommended), rerun with -NoWmf"
+                    }
+            }
         }
     }
 
     if($updateWmf)
     {
-
+        $update = $true
+        Write-Host "Updating WMF to 5.1...`n"
+        Write-Host "Downloading WMF updater..."
+        $webClient.DownloadFile("$wmfLink", "$env:HOMEDRIVE\WindowsHardeningCLI\wmf-updater.exe")
+        Write-Host "Running WMF updater..."
+        Start-Process -FilePath "$env:HOMEDRIVE\WindowsHardeningCLI\wmf-updater.exe" -ArgumentList "/quiet","/norestart" -Wait
+        Write-Host "Done!"
+        Write-Log "WMF was updated"
     }
-    
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
-    ## UNFINISHED SCRIPT TO UPDATE POWERSHELL
+}
+else
+{
+    Write-Host "-NoWmf is present, skipping WMF version checking..."
+    Write-Log -NoDate "-NoWmf is present, skipping WMF version checking"
+}
 
-    if($update)
+if($update)
+{
+    Start-Sleep 2
+    Clear-Host
+    $restart = Read-Host "`nNecessary updates complete. Restart right now? (y/N)"
+    if($restart -ilike "y*")
     {
-        $restart = Read-Host "`nNecessary updates complete. Restart now? (y/N)"
-        if($restart -ilike "y*")
-        {
-            reg delete HKCU\Environment /v updatedWithoutRestart /f
-            $env:updatedThisSession = $null
-            Restart-Computer
-        }
-        else
-        {
-            Write-Warning "Restart is required for updates to take effect."
-            Exit 1
-        }
+        [System.Environment]::GetEnvironmentVariable("updatedWithoutRestart",$false,"Machine")
+        Restart-Computer
+    }
+    else
+    {
+        [System.Environment]::SetEnvironmentVariable("updatedWithoutRestart",$true,"Machine")
+        Write-Warning "Restart is required for updates to take effect."
+        Exit 1
     }
 }
 
@@ -286,18 +347,22 @@ $dhcpRunning = ((Get-Service -ErrorAction SilentlyContinue -Name DHCP).Status -e
 if($serverOS)
 {
     Write-Host "Server Operating System was found"
+    Write-Log -NoDate "Server Operating System was found"
 }
 if($activeDirectoryRunning)
 {
     Write-Host "Active Directory Service is running"
+    Write-Log -NoDate "Active Directory Service is running"
 }
 if($dnsRunning)
 {
     Write-Host "DNS is running"
+    Write-Log -NoDate "DNS is running"
 }
 if($dhcpRunning)
 {
     Write-Host "DHCP is running"
+    Write-Log -NoDate "DHCP is running"
 }
 
 try {
@@ -330,8 +395,8 @@ try {
             "1"
                 {
                     Write-Host "General Windows Hardening will now commence..."
-                    Write-Warning "This will make several modifications to your HKLM registry hive and default Windows settings`nIt is strongly recommended you review these before proceeding, and comment out those unnecessary or potentially harmful."
-                    Write-Host "A backup of your HKLM will be stored in $env:HOMEDRIVE\WindowsHardeningCLI\RegistryBackups."
+                    Write-Warning "`nThis will make several modifications to your HKLM registry hive and default Windows settings`nIt is strongly recommended you review these before proceeding, and comment out those unnecessary or potentially harmful.`n"
+                    Write-Host "A backup of your HKLM will be stored in $env:HOMEDRIVE\WindowsHardeningCLI\RegistryBackups.`n"
                     Read-Host "(ENTER to start or CTRL+C to cancel)"
 
                     Write-Log "General Windows hardening begins!"
@@ -396,14 +461,6 @@ try {
                     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v SafeDLLSearchMode /t REG_DWORD /d 1 /f
                     reg add "HKLM\SYSTEM\CurrentControlSet\Control\Session Manager" /v ProtectionMode /t REG_DWORD /d 1 /f
 
-                    # Enlarging Windows Event Security Log Size
-                    Write-Log "Increaing the size of Windows Event Security Log..."
-                    wevtutil sl Security /ms:1024000
-                    wevtutil sl Application /ms:1024000
-                    wevtutil sl System /ms:1024000
-                    wevtutil sl "Windows Powershell" /ms:1024000
-                    wevtutil sl "Microsoft-Windows-PowerShell/Operational" /ms:1024000
-
                     # Record command line data in process creation events eventid 4688
                     Write-Log "Enabling auditing of command line data in process creations events (ID 4688)..."
                     reg add "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System\Audit" /v ProcessCreationIncludeCmdLine_Enabled /t REG_DWORD /d 1 /f
@@ -416,6 +473,19 @@ try {
                     Write-Log "Enabling Powershell logging..."
                     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ModuleLogging" /v EnableModuleLogging /t REG_DWORD /d 1 /f
                     reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" /v EnableScriptBlockLogging /t REG_DWORD /d 1 /f
+
+                    # Harden Lsass
+                    Write-Log "Hardening LSASS..."
+                    reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\LSASS.exe" /v AuditLevel /t REG_DWORD /d 00000008 /f
+                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v RunAsPPL /t REG_DWORD /d 00000001 /f
+                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" /v UseLogonCredential /t REG_DWORD /d 0 /f
+                    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation" /v AllowProtectedCreds /t REG_DWORD /d 1 /f
+                    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client" /v AllowDigest /t REG_DWORD /d 0 /f
+
+                    # Encrypt/Sign outgoing secure channel traffic when possible
+                    Write-Log "Signing outgoing secure channel traffic when possible..."
+                    reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SealSecureChannel /t REG_DWORD /d 1 /f
+                    reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SignSecureChannel /t REG_DWORD /d 1 /f
 
                     # Enable Windows Event Detailed Login
                     Write-Log "Enabling Windows Event Detailed Logins..."
@@ -431,6 +501,14 @@ try {
                     AuditPol /set /subcategory:"Security State Change" /success:enable /failure:enable
                     AuditPol /set /subcategory:"Security System Extension" /success:enable /failure:enable
                     AuditPol /set /subcategory:"System Integrity" /success:enable /failure:enable
+                    
+                    # Enlarging Windows Event Security Log Size
+                    Write-Log "Increaing the size of Windows Event Security Log..."
+                    wevtutil sl Security /ms:1024000
+                    wevtutil sl Application /ms:1024000
+                    wevtutil sl System /ms:1024000
+                    wevtutil sl "Windows Powershell" /ms:1024000
+                    wevtutil sl "Microsoft-Windows-PowerShell/Operational" /ms:1024000
 
                     # Stop Remote Registry
                     Write-Log "Attempting to stop remote registry..."
@@ -439,15 +517,7 @@ try {
                     # Flush dns
                     Write-Log "Flushing DNS..."
                     ipconfig /flushdns
-
-                    # Harden Lsass
-                    Write-Log "Hardening LSASS..."
-                    reg add "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options\LSASS.exe" /v AuditLevel /t REG_DWORD /d 00000008 /f
-                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\Lsa" /v RunAsPPL /t REG_DWORD /d 00000001 /f
-                    reg add "HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest" /v UseLogonCredential /t REG_DWORD /d 0 /f
-                    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\CredentialsDelegation" /v AllowProtectedCreds /t REG_DWORD /d 1 /f
-                    reg add "HKLM\SOFTWARE\Policies\Microsoft\Windows\WinRM\Client" /v AllowDigest /t REG_DWORD /d 0 /f
-
+                    
                     # Stop WinRM
                     Write-Log "Attempting to stop Remote Management..."
                     net stop WinRM -Force
@@ -466,11 +536,6 @@ try {
                     ftype jsefile="%SystemRoot%\system32\NOTEPAD.EXE" "%1"
                     ftype vbefile="%SystemRoot%\system32\NOTEPAD.EXE" "%1"
                     ftype vbsfile="%SystemRoot%\system32\NOTEPAD.EXE" "%1"
-
-                    # Encrypt/Sign outgoing secure channel traffic when possible
-                    Write-Log "Signing outgoing secure channel traffic when possible..."
-                    reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SealSecureChannel /t REG_DWORD /d 1 /f
-                    reg add "HKLM\SYSTEM\CurrentControlSet\Services\Netlogon\Parameters" /v SignSecureChannel /t REG_DWORD /d 1 /f
 
                     #### MAKE CHANGES ABOVE IF NECESSARY ####
                     #### MAKE CHANGES ABOVE IF NECESSARY ####
@@ -555,9 +620,13 @@ try {
                         }
 
                         Write-Host -ForegroundColor Blue "`n---Active Directory---"
-                        Write-Host "1. Scramble default password for all users"
+                        Write-Host "1. Scramble default password for all users and save in a .csv"
                         Write-Host "2. Deprivilege all users besides current administrator"
-                        Write-Host "3. Main menu"
+                        Write-Host "3. Generate new AD users"
+                        Write-Host "4. Begin auditing user permissions"
+                        Write-Host "5. Organizational Unit Management"
+                        Write-Host "6. Group Policy Management"
+                        Write-Host "7. Main menu"
                         $adchoice = Read-Host "`nYour selection"
                         switch($adchoice)
                         {
@@ -601,6 +670,22 @@ try {
                                 }
                             "3"
                                 {
+
+                                }
+                            "4"
+                                {
+
+                                }
+                            "5"
+                                {
+
+                                }
+                            "6"
+                                {
+
+                                }
+                            "7"
+                                {
                                     Break
                                 }
                             default
@@ -634,7 +719,7 @@ try {
                                     }
 
                                     mkdir $env:temp\updates\ -ErrorAction SilentlyContinue | Out-Null
-                                    Write-Host "`nEnsure CSV list has headers 'Hyperlinks' and 'UpdateName' and consists of updates for the correct OS"
+                                    Write-Host "`nEnsure CSV list has headers 'UpdateName' and 'Hyperlinks' respectfully and consists of updates for the correct OS"
                                     $csvList = Read-Host "`nEnter the literal path for CSV list filled of hyperlinks. (I.E. $env:HOMEDRIVE\...\...)"
                                     if(![System.IO.File]::Exists($csvList))
                                     {
@@ -646,20 +731,29 @@ try {
                                         Write-Host "`nIncorrect file type"
                                         Break
                                     }
-                                    $priorityChoice = Read-Host "`nEnter (1) for only security updates, (2) for only quality updates, or (3) for both"
+                                    if((($csvFile[0].PSObject.Properties.Name)[0] -ne "UpdateName") -or (($csvFile[0].PSObject.Properties.Name)[1] -ne "Hyperlinks"))
+                                    {
+                                        Write-Host "`nIncorrect headers"
+                                        Break
+                                    }
+                                    $priorityChoice = Read-Host "`nEnter (1) for every update in the list or (2) for every update after a given date"
                                     switch($priorityChoice)
                                     {
                                         "1"
                                             {
-                                                $updateHyperlinks = Import-Csv -LiteralPath "$csvList" | Where-Object {$_.Hyperlinks -like "*/secu/*"}
+                                                $updateHyperlinks = Import-Csv -LiteralPath "$csvList"
                                             }
                                         "2"
                                             {
-                                                $updateHyperlinks = Import-Csv -LiteralPath "$csvList" | Where-Object {$_.Hyperlinks -like "*/updt/*"}
-                                            }
-                                        "3"
-                                            {
-                                                $updateHyperlinks = Import-Csv -LiteralPath "$csvList"
+                                                DO
+                                                {
+                                                    $updateYear = Read-Host "Enter a four-digit year (e.g. 2016)"
+                                                } while (($updateYear.Length -ne 4) -or ($updateYear -notmatch "^[\d]+$"))
+                                                DO
+                                                {
+                                                    $updateMonth = Read-Host "Enter a two-digit month (e.g. 04)"
+                                                } while (($updateMonth.Length -ne 2) -or ($updateMonth -notmatch "^[\d]+$") -or ($updateMonth -gt "12"))
+                                                $updateHyperlinks = Import-Csv -LiteralPath "$csvList" | Where-Object {$_.Hyperlinks}
                                             }
                                         default
                                             {
@@ -710,6 +804,14 @@ try {
                                     reg add "HKLM\Software\Policies\Microsoft\Windows\WindowsUpdate" /v DisableWindowsUpdateAccess /t REG_DWORD /d 0 /f
                                     reg add "HKLM\SYSTEM\Internet Communication Management\Internet Communication" /v DisableWindowsUpdateAccess /t REG_DWORD /d 0 /f
                                     reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer" /v NoWindowsUpdate /t REG_DWORD /d 0 /f
+                                    net stop wuauserv
+                                    net stop cryptSvc
+                                    net stop bits
+                                    net stop msiserver
+                                    net start wuauserv
+                                    net start cryptSvc
+                                    net start bits
+                                    net start msiserver
                                 }
                             "4"
                                 {
@@ -1003,6 +1105,7 @@ try {
 }
 catch
 {
+    Write-Log -NoDate "Terminating error: $($_.Exception.Message)"
     $catch = $true
 }
 finally
@@ -1013,7 +1116,7 @@ finally
     }
     elseif ($catch)
     {
-        Write-Log "The script was closed via terminating error (potentially weird user input?)"
+        Write-Log "The script was closed via terminating error, listed above."
     }
     else
     {

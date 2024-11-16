@@ -242,9 +242,9 @@ else
     Write-Log -NoDate "-NoNet is present, skipping .NET version checking"
 }
 
-$updateWmf = $false
 if (!$NoWmf.IsPresent)
 {
+    $updateWmf = $false
     if($PSVersionTable.PSVersion.Major -ge "7" -and $PSVersionTable.PSVersion.Minor -ge "4")
     {
         Write-Host "WMF is up-to-date, 7.4.x"
@@ -254,8 +254,8 @@ if (!$NoWmf.IsPresent)
         Write-Host "WMF is up-to-date, 5.1.x"
         if(!(Test-Path "$env:ProgramFiles\Powershell\7"))
         {
-            $updateWmf = Read-Host "Would you like to optionally install 7.4.1? (y/N)"
-            if($updateWmf -ilike "y*")
+            $checkUpdateWMF = Read-Host "Would you like to optionally install 7.4.1? (y/N)"
+            if($checkUpdateWMF -ilike "y*")
             {
                 Write-Host "No problem"
             }

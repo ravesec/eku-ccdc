@@ -242,6 +242,7 @@ else
     Write-Log -NoDate "-NoNet is present, skipping .NET version checking"
 }
 
+$updateWmf = $false
 if (!$NoWmf.IsPresent)
 {
     if($PSVersionTable.PSVersion.Major -ge "7" -and $PSVersionTable.PSVersion.Minor -ge "4")
@@ -257,7 +258,6 @@ if (!$NoWmf.IsPresent)
             if($updateWmf -ilike "y*")
             {
                 Write-Host "No problem"
-                $updateWmf = $false
             }
             else
             {
@@ -278,15 +278,16 @@ if (!$NoWmf.IsPresent)
         }
         else
         {
-            $updateWmf = $true
             switch -Wildcard ((Get-CimInstance Win32_OperatingSystem).Caption)
             {
                 "*2012 R2*"
                     {
+                        $updateWmf = $true
                         $wmfLink = "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/W2K12-KB3191565-x64.msu"
                     }
                 "*2012*"
                     {
+                        $updateWmf = $true
                         $wmfLink = "https://download.microsoft.com/download/6/F/5/6F5FF66C-6775-42B0-86C4-47D41F2DA187/Win8.1AndW2K12R2-KB3191564-x64.msu"
                     }
                 default

@@ -252,19 +252,19 @@ if (!$NoWmf.IsPresent)
     elseif($PSVersionTable.PSVersion.Major -ge "5" -and $PSVersionTable.PSVersion.Minor -ge "1")
     {
         Write-Host "WMF is up-to-date, 5.1.x"
-        #if(!(Test-Path "$env:ProgramFiles\Powershell\7"))
-        #{
-        #    $checkUpdateWMF = Read-Host "Would you like to optionally install 7.4.1? (y/N)"
-        #    if($checkUpdateWMF -ilike "y*")
-        #    {
-        #        Write-Host "No problem"
-        #    }
-        #    else
-        #    {
-        #        $updateWmf = $true
-        #        $wmfLink = "https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/PowerShell-7.4.1-win-x64.msi"
-        #    }
-        #}
+        if(!(Test-Path "$env:ProgramFiles\Powershell\7"))
+        {
+            $checkUpdateWMF = Read-Host "Would you like to optionally install 7.4.1? (y/N)"
+            if($checkUpdateWMF -ilike "n*")
+            {
+                Write-Host "No problem"
+            }
+            else
+            {
+                $updateWmf = $true
+                $wmfLink = "https://github.com/PowerShell/PowerShell/releases/download/v7.4.1/PowerShell-7.4.1-win-x64.msi"
+            }
+        }
     }
     else
     {

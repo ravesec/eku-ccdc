@@ -11,10 +11,11 @@ Git will install system-wide if:
     You are running as a non-Administator but allow the installer access to the system via UAC
 Git will install only for the current user if:
     You cannot (due to permissions) allow the installer access to the system via UAC
-    You run this script with the `-UserInstall` parameter (it will still prompt UAC if you have permission to elevate)
+    You run this script with the `-UserInstall` parameter (it will still prompt for UAC if you have permission to elevate, select Yes)
 Git will cancel the installation if:
     You have permission to allow the installer access to the system via UAC yet choose not to
 
+Multiple installations of git may conflict, not every edge case has been tried
 RUN AT OWN RISK
 
 .EXAMPLE
@@ -32,7 +33,7 @@ Author: Logan Jackson
 Date: 10/29/2024
 
 .LINK
-Github: https://github.com/c-u-r-s-e
+Github: https://github.com/lj-sec
 
 #>
 
@@ -140,7 +141,7 @@ else
     Write-Warning "Git is not in the `$PATH"
     if ($gitPath -ne "")
     {
-        $ErrorActionPreference = Stop
+        $ErrorActionPreference = 'Stop'
         Write-Host "Attempting to add Git to `$PATH..."
         try
         {
@@ -152,7 +153,7 @@ else
         {
             Write-Warning "Git could not be added to path"
         }
-        $ErrorActionPreference = SilentlyContinue
+        $ErrorActionPreference = 'SilentlyContinue'
     }
     else
     {

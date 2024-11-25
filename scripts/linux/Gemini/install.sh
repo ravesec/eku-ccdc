@@ -1,29 +1,49 @@
 #!/bin/bash
+yum install -y nc
+apt install -y nc
 repo_root=$(git rev-parse --show-toplevel)
 mkdir /etc/gemini
 mkdir /.quarantine
-chmod 400 /.quarantine/
-touch /var/log/gemini.log
-mv $repo_root/scripts/linux/Gemini/localGemini.py /etc/gemini/monitor.py
-chmod +x /etc/gemini/monitor.py
-cat <<EOFA > /etc/systemd/system/gemini.service
-[Unit]
-Description=Gemini system integrity service
-
-[Service]
-Type=simple
-Restart=on-failure
-Environment="PATH=/sbin:/bin:/usr/sbin:/usr/bin"
-ExecStart=/bin/bash -c '/etc/gemini/monitor.py'
-StartLimitInterval=1s
-StartLimitBurst=999
-
-[Install]
-WantedBy=multi-user.target
-EOFA
+mv "$repo_root/scripts/linux/Gemini/Bash Version/core.sh" /etc/gemini/core
+chmod +x /etc/gemini/core
+mv "$repo_root/scripts/linux/Gemini/Bash Version/gemini.service" /etc/systemd/system/gemini.service
 systemctl daemon-reload
-echo "Gemini installed, but has not started. Please edit the file located at /etc/gemini/monitor.py and make changes to the settings as needed before starting."
-echo "Once settings have been changed, start Gemini by running these two commands:"
-echo "systemctl enable gemini.service"
-echo "systemctl start gemini.service"
-rm $0
+if [[ -z "$1" ]]; then
+	declare -i x=3
+	machineList=("centos" "ecom" "fedora" "debian" "ubuntu")
+	while [[ x -eq 3 ]]; do
+		echo "Enter your machine name(centos/fedora/debian/ubuntu): "
+		read machine
+		for item in "${machineList[@]}"; do
+			if [[ $machine == $item ]]; then
+				x=4
+			fi
+		done
+		if [[ x -eq 3 ]]; then
+			echo "Invalid entry."
+		fi
+	done
+	touch /etc/gemini/machine.name
+	echo "$machine" >> machine.name
+	echo "Gemini installed, but has not started. Please edit the file located at /etc/gemini/core.sh and make changes to the settings as needed before starting."
+	echo "Once settings have been changed, start Gemini by running these two commands:"
+	echo "systemctl enable gemini.service"
+	echo "systemctl start gemini.service"
+elif [[ "$1" == "-s" ]]; then
+    mv "$repo_root/scripts/linux/Gemini/Bash Version/splCore.sh" /etc/gemini/core
+	chmod +x /etc/gemini/core
+	touch /etc/gemini/buffer.lo
+	touch /etc/gemini/read.log
+	touch /etc/gemini/active.log
+	touch /var/log/masterGemini.log
+	mv $repo_root/scripts/linux/Gemini/listener.sh /etc/gemini/listener
+	chmod +x /etc/gemini/listener
+	mv $repo_root/scripts/linux/Gemini/geminiListener.service /etc/systemd/system/geminiListener.service
+	systemctl daemon-reload
+	systemctl enable geminiListener
+	systemctl start geminiListener
+	echo "Gemini installed, but has not started. Please edit the file located at /etc/gemini/core.sh and make changes to the settings as needed before starting."
+	echo "Once settings have been changed, start Gemini by running these two commands:"
+	echo "systemctl enable gemini.service"
+	echo "systemctl start gemini.service"
+fi

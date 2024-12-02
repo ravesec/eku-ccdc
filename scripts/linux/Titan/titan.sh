@@ -21,8 +21,7 @@ sendLog()
 }
 processConfFile()
 {
-	local fileCont=$(<"/etc/titan/titan.conf")
-	IFS="\n" read -ra confList <<< "$fileCont"
+	mapfile -t confList < "/etc/titan/titan.conf"
 	for line in "${confList[@]}"; do
 		if ! [[ "${line:0:1}" == "#" ]]; then
 			IFS="=" read -ra lineSplit <<< "$line"
@@ -32,6 +31,7 @@ processConfFile()
 					;;
 				*)
 					;;
+			esac
 		fi
 	done
 }

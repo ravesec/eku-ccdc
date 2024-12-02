@@ -4,10 +4,14 @@ apt install -y nc
 repo_root=$(git rev-parse --show-toplevel)
 mkdir /etc/gemini
 mkdir /.quarantine
-mv "$repo_root/scripts/linux/Gemini/Bash Version/core.sh" /etc/gemini/core
+mv "$repo_root/scripts/linux/Gemini/core.sh" /etc/gemini/core
 chmod +x /etc/gemini/core
-mv "$repo_root/scripts/linux/Gemini/Bash Version/gemini.service" /etc/systemd/system/gemini.service
+mv "$repo_root/scripts/linux/Gemini/gemini.service" /etc/systemd/system/gemini.service
 systemctl daemon-reload
+if [[ -d /var/www/ ]]; then
+	echo "Webserver detected, installing Titan Web-Guard."
+	bash $repo_root/scripts/linux/Titan/install.sh
+fi
 if [[ -z "$1" ]]; then
 	declare -i x=3
 	machineList=("centos" "ecom" "fedora" "debian" "ubuntu")
@@ -30,7 +34,7 @@ if [[ -z "$1" ]]; then
 	echo "systemctl enable gemini.service"
 	echo "systemctl start gemini.service"
 elif [[ "$1" == "-s" ]]; then
-    mv "$repo_root/scripts/linux/Gemini/Bash Version/splCore.sh" /etc/gemini/core
+    mv "$repo_root/scripts/linux/Gemini/splCore.sh" /etc/gemini/core
 	chmod +x /etc/gemini/core
 	touch /etc/gemini/buffer.lo
 	touch /etc/gemini/read.log

@@ -1,0 +1,1 @@
+This is a linux system firewall interface, utilizing either iptables or nftables. This is determined by the install.sh file, which will check if the machine is capable of running the required nftables and python version. If it can it will install the nftables version, otherwise it will install the iptables version.

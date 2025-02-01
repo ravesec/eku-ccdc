@@ -1,13 +1,7 @@
 #!/bin/bash
-lowerLetters=("a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m" "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z")
-upperLetters=("A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M" "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z")
-numbers=("0" "1" "2" "3" "4" "5" "6" "7" "8" "9")
-
-whitelistUsers=("root" "sysadmin" "sshd" "sync" "_apt" "nobody")
-suspiciousFileNames=("shell.php" "template.php")
-suspiciousServices=("minecraft" "discord" "snapchat" "systemb")
-revShellFlags=("import pty" "pty.spawn")
-suspiciousFileNames=("shell.php" "template.php")
+whitelistUsers=()
+suspiciousServices=()
+revShellFlags=()
 getFileContAsArray() #usage: "getFileCont {file name} {array variable name}"
 {
 	local fileName="$1"
@@ -41,22 +35,55 @@ userInWhitelist()
 		result="3"
 	fi
 }
-findFiles() 
+processConfFile()
 {
-    local origin="$1"
-    fileList=()
-    while IFS= read -r file; do
-        fileList+=("$file")
-    done < <(find "$origin" -type f)
-}
-sendLog()
-{
-	newLog="[ $machineName ] - $log"
-	echo $newLog | nc 172.20.241.20 1973
-	sleep 0.1
+	mapfile -t confList < "/etc/gemini/gemini.conf"
+	for line in "${confList[@]}"; do
+		if ! [[ "${line:0:1}" == "#" ]]; then
+			IFS="=" read -ra lineSplit <<< "$line"
+			case "${lineSplit[0]}" in
+				"remote_logging_server")
+					logServer="${lineSplit[1]}"
+					;;
+				"remote_logging_port")
+					logPort="${lineSplit[1]}"
+					;;
+				"user_whitelist")
+					whitelist="${lineSplit[1]}"
+					rawWhitelist = "${whitelist:1:-1}"
+					IFS="," read -ra whiteSplit <<< "$rawWhitelist"
+					for entry in "${whiteSplit[@]}"; do
+						whitelistUsers+=("$entry")
+					done
+					;;
+				"max_uid_gid")
+					UID_GID_LIMIT="${lineSplit[1]}"
+					;;
+				"suspicious_services")
+					servicelist="${lineSplit[1]}"
+					rawServicelist = "${servicelist:1:-1}"
+					IFS="," read -ra serviceSplit <<< "$rawServicelist"
+					for entry in "${serviceSplit[@]}"; do
+						suspiciousServices+=("$entry")
+					done
+					;;
+				"reverse_shell_flags")
+					flagList="${lineSplit[1]}"
+					rawFlagList = "${flagList:1:-1}"
+					IFS="," read -ra flagSplit <<< "$rawFlagList"
+					for entry in "${flagSplit[@]}"; do
+						revShellFlags+=("$entry")
+					done
+					;;
+				*)
+					;;
+			esac
+		fi
+	done
 }
 getFileContAsStr /etc/gemini/machine.name machineName
 while true; do
+processConfFile
 #Checking for unknown users
 getFileContAsArray "/etc/passwd" passwdConts
 for line in "${passwdConts[@]}"; do
@@ -65,12 +92,11 @@ for line in "${passwdConts[@]}"; do
     declare -i uid=${userInfo[2]}
     declare -i gid=${userInfo[3]}
 	userInWhitelist $username isInWhitelist
-	if [[ $uid -gt 999 || $gid -gt 999 ]] && [[ $isInWhitelist == "3" ]]; then
+	if [[ $uid -gt $UID_GID_LIMIT || $gid -gt $UID_GID_LIMIT ]] && [[ $isInWhitelist == "3" ]]; then
 		userdel -f $username
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"
 		echo $log >> /var/log/gemini.log
-		sendLog
 	fi
 isInWhitelist=""
 done
@@ -89,7 +115,6 @@ for line in "${serviceList[@]}"; do
 			current_time=$(date +"%H:%M:%S")
             log = "[ $current_time ] - A suspicious service was found and quarintined: $maliciousService"
             echo "$log" >> /var/log/gemini.log
-			sendLog
 		fi
 	done
 done
@@ -101,7 +126,6 @@ if [[ ! "${#crontabCont}" == 0 ]]; then
 		current_time=$(date +"%H:%M:%S")
 		log="[ $current_time ] - Changes were detected in /etc/crontab and removed: $crontabCont"
 		echo $log >> /var/log/gemini.log
-		sendLog
 	fi
 fi
 #Checking for common reverse shell practices
@@ -116,7 +140,6 @@ for process in "${processList[@]}"; do
 			current_time=$(date +"%H:%M:%S")
 			log="[ $current_time ] - Reverse shell flags were detected in current running processes."
 			echo $log >> /var/log/gemini.log
-			sendLog
 		fi
 	done
 done
@@ -137,22 +160,8 @@ for login in "${loginList[@]}"; do
 			current_time=$(date +"%H:%M:%S")
 			log="[ $current_time ] - A remote login was detected. User: $user was logged into at $date : $time from address: $remoteIP using seat: $seat"
 			echo $log >> /var/log/gemini.log
-			sendLog
 		fi
 	fi
-done
-#Checking for suspicious files in a webserver
-findFiles "/var/www/"
-for file in "${fileList[@]}"; do
-	for suspiciousFile in "${suspiciousFileNames[@]}"; do
-		if [[ "$file" == "$suspiciousFile" ]]; then
-			mv $file "/.quarantine/$suspiciousFile"
-			current_time=$(date +"%H:%M:%S")
-			log="[ $current_time ] - A suspicious file was detected in '/var/www' and was quarintined: $suspiciousFile"
-			echo $log >> /var/log/gemini.log
-			sendLog
-		fi
-	done
 done
 sleep 30
 done

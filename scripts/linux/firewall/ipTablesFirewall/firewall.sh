@@ -66,7 +66,7 @@ getChainList() #Usage: getChainList {chain} {variable name to save array to} -> 
 	esac
 	local targetChainStartIndex=$((-1))
 	local fullChainList=$(iptables -L --line-numbers)
-	IFS="\n" read -ra fullChainListSplit <<< "$fullChainList"
+	mapfile -t fullChainListSplit <<< "$fullChainList"
 	local num=$((0))
 	local currentLine=""
 	while [ "$num" -lt "${#fullChainListSplit[@]}" ]; do
@@ -90,6 +90,9 @@ getChainList() #Usage: getChainList {chain} {variable name to save array to} -> 
 		fi
 		((num=$num+1))
 	done
+	if ! [[ $targetChainEndIndex -gt 0 ]]; then
+		targetChainEndIndex=$((${#fullChainListSplit[@]}))
+	fi
 	if [[ $targetChainEndIndex -lt $targetChainStartIndex ]]; then
 		echo "An error occured in finding the selected chain's boundaries"
 		exit
@@ -104,6 +107,4 @@ getChainList() #Usage: getChainList {chain} {variable name to save array to} -> 
 		fi
 		((num=$num+1))
 	done
-	echo ""
-	exit
 }

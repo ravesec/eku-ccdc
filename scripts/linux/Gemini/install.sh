@@ -16,6 +16,7 @@ machineList=("centos" "ecom" "fedora" "debian" "ubuntu")
 while [[ x -eq 3 ]]; do
 	if [[ -d /opt/splunk/bin ]]; then
 		echo "Splunk" >> machine.name
+		x=4
 	else
 		echo "Enter your machine name(centos/fedora/debian/ubuntu): "
 		read machine

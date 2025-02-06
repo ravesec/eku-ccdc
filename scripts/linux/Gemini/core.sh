@@ -50,7 +50,7 @@ processConfFile()
 					;;
 				"user_whitelist")
 					whitelist="${lineSplit[1]}"
-					rawWhitelist = "${whitelist:1:-1}"
+					rawWhitelist="${whitelist:1:-1}"
 					IFS="," read -ra whiteSplit <<< "$rawWhitelist"
 					for entry in "${whiteSplit[@]}"; do
 						whitelistUsers+=("$entry")
@@ -61,7 +61,7 @@ processConfFile()
 					;;
 				"suspicious_services")
 					servicelist="${lineSplit[1]}"
-					rawServicelist = "${servicelist:1:-1}"
+					rawServicelist="${servicelist:1:-1}"
 					IFS="," read -ra serviceSplit <<< "$rawServicelist"
 					for entry in "${serviceSplit[@]}"; do
 						suspiciousServices+=("$entry")
@@ -69,7 +69,7 @@ processConfFile()
 					;;
 				"reverse_shell_flags")
 					flagList="${lineSplit[1]}"
-					rawFlagList = "${flagList:1:-1}"
+					rawFlagList="${flagList:1:-1}"
 					IFS="," read -ra flagSplit <<< "$rawFlagList"
 					for entry in "${flagSplit[@]}"; do
 						revShellFlags+=("$entry")
@@ -95,7 +95,7 @@ for line in "${passwdConts[@]}"; do
 	if [[ $uid -gt $UID_GID_LIMIT || $gid -gt $UID_GID_LIMIT ]] && [[ $isInWhitelist == "3" ]]; then
 		userdel -f $username
 		current_time=$(date +"%H:%M:%S")
-		log="[ $current_time ] - An unknown user with UID/GID above 999 was found and removed: $username"
+		log="[ $current_time ] - An unknown user with UID/GID above $UID_GID_LIMIT was found and removed: $username"
 		echo $log >> /var/log/gemini.log
 	fi
 isInWhitelist=""

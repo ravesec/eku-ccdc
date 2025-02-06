@@ -1,6 +1,4 @@
 #!/bin/bash
-yum install -y iptables iptables-persistant
-apt install -y iptables iptables-persistant
 repo_root=$(git rev-parse --show-toplevel)
 validNames=("centos" "ecom" "fedora" "ubuntu" "debian" "splunk")
 isValid="false"
@@ -71,8 +69,6 @@ done
 iptables -P INPUT DROP
 iptables -P FORWARD DROP
 iptables -P OUTPUT DROP
-
-netfilter-persistent save #saving rules
 
 mv $repo_root/scripts/linux/firewall/ipTablesFirewall/firewall.sh /bin/firewall
 chmod +x /bin/firewall

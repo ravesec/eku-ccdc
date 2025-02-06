@@ -14,6 +14,7 @@ curl --insecure -o /etc/yum.repos.d/CentOS.repo https://raw.githubusercontent.co
 curl --insecure -o /etc/yum.repos.d/epel.repo https://raw.githubusercontent.com/ravesec/eku-ccdc/refs/heads/main/config_files/epel.repo
 
 yum clean all
+yum-config-manager --disable epel
 yum update
 
 # Get rid of broken repos

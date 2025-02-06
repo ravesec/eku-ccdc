@@ -10,8 +10,8 @@ mkdir /etc/yum.repos.d/old
 mv /etc/yum.repos.d/CentOS*.repo /etc/yum.repos.d/old/
 mv /etc/yum.repos.d/epel*.repo /etc/yum.repos.d/old/
 
-curl -o /etc/yum.repos.d/CentOS.repo https://raw.githubusercontent.com/ravesec/eku-ccdc/refs/heads/main/config_files/CentOS.repo
-curl -o /etc/yum.repos.d/epel.repo https://raw.githubusercontent.com/ravesec/eku-ccdc/refs/heads/main/config_files/epel.repo
+curl --insecure -o /etc/yum.repos.d/CentOS.repo https://raw.githubusercontent.com/ravesec/eku-ccdc/refs/heads/main/config_files/CentOS.repo
+curl --insecure -o /etc/yum.repos.d/epel.repo https://raw.githubusercontent.com/ravesec/eku-ccdc/refs/heads/main/config_files/epel.repo
 
 yum clean all
 yum update
